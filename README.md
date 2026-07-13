@@ -30,16 +30,23 @@ docs/
   04-protection-matrix.md     Every fault: detection, response, latching, recovery
   05-build-plan.md            Phased build with exit criteria (150 W proto → 8ch rack)
   06-phase1-circuit-design.md Worked component values for the 150 W prototype
-hardware/                     KiCad projects (per phase)        [not started]
+hardware/
+  phase1-module/              KiCad project + CAPTURE-GUIDE.md  [capture pending]
 firmware/
-  module/                     STM32G431 module firmware         [not started]
-  manager/                    ESP32-S3 manager firmware         [not started]
+  common/                     labbench_can.h — shared CAN codec (module + manager)
+  module/core/                Hardware-independent control core (state machine,
+                              envelope clamp, ramp, derate, comms-loss policy)
+  module/                     STM32G431 HAL wrapper              [not started]
+  manager/                    ESP32-S3 manager firmware          [not started]
+  tests/                      Host unit tests — `make test` (gcc, no hardware)
 ```
 
 ## Status
 
-**Phase 0 complete — design documentation, including Phase-1 circuit values**
+**Phase 0 complete** — design docs including Phase-1 circuit values
 ([docs/06-phase1-circuit-design.md](docs/06-phase1-circuit-design.md)).
-Next: KiCad schematic capture of the 150 W prototype module
-(`hardware/phase1-module/`), then the Phase-1 test campaign
-([docs/05-build-plan.md](docs/05-build-plan.md)).
+**Firmware started** — CAN codec and portable module core implemented and
+passing host tests (`cd firmware/tests && make test`).
+Next: KiCad schematic capture of the 150 W prototype
+(guide: [hardware/phase1-module/CAPTURE-GUIDE.md](hardware/phase1-module/CAPTURE-GUIDE.md)),
+then the Phase-1 test campaign ([docs/05-build-plan.md](docs/05-build-plan.md)).

@@ -75,6 +75,11 @@ One diagram to keep all the scale factors straight:
 - **INA228** across the same shunt + V_out sense for telemetry (ADCRANGE = ±40.96 mV).
 - **DAC80502** (dual 16-bit, SPI, internal 2.5 V ref, gain ×1): powers up at
   zero-scale → both references demand 0 V / 0 A at boot. Safe by construction.
+  Runs on the **3V3 rail** (logic thresholds scale with VDD; the STM32 talks
+  3.3 V — at VDD 5 V its V_IH would exceed the MCU's swing). The 2.5 V internal
+  reference keeps enough headroom at 3.3 V. Straps: RSTSEL→AGND (POR to
+  zero-scale), SPI2C strap level for SPI mode **verify against datasheet**;
+  REFIO decoupled with 150 nF.
 
 ## 4. Control core — base divider + FB injection
 
@@ -138,7 +143,8 @@ Starting values **(bench)**:
 | EA_I | 10 kΩ | 22 nF | 15 kΩ | 720 Hz | 480 Hz |
 
 - Small RC (100 Ω + 1 nF) on the INA240 output before EA_I and the MCU ADC.
-- Diodes: BAT54 Schottky (low drop preserves EA swing authority).
+- Diodes: BAT54W Schottky, SC-70/SOT-323 3-pin (pin 1 anode, pin 2 NC,
+  pin 3 cathode — low drop preserves EA swing authority).
 - **Anti-windup (bench):** the inactive amp rails low (harmless — diode blocks),
   but on crossover it must climb back up; RRIO amps recover from a low rail
   quickly. If Phase-1 crossover tests show overshoot, add a Schottky clamp

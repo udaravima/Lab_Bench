@@ -1,0 +1,10 @@
+(kicad_sch (version 20230121) (generator kicad_gen)
+  (uuid e226ed8e-c542-40a5-ba84-a2db62eea8c8)
+  (paper "A4")
+  (lib_symbols
+
+  )
+  (text "io: not yet drawn - see docs/06-phase1-circuit-design.md" (at 38.1 38.1 0) (effects (font (size 1.27 1.27))) (uuid 415d7a58-b3a5-4853-b3d5-2bf7f2e0d8d1))
+
+  (sheet_instances (path "/" (page "1")))
+)

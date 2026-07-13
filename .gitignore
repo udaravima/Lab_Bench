@@ -1,0 +1,19 @@
+# KiCad
+*-backups/
+*.kicad_prl
+*-cache.lib
+fp-info-cache
+*.bak
+*.bck
+
+# Firmware build
+build/
+*.o
+*.elf
+*.bin
+*.hex
+*.map
+
+# Misc
+.DS_Store
+*.swp

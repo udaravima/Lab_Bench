@@ -1,0 +1,45 @@
+# Lab_Bench — Multi-Channel Modular Power Supply
+
+A modular, rack-style DC power supply: up to **8 hot-pluggable 600 W buck modules** on a
+shared DC input bus, coordinated by a central manager over CAN. Each channel is a
+self-contained CV/CC supply with bench-grade precision, usable for lab work, bulk DC
+power, and battery charging.
+
+## Headline specification
+
+| Parameter | Value |
+|---|---|
+| Input bus | 24–30 V DC nominal (12 V tolerated, output ceiling drops with it) |
+| Channels | 1–8, hot-pluggable, slot-addressed |
+| Per-channel output | 0 … (V_in − 2 V), 0–30 A, **600 W envelope** (first limit binds) |
+| Regulation | Analog CV/CC (diode-OR min-selector), firmware never in the loop |
+| Setpoint resolution | ~0.5 mV / ~0.5 mA (16-bit DAC, per-module calibration) |
+| Readback | 20-bit INA228, ±0.05 % class |
+| Comms | CAN 2.0B @ 500 kbit/s, heartbeat-supervised |
+| Scaling | Channels parallel into droop-share groups (firmware feature) |
+| Grounding | All outputs share input ground — parallel OK, **no series stacking** |
+| Global limits | Manager-enforced total power budget + hardwired E-stop line |
+
+## Repository layout
+
+```
+docs/
+  01-system-architecture.md   System topology, backplane, grounding, power budget
+  02-module-design.md         600 W module: power stage, CV/CC loop, sensing, MCU
+  03-can-protocol.md          Bus parameters, ID map, message payloads, fault semantics
+  04-protection-matrix.md     Every fault: detection, response, latching, recovery
+  05-build-plan.md            Phased build with exit criteria (150 W proto → 8ch rack)
+  06-phase1-circuit-design.md Worked component values for the 150 W prototype
+hardware/                     KiCad projects (per phase)        [not started]
+firmware/
+  module/                     STM32G431 module firmware         [not started]
+  manager/                    ESP32-S3 manager firmware         [not started]
+```
+
+## Status
+
+**Phase 0 complete — design documentation, including Phase-1 circuit values**
+([docs/06-phase1-circuit-design.md](docs/06-phase1-circuit-design.md)).
+Next: KiCad schematic capture of the 150 W prototype module
+(`hardware/phase1-module/`), then the Phase-1 test campaign
+([docs/05-build-plan.md](docs/05-build-plan.md)).

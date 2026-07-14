@@ -50,11 +50,11 @@ def build_control_core():
         sh.label(net, part.pin_pos(pin), rot=part.label_rot(pin))
 
     # ---- DAC80502: 16-bit dual reference source (V_REF / I_REF) ----
-    u1 = sh.add(kg.Placed(DAC, "U1", "DAC80502", 50.8, 101.6,
-                          footprint="Package_SO:VSSOP-10_3x3mm_P0.5mm"))
+    u1 = sh.add(kg.Placed(DAC, "U1", "DAC80502DRXT", 50.8, 101.6,
+                          footprint="Package_SON:WSON-10-1EP_2.5x2.5mm_P0.5mm"))
     gl("V_REF", u1, 2, shape="output")                      # VOUTA
     gl("I_REF", u1, 9, shape="output")                      # VOUTB
-    gl("DAC_SPI2C", u1, 5)                                  # mode strap, see note
+    sh.power("AGND", *u1.pin_pos(5), ground=True)           # SPI2C low = SPI mode (ds 8.5.1)
     gl("DAC_NSYNC", u1, 7, shape="input")
     gl("DAC_SDI", u1, 8, shape="input")
     gl("DAC_SCLK", u1, 6, shape="input")
@@ -142,8 +142,8 @@ def build_control_core():
     sh.text("CONTROL CORE - dual error amps + diode-OR minimum selector into LM5145 FB node.\\n"
             "Whichever amp demands the LOWER output wins -> automatic CV/CC crossover.\\n"
             "Accuracy is owned by the 0.1% dividers + DAC + amp offset (see docs/06 s.4).", 33.02, 40.64)
-    sh.text("VERIFY vs datasheet before ordering: DAC80502 SPI2C strap level for SPI mode,\\n"
-            "REFIO cap value. Package: VSSOP-10 (DGS). DAC runs on 3V3 (STM32 logic levels).\\n"
+    sh.text("DAC80502DRXT (WSON-10): SPI2C->AGND = SPI mode; RSTSEL->AGND = zero-code POR\\n"
+            "(both verified vs datasheet). DAC runs on 3V3 = STM32 IO rail (IOVDD<=VDD rule).\\n"
             "EAs: OPA2333 (RRIO; OPA2189 rejected - input CM stops 2.5V below V+).",
             33.02, 190.5)
     return sh
@@ -213,10 +213,9 @@ EXPECTED_NETS = {
     "DAC_NSYNC": {"U1.7"},
     "DAC_SDI":   {"U1.8"},
     "DAC_SCLK":  {"U1.6"},
-    "DAC_SPI2C": {"U1.5"},
     "3V3":       {"U1.1", "C3.1"},
     "5V0":       {"U2.8", "C5.1"},
-    "AGND":      {"U1.4", "U1.3", "C3.2", "C4.2", "C5.2", "U2.4", "R2.2"},
+    "AGND":      {"U1.4", "U1.3", "U1.5", "C3.2", "C4.2", "C5.2", "U2.4", "R2.2"},
 }
 
 if __name__ == "__main__":

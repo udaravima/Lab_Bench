@@ -20,7 +20,11 @@ VETTED = {
     "INA228AIDGSR":      "ina228.pdf (2026-07-14)",
     "TLV7011DBVR":       "tlv7022.pdf family ds (2026-07-14)",
     "LTC7004EMSE#TRPBF": "ltc7004.pdf (2026-07-14)",
+    "LMR36015AQRNXRQ1":  "lmr36015-q1.pdf pin table (2026-07-14)",
 }
+# DAC80502DRXT vendor symbol deliberately NOT merged: the official KiCad
+# Analog_DAC:DAC80502 symbol is pin-identical (verified vs dac70502.pdf) and
+# is what the generator uses; only the footprint is WSON-10 (DRX).
 
 
 def main():

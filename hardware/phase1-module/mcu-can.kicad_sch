@@ -1,10 +1,10 @@
 (kicad_sch (version 20230121) (generator kicad_gen)
-  (uuid f1e21abc-95e4-4247-a112-b9d6a2710ebb)
+  (uuid 5db81a47-8a9f-4bc8-9e02-d9f11f7fda94)
   (paper "A4")
   (lib_symbols
 
   )
-  (text "mcu-can: not yet drawn - see docs/06-phase1-circuit-design.md" (at 38.1 38.1 0) (effects (font (size 1.27 1.27))) (uuid 3d23a6a1-f842-4118-825f-5e055fd4ce08))
+  (text "mcu-can: not yet drawn - see docs/06-phase1-circuit-design.md" (at 38.1 38.1 0) (effects (font (size 1.27 1.27))) (uuid 942bf24a-dc52-4006-a1fe-06a56f303efc))
 
   (sheet_instances (path "/" (page "1")))
 )

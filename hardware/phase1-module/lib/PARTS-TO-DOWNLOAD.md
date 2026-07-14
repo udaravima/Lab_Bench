@@ -1,10 +1,10 @@
 # Parts to download — symbols & datasheets
 
-> **Status 2026-07-14:** all five section-A symbols downloaded, pin maps
-> diffed against datasheets (zero errors), and merged into
-> `lib/labbench.kicad_sym` by `tools/merge_vendor.py`. Section-B datasheets
-> still wanted — most importantly **DAC80502** (SPI2C strap must be verified
-> before ordering).
+> **Status 2026-07-14 (evening):** everything downloaded and verified.
+> Section-A symbols merged; section-B datasheets checked — DAC80502 straps
+> verified (SPI2C low = SPI, RSTSEL low = zero-code), LMR36015AQRNXRQ1 symbol
+> vetted and merged (needed for aux-rails). Two package corrections landed:
+> DAC80502 = WSON-10 only, LMR36015 = VQFN-HR-12. No open verification items.
 
 ## How to fetch (Mouser)
 
@@ -35,10 +35,10 @@ by the family name shown in the datasheet column.
 
 | Exact orderable | Package | Datasheet (family) | Verify from it |
 |---|---|---|---|
-| **DAC80502MDGSR** (TI) | VSSOP-10 (DGS) | "DAC80501/DAC80502" | SPI2C strap level for SPI mode; REFIO cap; power-on zero-scale; VDD 3.3 V logic thresholds |
+| **DAC80502DRXT/R** (TI) | **WSON-10 (DRX)** — dual comes in WSON only; the earlier VSSOP/DGS claim here applied to the single-channel DAC80501 | "DACx0502" | ✅ verified: SPI2C **low = SPI** (§8.5.1); RSTSEL **low = zero-code POR**; keep DAC IOVDD ≤ VDD (both 3V3 here) |
 | **OPA2333AIDGKR** (TI) | VSSOP-8 (DGK) | "OPAx333" | Standard dual-opamp pinout; CM range includes both rails; 5.5 V abs-max supply — **replaces OPA2189**, whose input CM stops 2.5 V below V+ (broken on our 5 V rail at 2.5 V full-scale) |
 | **INA240A3DR** (TI) | SOIC-8 (D) | "INA240" (covers A1–A4 gains) | A3 = gain 100; REF1/REF2 → GND for unidirectional; −4…80 V CM |
-| **LMR36015ADDAR** (TI) | HSOIC-8 (DDA) | "LMR36015" | 4.2–60 V in, 1.5 A sync buck — **replaces TPS54202**, whose 28 V V_IN(max) is inside our 24–30 V bus spec. Confirm exact suffix on the order page (adjustable-output, non-Q1 is fine) |
+| **LMR36015AQRNXRQ1** (TI) | **VQFN-HR-12 (RNX)** — the HSOIC-8/DDA claim here was wrong (that's the LMR33630) | "LMR36015-Q1" | ✅ verified: pin map matches vendor symbol; A**Q**…Q1 = adjustable, 400 kHz, non-FPWM — the right variant for 24 V→5 V aux. Replaces TPS54202 (28 V V_IN max) |
 | **STM32G431CBT6** (ST) | LQFP-48 | STM32G431x6/x8/xB datasheet | C=48 pins, B=128 KB flash, T=LQFP, 6=−40…85 °C; has FDCAN ✓. Also grab **RM0440** (STM32G4 reference manual) and the STM32G431 errata sheet |
 | **BAT54W** (any: Nexperia BAT54W,115 / onsemi BAT54WT1G / Diodes BAT54W-7-F) | SC-70 / SOT-323 | vendor BAT54W | 30 V, 200 mA Schottky; pin 1 = A, pin 2 = NC, pin 3 = K (already verified against the KiCad symbol) |
 

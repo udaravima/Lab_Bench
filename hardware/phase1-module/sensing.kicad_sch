@@ -1,10 +1,10 @@
 (kicad_sch (version 20230121) (generator kicad_gen)
-  (uuid 67d5ca37-f64f-4f5e-9bf5-56249a77cd19)
+  (uuid 42b17341-4a1d-4697-9c23-4d4a20a45383)
   (paper "A4")
   (lib_symbols
 
   )
-  (text "sensing: not yet drawn - see docs/06-phase1-circuit-design.md" (at 38.1 38.1 0) (effects (font (size 1.27 1.27))) (uuid 221a938f-8fff-4e1b-8128-9b060f712a1d))
+  (text "sensing: not yet drawn - see docs/06-phase1-circuit-design.md" (at 38.1 38.1 0) (effects (font (size 1.27 1.27))) (uuid 4dc541f3-c209-4ae5-a3d8-6fbd7fdac1d2))
 
   (sheet_instances (path "/" (page "1")))
 )

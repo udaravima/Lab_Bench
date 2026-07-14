@@ -53,7 +53,7 @@
     (property "Sheetfile" "io.kicad_sch" (at 139.7 84.41999999999999 0) (effects (font (size 1.27 1.27)) (justify left top)))
     (instances (project "phase1-module" (path "/e63e39d7-6ac0-4ffa-9e5c-2b84c50a0001" (page "8"))))
   )
-  (text "Lab_Bench phase-1 module - 150W CV/CC prototype. Generated schematic;\nsee hardware/phase1-module/CAPTURE-GUIDE.md and docs/06." (at 38.1 139.7 0) (effects (font (size 1.27 1.27))) (uuid a073aefa-410c-4f68-ba9d-ac2ab6cbe784))
+  (text "Lab_Bench phase-1 module - 150W CV/CC prototype. Generated schematic;\nsee hardware/phase1-module/CAPTURE-GUIDE.md and docs/06." (at 38.1 139.7 0) (effects (font (size 1.27 1.27))) (uuid 95b1683c-65b3-4e1b-afe5-4bd532aab76c))
 
   (sheet_instances (path "/" (page "1")))
 )

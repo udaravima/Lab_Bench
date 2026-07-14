@@ -1,10 +1,10 @@
 (kicad_sch (version 20230121) (generator kicad_gen)
-  (uuid 771150e4-1144-49ed-becb-a42615feea9e)
+  (uuid 810abe8b-4e29-47e6-b6d3-f3fd5c4fcc32)
   (paper "A4")
   (lib_symbols
 
   )
-  (text "aux-rails: not yet drawn - see docs/06-phase1-circuit-design.md" (at 38.1 38.1 0) (effects (font (size 1.27 1.27))) (uuid 27345a89-3e1e-4841-9d19-464bb55d796f))
+  (text "aux-rails: not yet drawn - see docs/06-phase1-circuit-design.md" (at 38.1 38.1 0) (effects (font (size 1.27 1.27))) (uuid 1bceac3f-b256-47d6-aff0-179ffde17f42))
 
   (sheet_instances (path "/" (page "1")))
 )

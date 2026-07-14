@@ -1,5 +1,11 @@
 # Parts to download — symbols & datasheets
 
+> **Status 2026-07-14:** all five section-A symbols downloaded, pin maps
+> diffed against datasheets (zero errors), and merged into
+> `lib/labbench.kicad_sym` by `tools/merge_vendor.py`. Section-B datasheets
+> still wanted — most importantly **DAC80502** (SPI2C strap must be verified
+> before ordering).
+
 ## How to fetch (Mouser)
 
 On each Mouser part page: **ECAD Model → Download → format "KiCad"** (served via
@@ -20,7 +26,7 @@ stay local and off GitHub).
 | 2 | **TCAN1042HGVDR** (TI) | SOIC-8 | CAN transceiver, 5 V bus drive + 3.3 V VIO | "H G V" suffixes matter (VIO variant). DRB (VSON-8) also fine if stock is better |
 | 3 | **INA228AIDGSR** (TI) | VSSOP-10 | Precision V/I telemetry | Datasheet also for ADCRANGE + SHUNT_CAL math (firmware) |
 | 4 | **TLV7011DBVR** (TI) | SOT-23-5 | Hardware OVP comparator | Tiny, easy — symbol optional (5 pins), datasheet is the point |
-| 5 | **LTC7004EMSE#TRPBF** (ADI) | MSOP-8E | Output-disconnect high-side gate driver | Confirm exposed-pad variant while downloading |
+| 5 | **LTC7004EMSE#TRPBF** (ADI) | MSOP-10 (MSE, exposed pad = pin 11, GND) | Output-disconnect high-side gate driver | Earlier revision of this file said MSOP-8 — wrong; datasheet confirms 10-lead |
 
 ## B. Datasheets only (symbol already in KiCad's official library)
 

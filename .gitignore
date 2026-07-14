@@ -21,3 +21,8 @@ build/
 # KiCad lock/autosave
 *.lck
 _autosave-*
+
+# Vendor ECAD drops stay local (redistribution unclear); curated lib/labbench.kicad_sym is tracked
+hardware/phase1-module/lib/vendor/
+__pycache__/
+*.pyc

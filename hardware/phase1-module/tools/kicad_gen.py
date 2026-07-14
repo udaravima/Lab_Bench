@@ -10,6 +10,8 @@ import re
 import uuid as uuidlib
 
 SYMDIR = "/usr/share/kicad/symbols"
+LOCAL_LIBDIR = __import__("os").path.join(
+    __import__("os").path.dirname(__import__("os").path.abspath(__file__)), "..", "lib")
 FONT = "(effects (font (size 1.27 1.27)))"
 
 
@@ -47,14 +49,21 @@ class Symbol:
 
     def __init__(self, lib, name, block=None):
         self.lib, self.name = lib, name
+        libtext = ""
         if block is None:
-            text = open(f"{SYMDIR}/{lib}.kicad_sym").read()
-            block = _find_block(text, f'(symbol "{name}"')
+            import os
+            for d in (LOCAL_LIBDIR, SYMDIR):
+                path = os.path.join(d, f"{lib}.kicad_sym")
+                if os.path.exists(path):
+                    libtext = open(path).read()
+                    block = _find_block(libtext, f'(symbol "{name}"')
+                    if block:
+                        break
         if block is None:
             raise KeyError(f"{lib}:{name} not found")
         m = re.search(r'\(extends "([^"]+)"\)', block)
         if m:
-            parent = _find_block(text, f'(symbol "{m.group(1)}"')
+            parent = _find_block(libtext, f'(symbol "{m.group(1)}"')
             props = dict(re.findall(r'\(property "([^"]+)" "([^"]*)"', block))
             flat = parent.replace(f'"{m.group(1)}', f'"{name}')
             for key, val in props.items():
@@ -63,15 +72,19 @@ class Symbol:
             block = flat
         self.block = block
         self.pins = {}   # (unit, pin_number) -> (x, y, name)
+        pin_re = (r'\(pin \w+ \w+\s*\(at ([-\d.]+) ([-\d.]+) [\d.]+\)'
+                  r'.*?\(name "([^"]*)".*?\(number "([^"]*)"')
         for um in re.finditer(r'\(symbol "%s_(\d+)_\d+"' % re.escape(name), block):
             unit = int(um.group(1))
             ub = _find_block(block[um.start():], um.group(0))
-            for pm in re.finditer(
-                    r'\(pin \w+ \w+\s*\(at ([-\d.]+) ([-\d.]+) [\d.]+\)'
-                    r'.*?\(name "([^"]*)".*?\(number "([^"]*)"', ub, re.S):
+            for pm in re.finditer(pin_re, ub, re.S):
                 x, y, pname, pnum = pm.groups()
                 key = (unit if unit else 1, pnum)
                 self.pins[key] = (float(x), float(y), pname)
+        if not self.pins:  # SnapMagic/UL style: pins directly in the main block
+            for pm in re.finditer(pin_re, block, re.S):
+                x, y, pname, pnum = pm.groups()
+                self.pins[(1, pnum)] = (float(x), float(y), pname)
 
     def pin_names(self, unit=1):
         return {num: n for (u, num), (_, _, n) in self.pins.items() if u in (0, unit)}

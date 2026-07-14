@@ -8,7 +8,7 @@
  fuse (35A) ── LM5069 hot-swap/inrush ──┬────────────────────────────────┐
                                         │                                │
                                  ┌──────┴──────────┐              aux buck 5V
-                                 │ LM5143 2-phase  │              (TPS54202)
+                                 │ LM5143 2-phase  │              (LMR36015)
                                  │ current-mode    │                 │ 3.3V LDO
                                  │ sync buck ctrl  │                 │
                                  └──┬──────────┬───┘            STM32G431
@@ -48,9 +48,9 @@ inner-loop (current-mode) stability itself. Precision CV/CC comes from two
 **diode-OR (minimum selector)** — whichever loop demands the *lower* output wins:
 
 ```
-V_ref (DAC A) ──┬─► EA_V (OPA2189) ──►|── ┐
+V_ref (DAC A) ──┬─► EA_V (OPA2333) ──►|── ┐
  output divider ┘                          ├──► FB summing node of LM5143
-I_ref (DAC B) ──┬─► EA_I (OPA2189) ──►|── ┘
+I_ref (DAC B) ──┬─► EA_I (OPA2333) ──►|── ┘
  INA240 (shunt) ┘
 ```
 

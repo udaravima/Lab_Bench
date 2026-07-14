@@ -30,14 +30,25 @@ stay local and off GitHub).
 
 ## B. Datasheets only (symbol already in KiCad's official library)
 
-| Part | Verify against datasheet |
-|---|---|
-| **DAC80502** | SPI2C strap level for SPI mode; REFIO cap value; power-on zero-scale |
-| **OPA2189** | Standard dual-opamp pinout in DGK (VSSOP-8) matches library symbol |
-| **INA240A3** | PW (TSSOP-8) pinout, REF1/REF2 strapping for unidirectional |
-| **TPS54202** | SOT-23-6 pin order, FB voltage, EN threshold |
-| **STM32G431CB** | (also grab RM0440 reference manual — firmware work) |
-| **BAT54W** | Any vendor's SC-70 single Schottky — pin 1 A / pin 3 K |
+Exact orderable variants — suffixes matter. Datasheets are per-family; search
+by the family name shown in the datasheet column.
+
+| Exact orderable | Package | Datasheet (family) | Verify from it |
+|---|---|---|---|
+| **DAC80502MDGSR** (TI) | VSSOP-10 (DGS) | "DAC80501/DAC80502" | SPI2C strap level for SPI mode; REFIO cap; power-on zero-scale; VDD 3.3 V logic thresholds |
+| **OPA2333AIDGKR** (TI) | VSSOP-8 (DGK) | "OPAx333" | Standard dual-opamp pinout; CM range includes both rails; 5.5 V abs-max supply — **replaces OPA2189**, whose input CM stops 2.5 V below V+ (broken on our 5 V rail at 2.5 V full-scale) |
+| **INA240A3DR** (TI) | SOIC-8 (D) | "INA240" (covers A1–A4 gains) | A3 = gain 100; REF1/REF2 → GND for unidirectional; −4…80 V CM |
+| **LMR36015ADDAR** (TI) | HSOIC-8 (DDA) | "LMR36015" | 4.2–60 V in, 1.5 A sync buck — **replaces TPS54202**, whose 28 V V_IN(max) is inside our 24–30 V bus spec. Confirm exact suffix on the order page (adjustable-output, non-Q1 is fine) |
+| **STM32G431CBT6** (ST) | LQFP-48 | STM32G431x6/x8/xB datasheet | C=48 pins, B=128 KB flash, T=LQFP, 6=−40…85 °C; has FDCAN ✓. Also grab **RM0440** (STM32G4 reference manual) and the STM32G431 errata sheet |
+| **BAT54W** (any: Nexperia BAT54W,115 / onsemi BAT54WT1G / Diodes BAT54W-7-F) | SC-70 / SOT-323 | vendor BAT54W | 30 V, 200 mA Schottky; pin 1 = A, pin 2 = NC, pin 3 = K (already verified against the KiCad symbol) |
+
+Substitution warnings: **BAT54** (no W) is SOT-23 with a different footprint;
+**BAT54A/C/S** are duals in various topologies — only plain **-W** fits our
+footprint and single-diode role. **STM32G431CBU6** (UFQFPN-48) is an acceptable
+substitute for the T6 if stock demands, footprint changes. For the DAC, any
+**DAC80502…DGS** variant works (the letter between 80502 and DGS is a grade
+code); WSON-package variants do NOT match our footprint — stick to VSSOP-10
+(DGS).
 
 ## C. Phase 2 — defer (don't download yet)
 

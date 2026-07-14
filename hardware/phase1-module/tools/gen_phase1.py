@@ -51,7 +51,7 @@ def build_control_core():
 
     # ---- DAC80502: 16-bit dual reference source (V_REF / I_REF) ----
     u1 = sh.add(kg.Placed(DAC, "U1", "DAC80502", 50.8, 101.6,
-                          footprint="Package_SON:WSON-10-1EP_2.5x2.5mm_P0.5mm"))
+                          footprint="Package_SO:VSSOP-10_3x3mm_P0.5mm"))
     gl("V_REF", u1, 2, shape="output")                      # VOUTA
     gl("I_REF", u1, 9, shape="output")                      # VOUTB
     gl("DAC_SPI2C", u1, 5)                                  # mode strap, see note
@@ -70,7 +70,7 @@ def build_control_core():
     sh.power("AGND", *c_dac.pin_pos(2), ground=True)
 
     # ---- CV error amplifier (U2A): Type-II integrator + diode-OR row ----
-    u2a = sh.add(kg.Placed(OPA, "U2", "OPA2189", 137.16, 76.2, unit=1,
+    u2a = sh.add(kg.Placed(OPA, "U2", "OPA2333", 137.16, 76.2, unit=1,
                            footprint="Package_SO:VSSOP-8_3x3mm_P0.65mm"))
     gl("V_MEAS", u2a, 3, shape="input")                     # +in
     r_av = res("R3", "10K 0.1%", 96.52, u2a.pin_pos(2)[1], rot=90)
@@ -94,7 +94,7 @@ def build_control_core():
     gl("FB", r_iv, 2, shape="output")
 
     # ---- CC error amplifier (U2B): mirror of the CV loop ----
-    u2b = sh.add(kg.Placed(OPA, "U2", "OPA2189", 137.16, 127.0, unit=2,
+    u2b = sh.add(kg.Placed(OPA, "U2", "OPA2333", 137.16, 127.0, unit=2,
                            footprint="Package_SO:VSSOP-8_3x3mm_P0.65mm"))
     gl("I_MEAS", u2b, 5, shape="input")                     # +in
     r_ai = res("R6", "10K 0.1%", 96.52, u2b.pin_pos(6)[1], rot=90)
@@ -118,7 +118,7 @@ def build_control_core():
     gl("FB", r_ii, 2, shape="output")
 
     # ---- op-amp power unit (U2C) + decoupling ----
-    u2c = sh.add(kg.Placed(OPA, "U2", "OPA2189", 50.8, 154.94, unit=3,
+    u2c = sh.add(kg.Placed(OPA, "U2", "OPA2333", 50.8, 154.94, unit=3,
                            footprint="Package_SO:VSSOP-8_3x3mm_P0.65mm"))
     sh.power("5V0", *u2c.pin_pos(8))
     sh.power("AGND", *u2c.pin_pos(4), ground=True)
@@ -143,7 +143,8 @@ def build_control_core():
             "Whichever amp demands the LOWER output wins -> automatic CV/CC crossover.\\n"
             "Accuracy is owned by the 0.1% dividers + DAC + amp offset (see docs/06 s.4).", 33.02, 40.64)
     sh.text("VERIFY vs datasheet before ordering: DAC80502 SPI2C strap level for SPI mode,\\n"
-            "REFIO cap value, WSON vs VSSOP package choice. DAC runs on 3V3 (STM32 logic levels).",
+            "REFIO cap value. Package: VSSOP-10 (DGS). DAC runs on 3V3 (STM32 logic levels).\\n"
+            "EAs: OPA2333 (RRIO; OPA2189 rejected - input CM stops 2.5V below V+).",
             33.02, 190.5)
     return sh
 

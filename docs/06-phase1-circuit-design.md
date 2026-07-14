@@ -124,7 +124,12 @@ and it rails low. CV↔CC crossover is automatic and analog.
 
 ## 5. Error amplifiers
 
-**Op-amp:** OPA2189 (zero-drift, RRIO, 14 MHz) on the 5 V rail — one dual package.
+**Op-amp:** OPA2333 (zero-drift, true rail-to-rail I/O, 350 kHz GBW, 10 µV max
+offset, 5.5 V max supply) on the 5 V rail — one dual package.
+*Why not OPA2189 (the original pick):* the OPAx189 input common-mode range
+stops ~2.5 V below V+ — on a 5 V rail that collides exactly with our 2.5 V
+full-scale V_MEAS/V_REF signals (and violates outright when the rail sags).
+350 kHz GBW still leaves >40 dB of loop gain at the 1–3 kHz outer crossover.
 
 **Topology (both loops):** integrator with a zero, polarity chosen so the output
 *rises* when the measured value exceeds its reference:
@@ -176,8 +181,10 @@ Two nested loops, deliberately decoupled by frequency:
 
 ## 7. Aux rails, disconnect, housekeeping
 
-- **Aux:** V_bus → TPS54202 buck → 5 V @ 0.5 A (op-amps, DAC, INA240, CAN VCC,
-  gate-driver charge pump) → 3.3 V LDO (MCU, INA228, TCAN1042 VIO).
+- **Aux:** V_bus → LMR36015 buck (4.2–60 V in, 1.5 A) → 5 V @ ≤0.5 A (op-amps,
+  INA240, CAN VCC, gate-driver charge pump) → 3.3 V LDO (MCU, DAC80502, INA228,
+  TCAN1042 VIO). *Why not TPS54202 (original pick):* its 28 V input maximum
+  sits inside our 24–30 V bus spec; the 60 V part adds real margin.
 - **Output disconnect:** back-to-back 60 V NFETs, common source, after the shunt.
   Gate drive options (decide at schematic): LTC7004 high-side driver (fast,
   µs-class fault opening) vs. VOM1271 photovoltaic driver (trivially simple,
@@ -206,14 +213,14 @@ divider top and with R_top — either can host the FRA injection transformer.
 | Buck controller | LM5145RGYR | 1 (+1 spare) |
 | FET pair | CSD18563Q5A (or equiv 60 V ≤10 mΩ) | 2 (+2) |
 | Inductor | 10 µH ≥12 A flat-wire | 1 (+1) |
-| Op-amp | OPA2189 | 1 (+1) |
+| Op-amp | OPA2333AIDGKR | 1 (+1) |
 | DAC | DAC80502 (SPI) | 1 |
 | Sense amp | INA240A3 | 1 (+1) |
 | Telemetry | INA228 | 1 |
 | Shunt | 2 mΩ 1 W 2512 Kelvin | 2 |
 | MCU | STM32G431CBT6 | 1 (+1) |
 | CAN xcvr | TCAN1042HGV | 1 |
-| Aux buck | TPS54202 | 1 |
+| Aux buck | LMR36015 | 1 |
 | Disconnect | 60 V NFETs + LTC7004 | 2 + 1 |
 | OVP comp | TLV7011 | 1 |
 | Polymer out caps | 220 µF 25 V | 2 (+2) |

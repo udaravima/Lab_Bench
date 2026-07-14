@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "labbench")(type "KiCad")(uri "${KIPRJMOD}/lib/labbench.kicad_sym")(options "")(descr "Lab_Bench project symbols"))
+)

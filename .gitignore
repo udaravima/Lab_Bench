@@ -17,3 +17,7 @@ build/
 # Misc
 .DS_Store
 *.swp
+
+# KiCad lock/autosave
+*.lck
+_autosave-*

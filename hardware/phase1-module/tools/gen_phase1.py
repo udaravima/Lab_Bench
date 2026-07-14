@@ -65,7 +65,7 @@ def build_control_core():
     c_ref = cap("C4", "150n", 81.28, 111.76)
     ll("DAC_REFIO", c_ref, 1)
     sh.power("AGND", *c_ref.pin_pos(2), ground=True)
-    c_dac = cap("C3", "100n", 27.94, 111.76)
+    c_dac = cap("C3", "100n", 40.64, 127.0)
     sh.power("3V3", *c_dac.pin_pos(1))
     sh.power("AGND", *c_dac.pin_pos(2), ground=True)
 
@@ -73,48 +73,48 @@ def build_control_core():
     u2a = sh.add(kg.Placed(OPA, "U2", "OPA2189", 137.16, 76.2, unit=1,
                            footprint="Package_SO:VSSOP-8_3x3mm_P0.65mm"))
     gl("V_MEAS", u2a, 3, shape="input")                     # +in
-    ll("EAV_INV", u2a, 2)                                   # -in
     r_av = res("R3", "10K 0.1%", 96.52, u2a.pin_pos(2)[1], rot=90)
     gl("V_REF", r_av, 1, shape="input")
-    ll("EAV_INV", r_av, 2)
-    c_fv = cap("C1", "10n", 96.52, 58.42, rot=90)           # Type-II: integrator
-    r_zv = res("R4", "33K", 121.92, 58.42, rot=90)          # Type-II: zero
+    sh.wire(r_av.pin_pos(2), u2a.pin_pos(2))                # -in run
+    sh.label("EAV_INV", (105.41, u2a.pin_pos(2)[1]), rot=90)
+    c_fv = cap("C1", "10n", 106.68, 58.42, rot=90)          # Type-II: integrator
+    r_zv = res("R4", "33K", 132.08, 58.42, rot=90)          # Type-II: zero
     ll("EAV_INV", c_fv, 1)
-    ll("EAV_FB", c_fv, 2)
-    ll("EAV_FB", r_zv, 1)
+    sh.wire(c_fv.pin_pos(2), r_zv.pin_pos(1))
+    sh.label("EAV_FB", (119.38, 58.42), rot=90)
     ll("EA_V_OUT", r_zv, 2)
     d_v = sh.add(kg.Placed(DSCH, "D1", "BAT54W", 160.02, 76.2, rot=180,
                            footprint="Package_TO_SOT_SMD:SOT-323_SC-70"))
-    ll("EA_V_OUT", u2a, 1)
-    ll("EA_V_OUT", d_v, 1)                                  # pin 1 = anode (faces EA out)
-    ll("EAV_INJ", d_v, 3)                                   # pin 3 = cathode -> R_inj -> FB
+    sh.wire(u2a.pin_pos(1), d_v.pin_pos(1))                 # out -> anode
+    sh.label("EA_V_OUT", (147.32, 76.2), rot=90)
     sh.no_connect(d_v.pin_pos(2))                           # pin 2 = NC on SC-70
     r_iv = res("R5", "3.9K", 182.88, 76.2, rot=90)
-    ll("EAV_INJ", r_iv, 1)
+    sh.wire(d_v.pin_pos(3), r_iv.pin_pos(1))                # cathode -> R_inj
+    sh.label("EAV_INJ", (168.91, 76.2), rot=90)
     gl("FB", r_iv, 2, shape="output")
 
     # ---- CC error amplifier (U2B): mirror of the CV loop ----
     u2b = sh.add(kg.Placed(OPA, "U2", "OPA2189", 137.16, 127.0, unit=2,
                            footprint="Package_SO:VSSOP-8_3x3mm_P0.65mm"))
     gl("I_MEAS", u2b, 5, shape="input")                     # +in
-    ll("EAI_INV", u2b, 6)                                   # -in
     r_ai = res("R6", "10K 0.1%", 96.52, u2b.pin_pos(6)[1], rot=90)
     gl("I_REF", r_ai, 1, shape="input")
-    ll("EAI_INV", r_ai, 2)
-    c_fi = cap("C2", "22n", 96.52, 109.22, rot=90)
-    r_zi = res("R7", "15K", 121.92, 109.22, rot=90)
+    sh.wire(r_ai.pin_pos(2), u2b.pin_pos(6))                # -in run
+    sh.label("EAI_INV", (105.41, u2b.pin_pos(6)[1]), rot=90)
+    c_fi = cap("C2", "22n", 106.68, 109.22, rot=90)
+    r_zi = res("R7", "15K", 132.08, 109.22, rot=90)
     ll("EAI_INV", c_fi, 1)
-    ll("EAI_FB", c_fi, 2)
-    ll("EAI_FB", r_zi, 1)
+    sh.wire(c_fi.pin_pos(2), r_zi.pin_pos(1))
+    sh.label("EAI_FB", (119.38, 109.22), rot=90)
     ll("EA_I_OUT", r_zi, 2)
     d_i = sh.add(kg.Placed(DSCH, "D2", "BAT54W", 160.02, 127.0, rot=180,
                            footprint="Package_TO_SOT_SMD:SOT-323_SC-70"))
-    ll("EA_I_OUT", u2b, 7)
-    ll("EA_I_OUT", d_i, 1)                                  # anode
-    ll("EAI_INJ", d_i, 3)                                   # cathode
+    sh.wire(u2b.pin_pos(7), d_i.pin_pos(1))                 # out -> anode
+    sh.label("EA_I_OUT", (147.32, 127.0), rot=90)
     sh.no_connect(d_i.pin_pos(2))
     r_ii = res("R8", "3.9K", 182.88, 127.0, rot=90)
-    ll("EAI_INJ", r_ii, 1)
+    sh.wire(d_i.pin_pos(3), r_ii.pin_pos(1))                # cathode -> R_inj
+    sh.label("EAI_INJ", (168.91, 127.0), rot=90)
     gl("FB", r_ii, 2, shape="output")
 
     # ---- op-amp power unit (U2C) + decoupling ----
@@ -136,7 +136,7 @@ def build_control_core():
 
     # ---- power flags (temporary home until aux-rails is drawn) ----
     for i, net in enumerate(("3V3", "5V0", "AGND")):
-        f = sh.pwr_flag(33.02 + 12.7 * i, 177.8)
+        f = sh.pwr_flag(33.02 + 25.4 * i, 172.72)
         sh.power(net, *f.pin_pos(1), ground=(net == "AGND"))
 
     sh.text("CONTROL CORE - dual error amps + diode-OR minimum selector into LM5145 FB node.\\n"

@@ -1,10 +1,10 @@
 (kicad_sch (version 20230121) (generator kicad_gen)
-  (uuid 96a457a0-faad-4653-89b0-30d0a91a2e8e)
+  (uuid 0818627a-7198-40bd-976f-86c22d22079a)
   (paper "A4")
   (lib_symbols
 
   )
-  (text "power-stage: not yet drawn - see docs/06-phase1-circuit-design.md" (at 38.1 38.1 0) (effects (font (size 1.27 1.27))) (uuid d2e1f38b-1c2f-46bc-b9de-a483e9e75fcd))
+  (text "power-stage: not yet drawn - see docs/06-phase1-circuit-design.md" (at 38.1 38.1 0) (effects (font (size 1.27 1.27))) (uuid 03920049-8e59-4725-91e7-ab07c791ca2a))
 
   (sheet_instances (path "/" (page "1")))
 )

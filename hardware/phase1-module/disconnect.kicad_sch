@@ -1,10 +1,10 @@
 (kicad_sch (version 20230121) (generator kicad_gen)
-  (uuid 440d6217-233b-46fa-b7ea-773eb40e8f26)
+  (uuid 1eaced9f-0889-44b4-ac8e-332ba43c8b1e)
   (paper "A4")
   (lib_symbols
 
   )
-  (text "disconnect: not yet drawn - see docs/06-phase1-circuit-design.md" (at 38.1 38.1 0) (effects (font (size 1.27 1.27))) (uuid 47d41054-0be8-40f4-9aca-14ad54ed8089))
+  (text "disconnect: not yet drawn - see docs/06-phase1-circuit-design.md" (at 38.1 38.1 0) (effects (font (size 1.27 1.27))) (uuid 21a6a46c-59e7-41ef-89b0-d0edff833086))
 
   (sheet_instances (path "/" (page "1")))
 )

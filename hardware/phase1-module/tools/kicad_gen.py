@@ -120,16 +120,35 @@ class Placed:
             return 0 if dx > 0 else 180
         return 270 if dy > 0 else 90
 
+    def _field_spots(self):
+        """Reference/Value positions outside the unit's pin bounding box:
+        wide symbols get fields above/below (centered); tall ones get them at
+        the top-right (left-justified); power ports get a compact side note."""
+        pts = [self.pin_pos(num) for (u, num) in self.sym.pins if u in (0, self.unit)]
+        xs, ys = [p[0] for p in pts], [p[1] for p in pts]
+        x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
+        if self.ref.startswith("#"):
+            return (self.x + 1.27, self.y - 1.27, "left"), (self.x + 1.27, self.y + 1.27, "left")
+        if (x1 - x0) >= (y1 - y0):
+            return (self.x, y0 - 3.81, ""), (self.x, y1 + 3.81, "")
+        return (x1 + 2.54, y0 - 1.27, "left"), (x1 + 2.54, y0 + 1.27, "left")
+
     def emit(self, project, path):
         pins = "\n".join(
             f'    (pin "{num}" (uuid {_uuid()}))'
             for (u, num) in sorted(self.sym.pins, key=lambda k: k[1])
             if u in (0, self.unit) or self._unit_count() == 1)
+        (rx, ry, rj), (vx, vy, vj) = self._field_spots()
+        rjust = f" (justify {rj})" if rj else ""
+        vjust = f" (justify {vj})" if vj else ""
+        rhide = " hide" if self.ref.startswith("#") else ""
+        if self.ref.startswith("#FLG"):
+            vjust += " hide"
         return f"""  (symbol (lib_id "{self.sym.lib}:{self.sym.name}") (at {self.x} {self.y} {self.rot}) (unit {self.unit})
     (in_bom yes) (on_board yes) (dnp no)
     (uuid {self.uuid})
-    (property "Reference" "{self.ref}" (at {self.x + 2.54} {self.y - 2.54} 0) {FONT})
-    (property "Value" "{self.value}" (at {self.x + 2.54} {self.y} 0) {FONT})
+    (property "Reference" "{self.ref}" (at {rx} {ry} 0) (effects (font (size 1.27 1.27)){rjust}{rhide}))
+    (property "Value" "{self.value}" (at {vx} {vy} 0) (effects (font (size 1.27 1.27)){vjust}))
     (property "Footprint" "{self.footprint}" (at {self.x} {self.y} 0) (effects (font (size 1.27 1.27)) hide))
     (property "Datasheet" "~" (at {self.x} {self.y} 0) (effects (font (size 1.27 1.27)) hide))
 {pins}
@@ -179,6 +198,11 @@ class Sheet:
 
     def no_connect(self, pos):
         self.items.append(f'  (no_connect (at {pos[0]} {pos[1]}) (uuid {_uuid()}))')
+
+    def wire(self, p1, p2):
+        self.items.append(
+            f'  (wire (pts (xy {p1[0]} {p1[1]}) (xy {p2[0]} {p2[1]})) '
+            f'(stroke (width 0) (type default)) (uuid {_uuid()}))')
 
     def text(self, s, x, y):
         esc = s.replace('"', "'")

@@ -70,10 +70,10 @@ PLACEMENT = {
     "RT1": (44.0, 33.0, 0),       # FET NTC below Q2, on AGND side of seam
     "RT2": (61.0, 28.7, 0),       # inductor NTC below L1
     # SW island taps (pad into pour at y<=26.5, other pad below)
-    "C27": (54.5, 27.2, 90),      # BST: pad1 dn (28.25)=PS_BST, pad2 up=SW
-    "R28": (56.5, 27.2, 90),      # ILIM: pad1 dn=PS_ILIM, pad2 up=SW
+    "C27": (55.3, 27.2, 90),      # BST: pad1 dn (28.25)=PS_BST, pad2 up=SW
+    "R28": (57.6, 27.2, 90),      # ILIM: pad1 dn=PS_ILIM, pad2 up=SW
     "R17": (52.0, 27.2, 270),     # snub: pad1 up=SW, pad2 dn=SNUB
-    "C17": (52.3, 30.4, 270),     # pad1 up=SNUB, pad2 dn=PGND (in bar)
+    "C17": (50.9, 30.4, 270),     # pad1 up=SNUB, pad2 dn=PGND (in bar)
     # ---- output bank straddle
     "C22": (86.2, 6.9, 90),      # top-strip straddle like C78     # 220u poly
     "C78": (75.5, 6.9, 90),     # pad1 dn in VOUT_INT, pad2 up in PGND_TOP strip
@@ -87,10 +87,10 @@ PLACEMENT = {
     "U4":  (94.5, 24.0, 90),      # INA240: pin8 (92.59,21.53) faces shunt
     "R31": (98.5, 29.0, 0),       # INA240_OUT -> I_MEAS
     "C31": (102.2, 29.0, 0),      # I_MEAS filter (AGND pocket)
-    "C33": (98.0, 19.5, 0),       # U4 5V0
+    "C33": (99.6, 19.5, 0),       # U4 5V0
     "U5":  (94.5, 36.0, 90),      # INA228
     "C34": (90.5, 36.0, 270),     # U5 3V3
-    "NT1": (94.5, 31.2, 0),       # star tie on the seam
+    "NT1": (97.5, 31.2, 0),       # star tie on the seam
     # ---- disconnect pair + LTC7004 + VOUT
     "Q3":  (102.9, 10.0, 0),      # tab VOUT_SW; sources 105.98 DISC_SRC
     "Q4":  (111.7, 10.0, 180),    # tab VOUT 109.55..115.16; sources 108.62
@@ -113,20 +113,20 @@ PLACEMENT = {
     # ---- controller + comp/FB + EN cluster
     "U3":  (47.0, 36.0, 0),       # LM5145: right col = LO/VCC/EP/BST/HO/SW
     "R29": (46.2, 16.6, 270),     # VBUS_F (pad1 in band) -> PS_VIN corridor
-    "C28": (50.5, 32.4, 90),      # PS_VIN 100n; pad2 up into PGND bar
+    "C28": (52.9, 32.4, 90),      # PS_VIN 100n; pad2 up into PGND bar
     "C29": (52.0, 41.5, 0),       # PS_VCC 2.2u; pad2 PGND
-    "C19": (50.6, 39.5, 0),       # ILIM 15p; pad2 PGND
-    "R1":  (40.5, 34.0, 0),       # FB divider + injection at the FB pin
-    "R5":  (40.5, 36.0, 0),
-    "R8":  (40.5, 38.0, 0),
-    "R2":  (40.5, 40.0, 0),
-    "R24": (40.5, 42.0, 0),
-    "C24": (40.5, 44.0, 0),
-    "C25": (43.8, 36.0, 0),
-    "C26": (43.8, 38.0, 0),
-    "R25": (43.8, 40.0, 0),
-    "C18": (43.8, 42.0, 0),       # SS
-    "R26": (43.8, 44.0, 0),       # RT
+    "C19": (48.2, 41.0, 0),      # ILIM 15p; pad1 taps the ILIM track
+    "R1":  (40.2, 34.0, 0),       # FB divider + injection at the FB pin
+    "R5":  (40.2, 36.0, 0),
+    "R8":  (40.2, 38.0, 0),
+    "R2":  (40.2, 40.0, 0),
+    "R24": (40.2, 42.0, 0),
+    "C24": (40.2, 44.0, 0),
+    "C25": (43.4, 36.0, 0),
+    "C26": (43.4, 38.0, 0),
+    "R25": (43.4, 40.0, 0),
+    "C18": (43.4, 42.0, 0),       # SS
+    "R26": (43.4, 44.0, 0),       # RT
     "R20": (31.0, 34.0, 0),       # EN chain
     "R21": (34.5, 34.0, 0),
     "Q5":  (31.5, 38.0, 0),
@@ -220,9 +220,9 @@ PWR_POURS = {  # name -> F.Cu polygon (also used by pour-connection checks)
     "VBUS_F":   [(12.0, 5.0), (49.6, 5.0), (49.6, 16.0), (12.0, 16.0)],
     "PGND_IN":  [(10.0, 17.3), (44.9, 17.3), (44.9, 30.0), (10.0, 30.0)],
     "PGND_TOP": [(66.0, 0.8), (91.0, 0.8), (91.0, 3.9), (66.0, 3.9)],
-    "PGND_BAR": [(38.0, 30.0), (53.0, 30.0), (53.0, 31.7), (38.0, 31.7)],
-    "SW":       [(50.5, 8.6), (56.9, 8.6), (56.9, 26.5), (47.0, 26.5),
-                 (47.0, 19.0), (50.5, 19.0)],   # trimmed north (audit SW-002)
+    "PGND_BAR": [(38.0, 30.0), (54.4, 30.0), (54.4, 31.7), (38.0, 31.7)],
+    "SW":       [(50.5, 8.6), (56.9, 8.6), (56.9, 19.0), (58.4, 19.0),
+                 (58.4, 26.5), (47.0, 26.5), (47.0, 19.0), (50.5, 19.0)],
     "VOUT_INT": [(64.3, 5.0), (91.7, 5.0), (91.7, 16.0), (64.3, 16.0)],
     "PGND_OUT": [(66.0, 17.3), (91.0, 17.3), (91.0, 30.0), (66.0, 30.0)],
     "VOUT_SW":  [(97.4, 5.0), (104.7, 5.0), (104.7, 16.0), (97.4, 16.0)],

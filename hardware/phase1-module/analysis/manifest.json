@@ -15,12 +15,13 @@
         "pcb": "pcb.json",
         "cross_analysis": "cross_analysis.json",
         "thermal": "thermal.json",
-        "emc": "emc.json"
+        "emc": "emc.json",
+        "spice": "spice.json"
       },
       "scripts": {
         "schematic": "analyze_schematic.py phase1-module.kicad_sch"
       },
-      "generated": "2026-07-15T20:35:06+05:30",
+      "generated": "2026-07-15T20:51:03+05:30",
       "pinned": false
     }
   }

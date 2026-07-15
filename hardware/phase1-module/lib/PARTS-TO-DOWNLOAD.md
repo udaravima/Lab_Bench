@@ -63,12 +63,16 @@ from the vetted vendor drops + one generated pattern). New/changed orderables:
 | Qty | Orderable part | Package / footprint | Role |
 |---|---|---|---|
 | 4 | **CSD18563Q5A** (TI) | SON 5×6 → `labbench:PowerFET_SON5x6_GDS` (generated from SLPS444C §7.2; pads renumbered 1=G 2=D 3=S for the generic symbol) | Q1/Q2 half-bridge, Q3/Q4 output disconnect |
-| 1 | **XAL1350-103ME** (Coilcraft) | 13×13 flat-wire → official `L_Coilcraft_XAL1350-XXX` | L1 main inductor, 10 µH / Isat 28 A |
+| 1 | **XAL1350-103ME_** (Coilcraft; suffix B/C/D = packaging) | 13×13 flat-wire → official `L_Coilcraft_XAL1350-XXX` | L1 main inductor, 10 µH / Isat ≈ 18 A @ 30 % drop, DCR ≈ 8.7 mΩ (Coilcraft Doc373 selector — earlier "28 A" here was wrong; 18 A still clears the ~14 A peak at valley ILIM) |
 | 4 | 22 µF 50 V X7R 1210 (e.g. Murata GRM32EC72A226KE05) | C_1210 | input bank C20/C75–C77 |
 | 1 | 220 µF 50 V SMD electrolytic (e.g. Panasonic EEE-FK1H221AM, Ø10×10.2) | CP_Elec_10x10.5 | input bulk C21 |
 | 2 | 220 µF 25 V polymer (e.g. Panasonic 25SVPF220M OS-CON, Ø8×11.9) | CP_Elec_8x11.9 | output bulk C22/C78 |
 | 4 | 22 µF 25 V X7R 1210 | C_1210 | output bank C23/C79–C81 |
 | 1 | 2.2 kΩ 1 W 2512 | R_2512 | R27 preload (was on a 0402 — fixed) |
+
+Crystal note (from ngspice run 2026-07-15): C66/C67 = 10 pF target **CL ≈ 8 pF**
+— order the 8 MHz crystal as a CL = 8 pF part (e.g. Abracon ABM8 series -8-…),
+or change C66/C67 to 18 pF for a CL = 12 pF crystal.
 
 Notes from the pass: default passives moved 0402 → **0603** (hand assembly);
 DAC80502 now uses the vendor WSON-10 footprint (DRX has **no** exposed pad —

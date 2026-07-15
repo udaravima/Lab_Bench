@@ -81,6 +81,30 @@ the official `WSON-10-1EP` was wrong for it); crystal symbol switched to
 one schematic component per physical capacitor. `tools/check_footprints.py`
 verifies every component's footprint resolves and every netted pin has a pad.
 
+## E. Pricing snapshot — verified 2026-07-16 (LCSC via jlcsearch, qty 1–10 USD)
+
+| Part | Unit $ | Stock | Note |
+|---|---|---|---|
+| LTC7004EMSE#PBF | 5.77 | **5** | priciest IC, thin stock — order early or Mouser (~1.5×) |
+| DAC80502DRXR/T | 4.19/4.68 | 189/53 | |
+| INA228AIDGSR | 3.83 | 236 | |
+| STM32G431CBT6 | 2.85 | 67k | |
+| LMR36015ARNXR | 1.91 | 1.2k | non-Q1 "A" variant OK (adjustable) |
+| INA240A3DR | 1.87 | 1.7k | |
+| LM5145RGYR | 1.55 | 5.2k | |
+| OPA2333AIDGKR | 1.14 | 1.3k | |
+| CSD18563Q5A ×4 | 0.85 | 794 | |
+| TLV7011DBVR | 0.52 | **42** | |
+| TCAN1042VDRQ1 | 0.57 | 2.5k | V-suffix = VIO variant, OK at 500k (HGV from Mouser also fine) |
+| NCP1117ST33T3G | 0.21 | 14k | |
+| 220 µF/25 V polymer | 0.13–0.17 | 10k | |
+| 2 mΩ 2512 shunt | — | — | buy the Vishay WSLP (~$1.50, Mouser): TCR owns the CC spec |
+| XAL1350-103 | ~5–6 (Mouser) | — | not on LCSC; Sunlord MWSA1265S-100MT $0.69 is a budget candidate **only after** verifying Isat ≥ 15 A from its datasheet |
+
+Totals: semiconductors ≈ **$29**; all components for one module ≈ **$45–50**
+(LCSC-heavy) or ~$75 all-Mouser; JLCPCB 4-layer 120×80 ×5 ≈ $30–45; with
+stencil + shipping the complete Phase-1 build lands ≈ **US$100–125**.
+
 ## Quality warning
 
 Vendor ECAD symbols are frequently sloppy (odd pin ordering, wrong units,

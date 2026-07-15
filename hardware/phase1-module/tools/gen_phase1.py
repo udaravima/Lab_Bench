@@ -23,8 +23,8 @@ SHEETS = [  # name, fixed sheet-element uuid, page
     ("io",           "e63e39d7-6ac0-4ffa-9e5c-2b84c50a0016", "8"),
 ]
 
-R_FP = "Resistor_SMD:R_0402_1005Metric"
-C_FP = "Capacitor_SMD:C_0402_1005Metric"
+R_FP = "Resistor_SMD:R_0603_1608Metric"      # 0603: hand-assembled board
+C_FP = "Capacitor_SMD:C_0603_1608Metric"
 
 
 def build_control_core():
@@ -51,7 +51,7 @@ def build_control_core():
 
     # ---- DAC80502: 16-bit dual reference source (V_REF / I_REF) ----
     u1 = sh.add(kg.Placed(DAC, "U1", "DAC80502DRXT", 50.8, 101.6,
-                          footprint="Package_SON:WSON-10-1EP_2.5x2.5mm_P0.5mm"))
+                          footprint="labbench:DAC80502_DRX_WSON-10"))
     gl("V_REF", u1, 2, shape="output")                      # VOUTA
     gl("I_REF", u1, 9, shape="output")                      # VOUTB
     sh.power("AGND", *u1.pin_pos(5), ground=True)           # SPI2C low = SPI mode (ds 8.5.1)
@@ -71,7 +71,7 @@ def build_control_core():
 
     # ---- CV error amplifier (U2A): Type-II integrator + diode-OR row ----
     u2a = sh.add(kg.Placed(OPA, "U2", "OPA2333", 137.16, 76.2, unit=1,
-                           footprint="Package_SO:VSSOP-8_3x3mm_P0.65mm"))
+                           footprint="Package_SO:VSSOP-8_3.0x3.0mm_P0.65mm"))
     gl("V_MEAS", u2a, 3, shape="input")                     # +in
     r_av = res("R3", "10K 0.1%", 96.52, u2a.pin_pos(2)[1], rot=90)
     gl("V_REF", r_av, 1, shape="input")
@@ -95,7 +95,7 @@ def build_control_core():
 
     # ---- CC error amplifier (U2B): mirror of the CV loop ----
     u2b = sh.add(kg.Placed(OPA, "U2", "OPA2333", 137.16, 127.0, unit=2,
-                           footprint="Package_SO:VSSOP-8_3x3mm_P0.65mm"))
+                           footprint="Package_SO:VSSOP-8_3.0x3.0mm_P0.65mm"))
     gl("I_MEAS", u2b, 5, shape="input")                     # +in
     r_ai = res("R6", "10K 0.1%", 96.52, u2b.pin_pos(6)[1], rot=90)
     gl("I_REF", r_ai, 1, shape="input")
@@ -119,7 +119,7 @@ def build_control_core():
 
     # ---- op-amp power unit (U2C) + decoupling ----
     u2c = sh.add(kg.Placed(OPA, "U2", "OPA2333", 50.8, 154.94, unit=3,
-                           footprint="Package_SO:VSSOP-8_3x3mm_P0.65mm"))
+                           footprint="Package_SO:VSSOP-8_3.0x3.0mm_P0.65mm"))
     sh.power("5V0", *u2c.pin_pos(8))
     sh.power("AGND", *u2c.pin_pos(4), ground=True)
     c_op = cap("C5", "100n", 71.12, 154.94)
@@ -179,7 +179,7 @@ def build_aux_rails():
     L = kg.get_symbol("Device", "L")
 
     u8 = sh.add(kg.Placed(U8, "U8", "LMR36015AQRNXRQ1", 76.2, 78.74,
-                          footprint="labbench:LMR36015_RNX_VQFN-HR-12"))
+                          footprint="labbench:LMR36015_RNX_VQFN-HR-12"))  # vendor fp, vetted
     for p in ("2", "10", "9"):                      # VIN x2 + EN tied to VIN (ds: allowed)
         gl("VBUS_F", u8, p, shape="input")
     for p in ("1", "11", "6"):                      # PGND x2 + AGND (ds: tie to system gnd)
@@ -292,7 +292,8 @@ def build_sensing():
     gl("V_MEAS", c32, 1)
     sh.power("AGND", *c32.pin_pos(2), ground=True)
 
-    nt = sh.add(kg.Placed(NT, "NT1", "AGND-PGND tie", 165.1, 152.4, rot=90))
+    nt = sh.add(kg.Placed(NT, "NT1", "AGND-PGND tie", 165.1, 152.4, rot=90,
+                          footprint="NetTie:NetTie-2_SMD_Pad0.5mm"))
     sh.power("AGND", *nt.pin_pos(1), ground=True)
     sh.power("PGND", *nt.pin_pos(2), ground=True)
 
@@ -309,8 +310,8 @@ def build_disconnect():
     QN = kg.get_symbol("Device", "Q_NMOS_GDS")
     Q2N = kg.get_symbol("Transistor_FET", "2N7002")
 
-    q3 = sh.add(kg.Placed(QN, "Q3", "60V NFET", 96.52, 63.5, footprint="labbench:PowerFET_5x6"))
-    q4 = sh.add(kg.Placed(QN, "Q4", "60V NFET", 134.62, 63.5, footprint="labbench:PowerFET_5x6"))
+    q3 = sh.add(kg.Placed(QN, "Q3", "60V NFET", 96.52, 63.5, footprint="labbench:PowerFET_SON5x6_GDS"))
+    q4 = sh.add(kg.Placed(QN, "Q4", "60V NFET", 134.62, 63.5, footprint="labbench:PowerFET_SON5x6_GDS"))
     gl("VOUT_SW", q3, 2, shape="input")             # D
     ll("DISC_SRC", q3, 3)                           # common sources
     ll("DISC_SRC", q4, 3)
@@ -396,7 +397,7 @@ def build_power_stage():
     L = kg.get_symbol("Device", "L")
 
     u3 = sh.add(kg.Placed(LM, "U3", "LM5145RGYR", 76.2, 106.68,
-                          footprint="labbench:LM5145_RGY_VQFN-20"))
+                          footprint="labbench:LM5145_RGY0020B"))
     # -- enable chain: UVLO divider + kill FET
     r20 = res("R20", "100K 1%", 30.48, 78.74)
     r21 = res("R21", "13K 1%", 30.48, 93.98)
@@ -490,8 +491,8 @@ def build_power_stage():
     gl("FB", c26, 2)
 
     # -- half bridge
-    q1 = sh.add(kg.Placed(QN, "Q1", "CSD18563Q5A", 154.94, 78.74, footprint="labbench:PowerFET_5x6"))
-    q2 = sh.add(kg.Placed(QN, "Q2", "CSD18563Q5A", 154.94, 116.84, footprint="labbench:PowerFET_5x6"))
+    q1 = sh.add(kg.Placed(QN, "Q1", "CSD18563Q5A", 154.94, 78.74, footprint="labbench:PowerFET_SON5x6_GDS"))
+    q2 = sh.add(kg.Placed(QN, "Q2", "CSD18563Q5A", 154.94, 116.84, footprint="labbench:PowerFET_SON5x6_GDS"))
     gl("VBUS_F", q1, 2, shape="input")
     gl("SW", q1, 3)
     gl("SW", q2, 2)
@@ -513,24 +514,31 @@ def build_power_stage():
     ll("PS_ILIM", c19, 1)
     sh.power("PGND", *c19.pin_pos(2), ground=True)
 
-    l1 = sh.add(kg.Placed(L, "L1", "10u/12A", 180.34, 96.52, rot=90,
-                          footprint="labbench:L_10uH_flatwire_13x13"))
+    l1 = sh.add(kg.Placed(L, "L1", "XAL1350-103ME 10u/14A", 180.34, 96.52, rot=90,
+                          footprint="Inductor_SMD:L_Coilcraft_XAL1350-XXX"))
     gl("SW", l1, 1)
     gl("VOUT_INT", l1, 2, shape="output")
-    # input/output banks + preload + snubber (DNP)
-    c20 = cap("C20", "4x 22u/50V X7R", 154.94, 146.05, fp=C_BULK)
-    c21 = cap("C21", "220u/50V bulk", 167.64, 146.05, fp=C_BULK)
-    for c in (c20, c21):
+    # input/output banks + preload + snubber (DNP); one component per physical cap
+    CPOL = kg.get_symbol("Device", "C_Polarized")
+    cin = [cap(r, "22u/50V X7R", x, 146.05, fp="Capacitor_SMD:C_1210_3225Metric")
+           for r, x in (("C20", 146.05), ("C75", 154.94), ("C76", 163.83), ("C77", 172.72))]
+    c21 = sh.add(kg.Placed(CPOL, "C21", "220u/50V", 181.61, 146.05,
+                           footprint="Capacitor_SMD:CP_Elec_10x10.5"))
+    for c in cin + [c21]:
         gl("VBUS_F", c, 1, shape="input")
         sh.power("PGND", *c.pin_pos(2), ground=True)
-    c22 = cap("C22", "2x 220u poly", 194.31, 146.05, fp=C_BULK)
-    c23 = cap("C23", "4x 22u/25V", 207.01, 146.05, fp=C_BULK)
-    r27 = res("R27", "2.2K 1W preload", 219.71, 146.05)
-    for c in (c22, c23, r27):
+    cpoly = [sh.add(kg.Placed(CPOL, r, "220u/25V poly", x, 146.05,
+                              footprint="Capacitor_SMD:CP_Elec_8x11.9"))
+             for r, x in (("C22", 193.04), ("C78", 201.93))]
+    cout = [cap(r, "22u/25V X7R", x, 146.05, fp="Capacitor_SMD:C_1210_3225Metric")
+            for r, x in (("C23", 210.82), ("C79", 219.71), ("C80", 228.6), ("C81", 237.49))]
+    r27 = res("R27", "2.2K 1W preload", 246.38, 146.05)
+    r27.footprint = "Resistor_SMD:R_2512_6332Metric"
+    for c in cpoly + cout + [r27]:
         gl("VOUT_INT", c, 1, shape="input")
         sh.power("PGND", *c.pin_pos(2), ground=True)
-    r17 = res("R17", "DNP snub", 232.41, 146.05)
-    c17 = cap("C17", "DNP", 232.41, 160.02)
+    r17 = res("R17", "DNP snub", 255.27, 146.05)
+    c17 = cap("C17", "DNP", 255.27, 160.02)
     gl("SW", r17, 1)
     ll("SNUB", r17, 2)
     ll("SNUB", c17, 1)
@@ -547,7 +555,7 @@ def build_mcu_can():
     sh, res, cap, gl, ll = _sheet("mcu-can")
     MCU = kg.get_symbol("MCU_ST_STM32G4", "STM32G431CBTx")
     CAN = kg.get_symbol("labbench", "TCAN1042HGVDR")
-    XTAL = kg.get_symbol("Device", "Crystal")
+    XTAL = kg.get_symbol("Device", "Crystal_GND24")
     LED = kg.get_symbol("Device", "LED")
     NTC = kg.get_symbol("Device", "Thermistor_NTC")
     C5 = kg.get_symbol("Connector_Generic", "Conn_01x05")
@@ -642,7 +650,9 @@ def build_mcu_can():
     gl("OSC_IN", u10, 5, shape="input")             # PF0
     gl("OSC_OUT", u10, 6, shape="output")           # PF1
     gl("OSC_IN", y1, 1)
-    gl("OSC_OUT", y1, 2)
+    gl("OSC_OUT", y1, 3)                            # GND24: 1/3 crystal, 2/4 shield
+    sh.power("AGND", *y1.pin_pos(2), ground=True)
+    sh.power("AGND", *y1.pin_pos(4), ground=True)
     c66 = cap("C66", "10p", 210.82, 137.16)
     c67 = cap("C67", "10p", 226.06, 137.16)
     gl("OSC_IN", c66, 1)
@@ -839,7 +849,8 @@ EXPECTED_NETS = {
     "FB":        {"R5.2", "R8.2", "R1.2", "R2.1", "U3.5", "R24.1", "C25.1", "C26.2"},
     "V_MEAS":    {"U2.3", "R32.2", "R33.1", "C32.1", "U10.8"},
     "I_MEAS":    {"U2.5", "R31.2", "C31.1", "U10.9"},
-    "~VOUT_INT": {"R1.1", "L1.2", "C22.1", "C23.1", "R27.1", "R30.1", "U4.8",
+    "~VOUT_INT": {"R1.1", "L1.2", "C22.1", "C78.1", "C23.1", "C79.1", "C80.1",
+                  "C81.1", "R27.1", "R30.1", "U4.8",
                   "U5.10", "R45.1", "R25.1"},
     "VOUT_SW":   {"R30.2", "U4.1", "U5.9", "Q3.2"},
     "~VOUT":     {"Q4.2", "U5.8", "R32.1", "J4.1"},
@@ -897,7 +908,7 @@ EXPECTED_NETS = {
     "SWCLK":     {"U10.38", "J2.3"},
     "NRST":      {"U10.7", "J2.4", "C68.1"},
     "OSC_IN":    {"U10.5", "Y1.1", "C66.1"},
-    "OSC_OUT":   {"U10.6", "Y1.2", "C67.1"},
+    "OSC_OUT":   {"U10.6", "Y1.3", "C67.1"},
     "LED_A":     {"D7.2", "R66.1"},
     "LED_SINK":  {"U10.18", "D7.1"},
     "BOOT0":     {"U10.45", "R65.1"},
@@ -910,7 +921,8 @@ EXPECTED_NETS = {
     "VBUS":      {"J1.1", "F1.1"},
     "FAN_PWM":   {"U10.22", "Q8.1"},
     "FAN_NEG":   {"J6.2", "Q8.3", "D6.2"},
-    "~VBUS_F":   {"F1.2", "D5.1", "Q1.2", "C20.1", "C21.1", "R29.1", "R20.1",
+    "~VBUS_F":   {"F1.2", "D5.1", "Q1.2", "C20.1", "C75.1", "C76.1", "C77.1",
+                  "C21.1", "R29.1", "R20.1",
                   "U8.2", "U8.10", "U8.9", "C50.1", "C51.1", "R60.1"},
     # -- power rails (superset: must contain at least these)
     "~3V3":      {"U1.1", "C3.1", "U9.2", "C57.1", "R18.1", "R47.1", "R52.1",
@@ -925,10 +937,11 @@ EXPECTED_NETS = {
                   "C44.2", "R44.2", "Q7.2", "Q9.2", "R23.2", "R16.2", "R19.2",
                   "R21.2", "R26.2", "C18.2", "U3.6", "U3.15", "U3.21", "Q5.2",
                   "Q6.2", "R61.2", "C62.2", "RT1.2", "RT2.2", "C66.2", "C67.2",
-                  "C68.2", "R64.2", "R65.2", "U10.19", "U10.23", "U10.35",
+                  "C68.2", "R64.2", "R65.2", "Y1.2", "Y1.4", "U10.19", "U10.23", "U10.35",
                   "U10.47", "U11.2", "C69.2", "C70.2", "J2.5", "J3.1", "NT1.1",
                   "U6.3", "U6.5", "U6.11", "U7.2"},
-    "~PGND":     {"U3.12", "Q2.3", "C20.2", "C21.2", "C22.2", "C23.2", "R27.2",
+    "~PGND":     {"U3.12", "Q2.3", "C20.2", "C21.2", "C22.2", "C23.2", "C75.2",
+                  "C76.2", "C77.2", "C78.2", "C79.2", "C80.2", "C81.2", "R27.2",
                   "C17.2", "C19.2", "C28.2", "C29.2", "U8.1", "U8.6", "U8.11",
                   "C50.2", "C51.2", "C53.2", "C54.2", "C55.2", "U9.1", "C56.2",
                   "C57.2", "R51.2", "D5.2", "J1.2", "J4.2", "J5.7", "J5.8",

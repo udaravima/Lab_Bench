@@ -52,8 +52,30 @@ code); WSON-package variants do NOT match our footprint — stick to VSSOP-10
 
 ## C. Phase 2 — defer (don't download yet)
 
-LM5143 (2-phase controller), LM5069 (hot-swap), power FETs (CSD18563Q5A or
-equivalent — final selection happens after Phase-1 thermals).
+LM5143 (2-phase controller), LM5069 (hot-swap). (Phase-1 power FETs moved to
+section D — they are needed now.)
+
+## D. Footprint pass — parts finalized 2026-07-15
+
+Footprints live in `lib/labbench.pretty/` (built by `tools/build_fplib.py`
+from the vetted vendor drops + one generated pattern). New/changed orderables:
+
+| Qty | Orderable part | Package / footprint | Role |
+|---|---|---|---|
+| 4 | **CSD18563Q5A** (TI) | SON 5×6 → `labbench:PowerFET_SON5x6_GDS` (generated from SLPS444C §7.2; pads renumbered 1=G 2=D 3=S for the generic symbol) | Q1/Q2 half-bridge, Q3/Q4 output disconnect |
+| 1 | **XAL1350-103ME** (Coilcraft) | 13×13 flat-wire → official `L_Coilcraft_XAL1350-XXX` | L1 main inductor, 10 µH / Isat 28 A |
+| 4 | 22 µF 50 V X7R 1210 (e.g. Murata GRM32EC72A226KE05) | C_1210 | input bank C20/C75–C77 |
+| 1 | 220 µF 50 V SMD electrolytic (e.g. Panasonic EEE-FK1H221AM, Ø10×10.2) | CP_Elec_10x10.5 | input bulk C21 |
+| 2 | 220 µF 25 V polymer (e.g. Panasonic 25SVPF220M OS-CON, Ø8×11.9) | CP_Elec_8x11.9 | output bulk C22/C78 |
+| 4 | 22 µF 25 V X7R 1210 | C_1210 | output bank C23/C79–C81 |
+| 1 | 2.2 kΩ 1 W 2512 | R_2512 | R27 preload (was on a 0402 — fixed) |
+
+Notes from the pass: default passives moved 0402 → **0603** (hand assembly);
+DAC80502 now uses the vendor WSON-10 footprint (DRX has **no** exposed pad —
+the official `WSON-10-1EP` was wrong for it); crystal symbol switched to
+`Crystal_GND24` so the 3225's shield pads are grounded; bulk-cap banks are now
+one schematic component per physical capacitor. `tools/check_footprints.py`
+verifies every component's footprint resolves and every netted pin has a pad.
 
 ## Quality warning
 

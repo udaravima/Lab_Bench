@@ -36,7 +36,8 @@ firmware/
   common/                     labbench_can.h — shared CAN codec (module + manager)
   module/core/                Hardware-independent control core (state machine,
                               envelope clamp, ramp, derate, comms-loss policy)
-  module/                     STM32G431 HAL wrapper              [not started]
+  module/                     STM32G431 bare-metal firmware (Makefile + arm-gcc;
+                              binds core to SPI DAC, I2C INA228, FDCAN, ADC, PWM)
   manager/                    ESP32-S3 manager firmware          [not started]
   tests/                      Host unit tests — `make test` (gcc, no hardware)
 ```
@@ -60,6 +61,12 @@ out together at the end. The generation pipeline is committed and reproducible:
 `tools/route_board.py` (vias, heat patches, critical routes — copper-DRC clean)
 → `tools/autoroute.py` (WIP, see its header). Parts pricing verified 2026-07-16:
 full Phase-1 build ≈ US$100–125 incl. 4-layer PCB.
-**Next:** STM32G431 HAL firmware, then remaining phase schematics; PCB +
-ordering + the Phase-1 test campaign ([docs/05-build-plan.md](docs/05-build-plan.md))
-come after.
+**Module firmware v0.1 builds** — bare-metal STM32G431 (no vendor HAL, vendored
+CMSIS headers): 96 MHz clocks, ADC scan, DAC80502 SPI, INA228 I2C, FDCAN 500k
+classic CAN with slot filters, fan PWM, IWDG, flash-page calibration store, and
+the full CAN dispatch/telemetry glue around the host-tested `module_core`.
+6.3 KB flash. Build: `cd firmware/module && make` (uses arm-none-eabi-gcc from
+PATH or `~/tools/xpack-arm-none-eabi-gcc-*`).
+**Next:** remaining phase schematics (Phase-2 module, backplane + manager);
+PCB layout + ordering + the Phase-1 test campaign
+([docs/05-build-plan.md](docs/05-build-plan.md)) come after.

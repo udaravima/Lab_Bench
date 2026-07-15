@@ -198,14 +198,18 @@ class Sheet:
             f'  (label "{net}" (at {pos[0]} {pos[1]} {rot}) {FONT} (uuid {_uuid()}))')
 
     def power(self, net, x, y, ground=False, rot=0):
+        global _pwr_seq
+        _pwr_seq += 1
         sym = power_symbol(net, ground=ground)
-        p = Placed(sym, f"#PWR{len(self.symbols):03d}", net, x, y, rot)
+        p = Placed(sym, f"#PWR{_pwr_seq:03d}", net, x, y, rot)
         self.add(p)
         return p
 
     def pwr_flag(self, x, y):
+        global _pwr_seq
+        _pwr_seq += 1
         sym = get_symbol("power", "PWR_FLAG")
-        p = Placed(sym, f"#FLG{len(self.symbols):03d}", "PWR_FLAG", x, y, 0)
+        p = Placed(sym, f"#FLG{_pwr_seq:03d}", "PWR_FLAG", x, y, 0)
         self.add(p)
         return p
 
@@ -239,6 +243,7 @@ class Sheet:
 
 
 _symcache = {}
+_pwr_seq = 0
 
 
 def get_symbol(lib, name):

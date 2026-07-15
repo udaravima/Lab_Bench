@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "project": "phase1-module.kicad_pro",
+  "current": "2026-07-15_2034",
+  "runs": {
+    "2026-07-15_2034": {
+      "source_hashes": {
+        "phase1-module.kicad_sch": "sha256:93b108af9fbe5a075d05f126c9b717aef01dce4e6ae998ff49305ca08260462f",
+        "phase1-module.kicad_pcb": "sha256:955d76bd1514d1c6734631eef4ab791f20983111ee02e27388b53ef7eba9ece0",
+        "schematic.json": "sha256:8ab7df8ae19e6374cb64385dc0341a580db37de811b67ae7c4205b3f4197a40c",
+        "pcb.json": "sha256:44562928749a21ea0463ae84c720aa81801dcff1d0c6d727034a99eb8fe5d2b7"
+      },
+      "outputs": {
+        "schematic": "schematic.json",
+        "pcb": "pcb.json",
+        "cross_analysis": "cross_analysis.json",
+        "thermal": "thermal.json",
+        "emc": "emc.json"
+      },
+      "scripts": {
+        "schematic": "analyze_schematic.py phase1-module.kicad_sch"
+      },
+      "generated": "2026-07-15T20:35:06+05:30",
+      "pinned": false
+    }
+  }
+}

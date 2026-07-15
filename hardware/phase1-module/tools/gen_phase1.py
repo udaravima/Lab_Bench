@@ -255,7 +255,7 @@ def build_sensing():
     sh.power("5V0", *u4.pin_pos(6))
     for p in ("2", "4", "3", "7"):                  # GND x2 + REF1/REF2 -> unidirectional
         sh.power("AGND", *u4.pin_pos(p), ground=True)
-    r31 = res("R31", "100", 104.14, 96.52, rot=90)
+    r31 = res("R31", "1K", 104.14, 96.52, rot=90)
     ll("INA240_OUT", u4, 5)
     ll("INA240_OUT", r31, 1)
     gl("I_MEAS", r31, 2, shape="output")
@@ -320,7 +320,7 @@ def build_disconnect():
     ll("DISC_GATE", q4, 1)
 
     u6 = sh.add(kg.Placed(LTC, "U6", "LTC7004", 76.2, 127.0,
-                          footprint="Package_SO:MSOP-10-1EP_3x3mm_P0.5mm_EP1.68x1.88mm_ThermalVias"))
+                          footprint="Package_SO:MSOP-10-1EP_3x3mm_P0.5mm_EP1.68x1.88mm"))
     sh.power("5V0", *u6.pin_pos(1))                 # VCC
     sh.power("5V0", *u6.pin_pos(2))                 # VCCUV tied high
     sh.power("AGND", *u6.pin_pos(3), ground=True)

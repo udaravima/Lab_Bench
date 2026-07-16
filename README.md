@@ -13,7 +13,7 @@ precision, usable for lab work, bulk DC power, and battery charging.
 | Channels | 1–8, hot-pluggable, slot-addressed |
 | Per-channel output | 0 … (V_in − 2 V), 0–30 A, **600 W envelope** (first limit binds) |
 | Regulation | Analog CV/CC (diode-OR min-selector), firmware never in the loop |
-| Setpoint resolution | ~0.5 mV / ~0.5 mA (16-bit DAC, per-module calibration) |
+| Setpoint resolution | ~0.5 mV / ≤0.8 mA (16-bit DAC, per-module calibration) |
 | Readback | 20-bit INA228, ±0.05 % class |
 | Comms | CAN 2.0B @ 500 kbit/s, heartbeat-supervised |
 | Scaling | Channels parallel into droop-share groups (firmware feature) |
@@ -31,6 +31,7 @@ precision, usable for lab work, bulk DC power, and battery charging.
 | [docs/05-build-plan.md](docs/05-build-plan.md) | Phased build with exit criteria (150 W proto → 8-ch rack) |
 | [docs/06-phase1-circuit-design.md](docs/06-phase1-circuit-design.md) | Worked component values for the 150 W prototype |
 | [docs/07-module-firmware.md](docs/07-module-firmware.md) | STM32G431 firmware architecture, pin map, bring-up |
+| [docs/08-phase2-circuit-design.md](docs/08-phase2-circuit-design.md) | Worked component values for the 600 W module (LM5143 + LM5069) |
 | [HANDOVER.md](HANDOVER.md) | Session handover: state, decisions, gotchas, next steps |
 | [hardware/phase1-module/tools/README.md](hardware/phase1-module/tools/README.md) | Schematic/PCB generation + verification pipeline |
 | [hardware/phase1-module/lib/PARTS-TO-DOWNLOAD.md](hardware/phase1-module/lib/PARTS-TO-DOWNLOAD.md) | Exact orderables, package corrections, verified pricing |
@@ -67,10 +68,14 @@ firmware/
   routes — zero copper DRC errors); the signal autorouter is committed as WIP.
 - **Pricing verified** — complete Phase-1 build ≈ **US$100–125** including
   five 4-layer PCBs (details in PARTS-TO-DOWNLOAD.md §E).
-- **Next:** Phase-2 600 W module schematic (LM5143 2-phase + LM5069
-  hot-swap), Phase-3 backplane + ESP32-S3 manager schematics, manager
-  firmware — then the batch PCB pass, ordering, and the Phase-1 test
-  campaign per [docs/05-build-plan.md](docs/05-build-plan.md).
+- **Phase-2 circuit design: complete (docs/08)** — all component values
+  worked and datasheet-verified (LM5143 interleaved config, LM5069 hot-swap
+  with SOA check, 6.8 µH subharmonic-stability fix, INA240A3 scaling fix).
+- **Next:** Phase-2 schematic generation (gen_phase2.py reusing the
+  verified Phase-1 control-core sheet), Phase-3 backplane + ESP32-S3
+  manager schematics, manager firmware — then the batch PCB pass,
+  ordering, and the Phase-1 test campaign per
+  [docs/05-build-plan.md](docs/05-build-plan.md).
 
 ## License
 

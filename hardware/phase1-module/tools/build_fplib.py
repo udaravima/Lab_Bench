@@ -125,6 +125,85 @@ def powerfet_son5x6():
     print("  generated labbench:PowerFET_SON5x6_GDS")
 
 
+def lm5143_rha0040p():
+    """TI RHA0040P (VQFNP 6x6, 40 pin) land pattern, lm5143.pdf p.68:
+    40 pads 0.25x0.6 on 0.5 pitch (10/side, centers +/-2.6 from center,
+    row -2.25..+2.25), EP 3.3x3.3 = pad 41. None of the stock Texas_RHA
+    variants match (EP 4.6/4.15/2.9/3.52x2.62 vs 3.3 square)."""
+    fp = pcbnew.FOOTPRINT(pcbnew.BOARD())
+    fp.SetFPID(pcbnew.LIB_ID("labbench", "LM5143_RHA0040P"))
+    fp.SetAttributes(pcbnew.FP_SMD)
+    fp.SetDescription("TI VQFNP-40 RHA0040P 6x6mm P0.5mm EP3.3x3.3 "
+                      "(lm5143.pdf land pattern, verified 2026-07-16)")
+    fp.SetKeywords("vqfn 40 rha0040p lm5143")
+
+    def pad(num, x, y, w, h, paste_ratio=0.0):
+        p = pcbnew.PAD(fp)
+        p.SetNumber(str(num))
+        p.SetShape(pcbnew.PAD_SHAPE_ROUNDRECT)
+        p.SetRoundRectRadiusRatio(0.2)
+        p.SetAttribute(pcbnew.PAD_ATTRIB_SMD)
+        p.SetLayerSet(pcbnew.PAD.SMDMask())
+        p.SetPos0(pcbnew.VECTOR2I(pcbnew.FromMM(x), pcbnew.FromMM(y)))
+        p.SetSize(pcbnew.VECTOR2I(pcbnew.FromMM(w), pcbnew.FromMM(h)))
+        p.SetDrawCoord()
+        if paste_ratio:
+            p.SetLocalSolderPasteMarginRatio(paste_ratio)
+        fp.Add(p)
+
+    row = [round(-2.25 + 0.5 * i, 2) for i in range(10)]
+    for i, y in enumerate(row):                 # 1-10 left column, top->bottom
+        pad(1 + i, -2.6, y, 0.6, 0.25)
+    for i, x in enumerate(row):                 # 11-20 bottom row, left->right
+        pad(11 + i, x, 2.6, 0.25, 0.6)
+    for i, y in enumerate(reversed(row)):       # 21-30 right column, bottom->top
+        pad(21 + i, 2.6, y, 0.6, 0.25)
+    for i, x in enumerate(reversed(row)):       # 31-40 top row, right->left
+        pad(31 + i, x, -2.6, 0.25, 0.6)
+    pad(41, 0, 0, 3.3, 3.3, paste_ratio=-0.2)   # EP, reduced paste
+
+    def line(layer, x1, y1, x2, y2, w=0.12):
+        s = pcbnew.FP_SHAPE(fp)
+        s.SetShape(pcbnew.SHAPE_T_SEGMENT)
+        s.SetStart0(pcbnew.VECTOR2I(pcbnew.FromMM(x1), pcbnew.FromMM(y1)))
+        s.SetEnd0(pcbnew.VECTOR2I(pcbnew.FromMM(x2), pcbnew.FromMM(y2)))
+        s.SetLayer(layer)
+        s.SetWidth(pcbnew.FromMM(w))
+        s.SetDrawCoord()
+        fp.Add(s)
+
+    def rect(layer, x1, y1, x2, y2, w=0.05):
+        for a, b in (((x1, y1), (x2, y1)), ((x2, y1), (x2, y2)),
+                     ((x2, y2), (x1, y2)), ((x1, y2), (x1, y1))):
+            line(layer, a[0], a[1], b[0], b[1], w)
+
+    rect(pcbnew.F_Fab, -3.0, -3.0, 3.0, 3.0, 0.1)
+    # silk corners only (pads occupy all four sides); pin-1 dot at top-left
+    for sx, sy in ((-1, -1), (1, -1), (1, 1), (-1, 1)):
+        line(pcbnew.F_SilkS, sx * 3.11, sy * 3.11, sx * 3.11, sy * 2.75)
+        line(pcbnew.F_SilkS, sx * 3.11, sy * 3.11, sx * 2.75, sy * 3.11)
+    c = pcbnew.FP_SHAPE(fp)
+    c.SetShape(pcbnew.SHAPE_T_CIRCLE)
+    c.SetStart0(pcbnew.VECTOR2I(pcbnew.FromMM(-3.6), pcbnew.FromMM(-2.25)))
+    c.SetEnd0(pcbnew.VECTOR2I(pcbnew.FromMM(-3.5), pcbnew.FromMM(-2.25)))
+    c.SetLayer(pcbnew.F_SilkS)
+    c.SetWidth(pcbnew.FromMM(0.2))
+    c.SetDrawCoord()
+    fp.Add(c)
+    rect(pcbnew.F_CrtYd, -3.25, -3.25, 3.25, 3.25)
+
+    ref = fp.Reference()
+    ref.SetPos0(pcbnew.VECTOR2I(0, pcbnew.FromMM(-4.1)))
+    ref.SetDrawCoord()
+    val = fp.Value()
+    val.SetPos0(pcbnew.VECTOR2I(0, pcbnew.FromMM(4.1)))
+    val.SetLayer(pcbnew.F_Fab)
+    val.SetDrawCoord()
+
+    pcbnew.FootprintSave(PRETTY, fp)
+    print("  generated labbench:LM5143_RHA0040P")
+
+
 def write_fp_lib_table():
     path = os.path.join(LIB, "..", "fp-lib-table")
     with open(path, "w") as f:
@@ -138,5 +217,6 @@ if __name__ == "__main__":
     os.makedirs(PRETTY, exist_ok=True)
     import_vendor()
     powerfet_son5x6()
+    lm5143_rha0040p()
     write_fp_lib_table()
     print("build_fplib: done")

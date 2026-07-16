@@ -148,7 +148,7 @@ consistent with protection-matrix rows 8/9 auto-recovery semantics. DGS
 | C_TIMER | **100 nF** | t_start (Eq. 12, C_OUT 550 µF) = 2.5 ms; ×1.5 margin → 3.7 ms; C_T = t·85 µA/4 V → 79 nF → 100 nF ⇒ t_flt = 4.7 ms, insertion delay = 73 ms |
 | SOA check | pass, 34 % margin | Hot-short: 30 V, P_LIM/30 V = 3.35 A for 4.7 ms. FET SOA at 4.7 ms (power-law interp, Eq. 15–18) = 11.7 A; derated to T_C 100 °C → 5.85 A ≥ 1.3 × 3.35 = 4.36 A ✓ |
 | UVLO divider | R1 = 47.5 k, R2 = 12.1 k, R3 = 4.87 k (Eq. 21–23) | UV on 10.50 V / off 9.50 V; OV off 33.1 V / re-arm 31.8 V (21 µA hysteresis sources; thresholds 2.5 V) — matches docs/02 §6 (UVLO 10.5 V, OVP 33 V) |
-| PGD | open-drain → LMR36015 EN (pull-up to protected rail) + MCU input **PC13** | releases when FET V_DS < 1.25 V |
+| PGD | open-drain → LMR36015 EN, 100 k pull-up to the protected rail | releases when FET V_DS < 1.25 V. **Not wired to the MCU**: the pull-up must go to VBUS_P (the aux rail doesn't exist yet — chicken-and-egg), which is far above GPIO levels; a divider that satisfies both the EN threshold and V_IH across 24–30 V doesn't close. The MCU infers hot-swap health from AUX_PG, which PGD gates anyway |
 
 > **Why the aux buck waits for PGD:** during inrush the pass FET is a
 > resistor in its linear region, budgeted by P_LIM for *capacitor charging
@@ -181,9 +181,12 @@ consistent with protection-matrix rows 8/9 auto-recovery semantics. DGS
   LSB coarsens from the headline ~0.5 mA to **0.76 mA** (docs/01 amended).
 - **Measurement divider 110 k / 10.0 k, 0.1 % thin film** (exactly /12;
   FS 30.0 V), Kelvin from the output terminals as in Phase 1.
-- **Output shunt: 0.5 mΩ ≥ 3 W** wide-terminal (3920 class), Kelvin;
-  0.45 W at 30 A. INA228 across the same shunt: 15 mV at 30 A, stays on
-  ADCRANGE = 1 (±40.96 mV); firmware SHUNT_CAL recomputed for 0.5 mΩ.
+- **Output shunt: 2 × 1.0 mΩ 2512 ≥ 3 W in parallel = 0.5 mΩ** (R30 ∥ R34),
+  Kelvin sensed across the pair; 0.45 W total spread over two packages.
+  1.0 mΩ 2512 sources far more easily than a single 0.5 mΩ 3920, and the
+  ±1 % split imbalance is absorbed by the 2-pt calibration. INA228 across
+  the same pair: 15 mV at 30 A, stays on ADCRANGE = 1 (±40.96 mV);
+  firmware SHUNT_CAL recomputed for 0.5 mΩ.
 - MCU ADC scale constants (board.h): V_MEAS 9668 µV/count (3.3/4096 × 12),
   I_MEAS 8057 µA/count (3.3/4096 / 0.1 V/A… = /(100 × 0.5 mΩ)),
   DAC V counts = µV·2¹⁶/30.0e6, DAC I counts = µA·2¹⁶/50.0e6.
@@ -253,13 +256,16 @@ the loop believe the output is high, so it regulates the real output
   PS_OFF driver (MCU, PB3 logic unchanged), /HW_ENABLE gate, LM5069 PGD.
   Any of firmware, backplane E-stop, or an unhealthy hot-swap holds the
   converter off in hardware.
-- **Hardware OVP (TLV7011): threshold 29.4 V** = 105 % of the 28 V
-  envelope. It must sit *below* the 30 V bus so a shorted high-side FET
-  (output dragged to V_bus) trips it, and *above* the 28.4 V divider
-  ceiling so a CV-loop-open fault (output regulates at the ceiling —
-  still a controlled state) does not nuisance-trip. Note the squeeze:
-  28.4 < 29.4 < 30 — tell the layout/tolerance pass this comparator
-  divider wants 0.1 % parts.
+- **Hardware OVP (TLV7011): threshold 29.35 V** (215 k/20 k, 0.1 %) = 105 %
+  of the 28 V envelope. It must sit *below* the 30 V bus so a shorted
+  high-side FET (output dragged to V_bus) trips it, and *above* the 28.4 V
+  divider ceiling so a CV-loop-open fault (output regulates at the ceiling —
+  still a controlled state) does not nuisance-trip. The squeeze
+  28.4 < 29.4 < 30 also kills the Phase-1 reference scheme: a 2.5 V derived
+  from the 3V3 LDO (±2 %) wanders the trip point past the bus voltage.
+  Phase 2 uses a **TL431B (2.495 V ±0.5 %)** self-biased from 5 V —
+  worst-case trip 29.35 ± 0.19 V, clear of both fences. (TL431 DBZ pinout:
+  1=K, 2=REF, 3=A — the TL432 swaps 1/2, don't substitute.)
 - **Output disconnect: 4 × CSD18540Q5B** (two parallel per direction,
   common source), LTC7004 driver as Phase 1. At 30 A: ≈ 1.3 mΩ/direction
   → ≈ 2.3 W total spread over four packages — pour + airflow. LTC7004
@@ -304,7 +310,6 @@ finalized by FRA/Bode on the board — Phase-2 exit criterion, docs/05.
 | Pin | Phase-1 | Phase-2 |
 |---|---|---|
 | PB4 | free | DROOP_EN (out, high = droop switch closed) |
-| PC13 | free | HOTSWAP_PGD (in, pull-up, low = FET not enhanced) |
 | PB15 | PS_FPWM → LM5145 SYNCIN | PS_FPWM → LM5143 DEMB (same polarity: high = FPWM) |
 | PA15 | PS_PGOOD ← LM5145 PGOOD | PS_PGOOD ← LM5143 PG1 |
 | everything else | — | unchanged (I²C stays on PA8/PA9, OUT_REQ on PB14, PB8/BOOT0 untouched — HANDOVER.md traps) |
@@ -348,25 +353,27 @@ stock — jlcsearch first, then Mouser):
 | Item | Requirement |
 |---|---|
 | Phase shunts | 3.5 mΩ (alt 3.0 mΩ) ±1 % ≥3 W 2512/2726 Kelvin ×2 |
-| Output shunt | 0.5 mΩ ±1 % ≥3 W 3920-class wide terminal |
+| Output shunt | 1.0 mΩ ±1 % ≥3 W 2512 ×2 (parallel pair = 0.5 mΩ, §4) |
 | Hot-swap R_SNS | 1.5 mΩ ±1 % ≥3 W Kelvin |
 | Output caps | 220 µF 35 V hybrid polymer ×4 (ESR ≤ 25 mΩ each) |
 | Input bulk | 470 µF 50 V electrolytic + 8 × 10 µF 50 V X7S 1210 |
-| Droop switch | TMUX1101-class SPST analog switch, 5 V supply, 3.3 V logic |
-| Fuse + holder | 35 A blade | 
+| Droop switch | TMUX1101DBVR (SOT-23-5; pinout + V_IH ≤ 1.49 V verified, tmux1101.pdf) |
+| OVP reference | TL431B DBZ, 2.495 V ±0.5 % (§8) |
+| Fuse + holder | 35 A ATO blade |
 | Control core | Phase-1 BOM carries over (PARTS-TO-DOWNLOAD.md) |
 
 ## 15. Open items → resolve at schematic capture
 
-1. PG2 behavior with FB2 = AGND in interleaved mode (float it, but confirm
-   no spurious pull needed) — LM5143 datasheet re-read at capture.
-2. TMUX1101 exact variant + logic V_IH verification (or SN74LVC1G66-class
-   alternative if TMUX prices badly).
+1. PG2 behavior with FB2 = AGND in interleaved mode (left n.c. in the
+   schematic; confirm no spurious pull needed at bring-up).
+2. ~~TMUX1101 variant + V_IH~~ — resolved: TMUX1101DBVR, V_IH ≤ 1.49 V (§14).
 3. LTC7004 gate-drive amplitude for the 4-FET disconnect stack (local PDF).
-4. OVP comparator divider values for 29.4 V ± tolerance stack (0.1 %).
-5. RES/hiccup cap value vs restart cadence (bench preference).
-6. DITH: populate 47 nF or strap to VDDA — decide after first EMC scan.
-7. Snubber values for SW1/SW2 — bench-derived, footprints only.
-8. gen_phase2.py: factor the Phase-1 control-core sheet generation into a
-   shared module (docs/05 calls for the control core as a reusable
-   hierarchical sheet) — next session's work.
+4. ~~OVP divider values~~ — resolved: 215 k/20 k 0.1 % + TL431B ref (§8).
+5. RES/hiccup cap value vs restart cadence (bench preference, 470 nF drawn).
+6. DITH: 47 nF populated; R39 (DNP) straps DITH→VDDA to disable if the
+   first EMC scan prefers it.
+7. Snubber values for SW1/SW2 — bench-derived, DNP footprints drawn.
+8. ~~gen_phase2.py~~ — done (2026-07-16): hardware/common/sheets_common.py
+   carries the shared sheets; hardware/phase2-module/ is generated and
+   netlist-verified (171 components, 116 nets). Remaining: EMC/SPICE audit
+   pass on the Phase-2 schematic, then MPN properties at the BOM pass.

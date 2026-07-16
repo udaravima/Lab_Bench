@@ -34,17 +34,18 @@ manager, CAN 2.0B @500k. Docs 01–07 are the spec; read 05 (build plan) first
 | Module firmware | v0.1 builds clean (6.3 KB): full peripheral binding + CAN dispatch around the host-tested `module_core`. Untested on silicon (no board yet) |
 | Host tests | `cd firmware/tests && make test` — must stay green |
 | Manager firmware | not started |
-| Phase-2 circuit design | **complete (docs/08, 2026-07-16)**: all values worked + datasheet-verified; LM5143/LM5069/CSD18540Q5B/CSD19536KTT/XAL1510 PDFs now in docs/datasheets/ |
-| Phase-2/3 schematic generation | not started — **this is the next work** (gen_phase2.py from docs/08) |
+| Phase-2 circuit design | **complete (docs/08, 2026-07-16)**: all values worked + datasheet-verified; LM5143/LM5069/CSD18540Q5B/CSD19536KTT/XAL1510/TMUX1101/TL431 PDFs now in docs/datasheets/ |
+| Phase-2 schematic | **complete, v1 (2026-07-16)**: 8 generated sheets, 171 components, 116 nets machine-verified (gen_phase2.py + shared hardware/common/sheets_common.py; extraction proven netlist-identical for Phase 1). Not yet audited (kicad-happy/SPICE) |
+| Phase-3 schematics | not started — **this is the next work** (backplane + ESP32-S3 manager) |
 | Ordering/BOM | prices verified (PARTS-TO-DOWNLOAD.md §E); MPN-properties pass into schematic symbols not done yet |
 
 ## Immediate next steps (agreed order)
 
-1. **Phase-2 600 W module schematic**: draw docs/08 (all values worked and
-   verified there — don't re-derive, but do re-check §15 open items at
-   capture). Reuse the verified Phase-1 control block (docs/05 says: draw the
-   control core as a reusable hierarchical sheet). Extend the gen_phase1.py
-   approach (gen_phase2.py sharing kicad_gen.py + checkers + EXPECTED_NETS).
+1. **Audit the Phase-2 schematic** (kicad-happy analyzers + ngspice like the
+   Phase-1 audit) — the netlist/footprint checkers are green but no
+   analyzer pass has run yet. Rebuild chain:
+   `cd hardware/phase2-module/tools && python3 gen_phase2.py`, export
+   netlist, `check_netlist.py` + `check_footprints.py`.
 2. **Phase-3 backplane + ESP32-S3 manager schematics** (bus bars, slot IDs,
    CAN termination, E-stop; manager board with display/encoder/USB).
 3. **ESP32-S3 manager firmware** (discovery, UI, SCPI, budget arbiter,

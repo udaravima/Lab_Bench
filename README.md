@@ -39,10 +39,12 @@ precision, usable for lab work, bulk DC power, and battery charging.
 ## Repository layout
 
 ```
-docs/                         Design docs 01..07 (+ datasheets/, gitignored)
+docs/                         Design docs 01..08 (+ datasheets/, gitignored)
+hardware/common/              Shared schematic generator + sheet builders + checkers
 hardware/phase1-module/       KiCad 7 project — GENERATED, do not hand-edit
   tools/                      Generators + mechanical checkers (see README)
-  lib/                        Vetted symbol + footprint libraries
+  lib/                        Vetted symbol + footprint libraries (shared by phase 2)
+hardware/phase2-module/       KiCad 7 project — GENERATED (600 W module, docs/08)
 firmware/
   common/labbench_can.h       CAN codec, shared module <-> manager
   module/core/                Portable control core (host-tested)
@@ -71,10 +73,15 @@ firmware/
 - **Phase-2 circuit design: complete (docs/08)** — all component values
   worked and datasheet-verified (LM5143 interleaved config, LM5069 hot-swap
   with SOA check, 6.8 µH subharmonic-stability fix, INA240A3 scaling fix).
-- **Next:** Phase-2 schematic generation (gen_phase2.py reusing the
-  verified Phase-1 control-core sheet), Phase-3 backplane + ESP32-S3
-  manager schematics, manager firmware — then the batch PCB pass,
-  ordering, and the Phase-1 test campaign per
+- **Phase-2 schematic: complete (v1) and machine-verified** — 8 generated
+  sheets, 171 components, 116 nets asserted against the intended net table,
+  every footprint pad-checked. The control core / sensing / disconnect /
+  aux / MCU sheets are the verified Phase-1 blocks, factored into
+  `hardware/common/sheets_common.py` (extraction proven netlist-identical
+  for Phase 1) and re-parameterized per docs/08.
+- **Next:** Phase-3 backplane + ESP32-S3 manager schematics, manager
+  firmware, kicad-happy/SPICE audit of the Phase-2 schematic — then the
+  batch PCB pass, ordering, and the Phase-1 test campaign per
   [docs/05-build-plan.md](docs/05-build-plan.md).
 
 ## License

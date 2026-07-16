@@ -8,9 +8,13 @@ Run: python3 merge_vendor.py   (from tools/)
 import glob
 import os
 import re
-import kicad_gen as kg
+import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(HERE, "..", "..", "common"))
+import kicad_gen as kg          # noqa: E402
+import synth_symbols            # noqa: E402
+
 LIB = os.path.join(HERE, "..", "lib")
 
 # symbol name -> datasheet the pin map was verified against (date of check)
@@ -39,6 +43,11 @@ def main():
     missing = set(VETTED) - set(blocks)
     if missing:
         raise SystemExit(f"vetted symbols not found in vendor dir: {missing}")
+    # synthesized symbols (no vendor download exists): pin maps transcribed
+    # from local datasheets in hardware/common/synth_symbols.py
+    for name, (gen, vetted) in synth_symbols.SYNTH.items():
+        blocks[name] = gen()
+        VETTED[name] = vetted
     body = "\n".join(f"  {b}" for _, b in sorted(blocks.items()))
     out = os.path.join(LIB, "labbench.kicad_sym")
     with open(out, "w") as fh:

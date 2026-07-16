@@ -10,9 +10,15 @@ import re
 import uuid as uuidlib
 
 SYMDIR = "/usr/share/kicad/symbols"
-LOCAL_LIBDIR = __import__("os").path.join(
-    __import__("os").path.dirname(__import__("os").path.abspath(__file__)), "..", "lib")
+# Project symbol-library directories. Generators prepend their own lib dir
+# via add_lib_dir() before building (phase1 and phase2 share one lib).
+LIB_DIRS = []
 FONT = "(effects (font (size 1.27 1.27)))"
+
+
+def add_lib_dir(path):
+    if path not in LIB_DIRS:
+        LIB_DIRS.insert(0, path)
 
 
 def _uuid():
@@ -52,7 +58,7 @@ class Symbol:
         libtext = ""
         if block is None:
             import os
-            for d in (LOCAL_LIBDIR, SYMDIR):
+            for d in (*LIB_DIRS, SYMDIR):
                 path = os.path.join(d, f"{lib}.kicad_sym")
                 if os.path.exists(path):
                     libtext = open(path).read()

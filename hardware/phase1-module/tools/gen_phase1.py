@@ -7,10 +7,17 @@ is the single source of truth checked by check_netlist.py.
 Run:  python3 gen_phase1.py   (from tools/, writes into the parent dir)
 """
 import os
-import kicad_gen as kg
+import sys
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(HERE, "..", "..", "common"))
+import kicad_gen as kg          # noqa: E402  (shared, hardware/common)
+import sheets_common as sc      # noqa: E402
+
+kg.add_lib_dir(os.path.join(HERE, "..", "lib"))
 
 PROJECT = "phase1-module"
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+OUT = os.path.join(HERE, "..")
 
 ROOT_UUID = "e63e39d7-6ac0-4ffa-9e5c-2b84c50a0001"
 SHEETS = [  # name, fixed sheet-element uuid, page
@@ -25,128 +32,6 @@ SHEETS = [  # name, fixed sheet-element uuid, page
 
 R_FP = "Resistor_SMD:R_0603_1608Metric"      # 0603: hand-assembled board
 C_FP = "Capacitor_SMD:C_0603_1608Metric"
-
-
-def build_control_core():
-    path = f"/{ROOT_UUID}/{dict((n, u) for n, u, _ in SHEETS)['control-core']}"
-    sh = kg.Sheet(PROJECT, path)
-
-    R = kg.get_symbol("Device", "R")
-    C = kg.get_symbol("Device", "C")
-    DAC = kg.get_symbol("Analog_DAC", "DAC80502")
-    OPA = kg.get_symbol("Amplifier_Operational", "OPA2333xxDGK")
-    DSCH = kg.get_symbol("Diode", "BAT54W")
-
-    def res(ref, val, x, y, rot=0):
-        return sh.add(kg.Placed(R, ref, val, x, y, rot, footprint=R_FP))
-
-    def cap(ref, val, x, y, rot=0):
-        return sh.add(kg.Placed(C, ref, val, x, y, rot, footprint=C_FP))
-
-    def gl(net, part, pin, shape="passive"):
-        sh.glabel(net, part.pin_pos(pin), rot=part.label_rot(pin), shape=shape)
-
-    def ll(net, part, pin):
-        sh.label(net, part.pin_pos(pin), rot=part.label_rot(pin))
-
-    # ---- DAC80502: 16-bit dual reference source (V_REF / I_REF) ----
-    u1 = sh.add(kg.Placed(DAC, "U1", "DAC80502DRXT", 50.8, 101.6,
-                          footprint="labbench:DAC80502_DRX_WSON-10"))
-    gl("V_REF", u1, 2, shape="output")                      # VOUTA
-    gl("I_REF", u1, 9, shape="output")                      # VOUTB
-    sh.power("AGND", *u1.pin_pos(5), ground=True)           # SPI2C low = SPI mode (ds 8.5.1)
-    gl("DAC_NSYNC", u1, 7, shape="input")
-    gl("DAC_SDI", u1, 8, shape="input")
-    gl("DAC_SCLK", u1, 6, shape="input")
-    sh.power("3V3", *u1.pin_pos(1))
-    sh.power("AGND", *u1.pin_pos(4), ground=True)
-    sh.power("AGND", *u1.pin_pos(3), ground=True)           # RSTSEL low: POR to zero-scale
-    ll("DAC_REFIO", u1, 10)
-    c_ref = cap("C4", "150n", 81.28, 111.76)
-    ll("DAC_REFIO", c_ref, 1)
-    sh.power("AGND", *c_ref.pin_pos(2), ground=True)
-    c_dac = cap("C3", "100n", 40.64, 127.0)
-    sh.power("3V3", *c_dac.pin_pos(1))
-    sh.power("AGND", *c_dac.pin_pos(2), ground=True)
-
-    # ---- CV error amplifier (U2A): Type-II integrator + diode-OR row ----
-    u2a = sh.add(kg.Placed(OPA, "U2", "OPA2333", 137.16, 76.2, unit=1,
-                           footprint="Package_SO:VSSOP-8_3.0x3.0mm_P0.65mm"))
-    gl("V_MEAS", u2a, 3, shape="input")                     # +in
-    r_av = res("R3", "10K 0.1%", 96.52, u2a.pin_pos(2)[1], rot=90)
-    gl("V_REF", r_av, 1, shape="input")
-    sh.wire(r_av.pin_pos(2), u2a.pin_pos(2))                # -in run
-    sh.label("EAV_INV", (105.41, u2a.pin_pos(2)[1]), rot=90)
-    c_fv = cap("C1", "10n", 106.68, 58.42, rot=90)          # Type-II: integrator
-    r_zv = res("R4", "33K", 132.08, 58.42, rot=90)          # Type-II: zero
-    ll("EAV_INV", c_fv, 1)
-    sh.wire(c_fv.pin_pos(2), r_zv.pin_pos(1))
-    sh.label("EAV_FB", (119.38, 58.42), rot=90)
-    ll("EA_V_OUT", r_zv, 2)
-    d_v = sh.add(kg.Placed(DSCH, "D1", "BAT54W", 160.02, 76.2, rot=180,
-                           footprint="Package_TO_SOT_SMD:SOT-323_SC-70"))
-    sh.wire(u2a.pin_pos(1), d_v.pin_pos(1))                 # out -> anode
-    sh.label("EA_V_OUT", (147.32, 76.2), rot=90)
-    sh.no_connect(d_v.pin_pos(2))                           # pin 2 = NC on SC-70
-    r_iv = res("R5", "3.9K", 182.88, 76.2, rot=90)
-    sh.wire(d_v.pin_pos(3), r_iv.pin_pos(1))                # cathode -> R_inj
-    sh.label("EAV_INJ", (168.91, 76.2), rot=90)
-    gl("FB", r_iv, 2, shape="output")
-
-    # ---- CC error amplifier (U2B): mirror of the CV loop ----
-    u2b = sh.add(kg.Placed(OPA, "U2", "OPA2333", 137.16, 127.0, unit=2,
-                           footprint="Package_SO:VSSOP-8_3.0x3.0mm_P0.65mm"))
-    gl("I_MEAS", u2b, 5, shape="input")                     # +in
-    r_ai = res("R6", "10K 0.1%", 96.52, u2b.pin_pos(6)[1], rot=90)
-    gl("I_REF", r_ai, 1, shape="input")
-    sh.wire(r_ai.pin_pos(2), u2b.pin_pos(6))                # -in run
-    sh.label("EAI_INV", (105.41, u2b.pin_pos(6)[1]), rot=90)
-    c_fi = cap("C2", "22n", 106.68, 109.22, rot=90)
-    r_zi = res("R7", "15K", 132.08, 109.22, rot=90)
-    ll("EAI_INV", c_fi, 1)
-    sh.wire(c_fi.pin_pos(2), r_zi.pin_pos(1))
-    sh.label("EAI_FB", (119.38, 109.22), rot=90)
-    ll("EA_I_OUT", r_zi, 2)
-    d_i = sh.add(kg.Placed(DSCH, "D2", "BAT54W", 160.02, 127.0, rot=180,
-                           footprint="Package_TO_SOT_SMD:SOT-323_SC-70"))
-    sh.wire(u2b.pin_pos(7), d_i.pin_pos(1))                 # out -> anode
-    sh.label("EA_I_OUT", (147.32, 127.0), rot=90)
-    sh.no_connect(d_i.pin_pos(2))
-    r_ii = res("R8", "3.9K", 182.88, 127.0, rot=90)
-    sh.wire(d_i.pin_pos(3), r_ii.pin_pos(1))                # cathode -> R_inj
-    sh.label("EAI_INJ", (168.91, 127.0), rot=90)
-    gl("FB", r_ii, 2, shape="output")
-
-    # ---- op-amp power unit (U2C) + decoupling ----
-    u2c = sh.add(kg.Placed(OPA, "U2", "OPA2333", 50.8, 154.94, unit=3,
-                           footprint="Package_SO:VSSOP-8_3.0x3.0mm_P0.65mm"))
-    sh.power("5V0", *u2c.pin_pos(8))
-    sh.power("AGND", *u2c.pin_pos(4), ground=True)
-    c_op = cap("C5", "100n", 71.12, 154.94)
-    sh.power("5V0", *c_op.pin_pos(1))
-    sh.power("AGND", *c_op.pin_pos(2), ground=True)
-
-    # ---- base divider: hardware output ceiling 0.8V * 26.5 = 21.2V ----
-    r_top = res("R1", "25.5K 0.1%", 218.44, 88.9)
-    r_bot = res("R2", "1.0K 0.1%", 218.44, 106.68)
-    gl("VOUT_INT", r_top, 1, shape="input")
-    gl("FB", r_top, 2, shape="output")
-    gl("FB", r_bot, 1, shape="output")
-    sh.power("AGND", *r_bot.pin_pos(2), ground=True)
-
-    # ---- power flags (temporary home until aux-rails is drawn) ----
-    for i, net in enumerate(("3V3", "5V0", "AGND")):
-        f = sh.pwr_flag(33.02 + 25.4 * i, 172.72)
-        sh.power(net, *f.pin_pos(1), ground=(net == "AGND"))
-
-    sh.text("CONTROL CORE - dual error amps + diode-OR minimum selector into LM5145 FB node.\\n"
-            "Whichever amp demands the LOWER output wins -> automatic CV/CC crossover.\\n"
-            "Accuracy is owned by the 0.1% dividers + DAC + amp offset (see docs/06 s.4).", 33.02, 40.64)
-    sh.text("DAC80502DRXT (WSON-10): SPI2C->AGND = SPI mode; RSTSEL->AGND = zero-code POR\\n"
-            "(both verified vs datasheet). DAC runs on 3V3 = STM32 IO rail (IOVDD<=VDD rule).\\n"
-            "EAs: OPA2333 (RRIO; OPA2189 rejected - input CM stops 2.5V below V+).",
-            33.02, 190.5)
-    return sh
 
 
 def _sheet(name):
@@ -170,222 +55,6 @@ def _sheet(name):
 
 C_BULK = "Capacitor_SMD:C_1210_3225Metric"
 SOT23 = "Package_TO_SOT_SMD:SOT-23"
-
-
-def build_aux_rails():
-    sh, res, cap, gl, ll = _sheet("aux-rails")
-    U8 = kg.get_symbol("labbench", "LMR36015AQRNXRQ1")
-    U9 = kg.get_symbol("Regulator_Linear", "NCP1117-3.3_SOT223")
-    L = kg.get_symbol("Device", "L")
-
-    u8 = sh.add(kg.Placed(U8, "U8", "LMR36015AQRNXRQ1", 76.2, 78.74,
-                          footprint="labbench:LMR36015_RNX_VQFN-HR-12"))  # vendor fp, vetted
-    for p in ("2", "10", "9"):                      # VIN x2 + EN tied to VIN (ds: allowed)
-        gl("VBUS_F", u8, p, shape="input")
-    for p in ("1", "11", "6"):                      # PGND x2 + AGND (ds: tie to system gnd)
-        sh.power("PGND", *u8.pin_pos(p), ground=True)
-    c50 = cap("C50", "4.7u/50V", 38.1, 83.82, fp=C_BULK)
-    c51 = cap("C51", "4.7u/50V", 48.26, 83.82, fp=C_BULK)
-    for c in (c50, c51):
-        gl("VBUS_F", c, 1, shape="input")
-        sh.power("PGND", *c.pin_pos(2), ground=True)
-    ll("SW_AUX", u8, 12)
-    sh.no_connect(u8.pin_pos(3))                    # NC-type pin; ds: tie to SW in copper
-    c52 = cap("C52", "100n", 99.06, 63.5, rot=90)
-    ll("AUX_BOOT", c52, 1)
-    ll("SW_AUX", c52, 2)
-    ll("AUX_BOOT", u8, 4)
-    c53 = cap("C53", "1u", 55.88, 99.06)
-    ll("AUX_VCC", u8, 5)
-    ll("AUX_VCC", c53, 1)
-    sh.power("PGND", *c53.pin_pos(2), ground=True)
-    l2 = sh.add(kg.Placed(L, "L2", "33u/1.2A", 113.03, 91.44, rot=90,
-                          footprint="Inductor_SMD:L_1210_3225Metric"))
-    ll("SW_AUX", l2, 1)
-    sh.power("5V0", *l2.pin_pos(2))
-    r50 = res("R50", "100K 1%", 127.0, 88.9)
-    r51 = res("R51", "24.9K 1%", 127.0, 104.14)
-    sh.power("5V0", *r50.pin_pos(1))
-    ll("AUX_FB", r50, 2)
-    ll("AUX_FB", r51, 1)
-    ll("AUX_FB", u8, 7)                             # VREF = 1.0V -> 5.016V out
-    sh.power("PGND", *r51.pin_pos(2), ground=True)
-    for i, val in enumerate(("22u/16V", "22u/16V")):
-        c = cap(f"C5{4+i}", val, 141.0 + 10.16 * i, 88.9, fp=C_BULK)
-        sh.power("5V0", *c.pin_pos(1))
-        sh.power("PGND", *c.pin_pos(2), ground=True)
-    r52 = res("R52", "100K", 96.52, 99.06)
-    gl("AUX_PG", u8, 8, shape="output")
-    gl("AUX_PG", r52, 2)
-    sh.power("3V3", *r52.pin_pos(1))
-
-    u9 = sh.add(kg.Placed(U9, "U9", "NCP1117-3.3", 177.8, 78.74,
-                          footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2"))
-    sh.power("5V0", *u9.pin_pos(3))
-    sh.power("3V3", *u9.pin_pos(2))
-    sh.power("PGND", *u9.pin_pos(1), ground=True)
-    c56 = cap("C56", "10u/16V", 163.83, 88.9, fp=C_BULK)
-    sh.power("5V0", *c56.pin_pos(1))
-    sh.power("PGND", *c56.pin_pos(2), ground=True)
-    c57 = cap("C57", "22u/10V", 194.31, 88.9, fp=C_BULK)
-    sh.power("3V3", *c57.pin_pos(1))
-    sh.power("PGND", *c57.pin_pos(2), ground=True)
-
-    sh.text("AUX RAILS: VBUS 12-30V -> LMR36015 (60V, 400kHz, adj) -> 5V0 -> NCP1117 -> 3V3.\\n"
-            "FB divider 100K/24.9K -> 5.016V (VREF=1.0V). NC pin ties to SW per datasheet.\\n"
-            "Layout: CIN loop tight; BOOT cap adjacent; VCC LDO cap 1uF, no external loads.", 33.02, 40.64)
-    return sh
-
-
-def build_sensing():
-    sh, res, cap, gl, ll = _sheet("sensing")
-    INA240 = kg.get_symbol("Amplifier_Current", "INA240A3D")
-    INA228 = kg.get_symbol("labbench", "INA228AIDGSR")
-    NT = kg.get_symbol("Device", "NetTie_2")
-
-    r30 = res("R30", "2m/1W Kelvin", 101.6, 55.88, rot=90)
-    r30.footprint = "Resistor_SMD:R_2512_6332Metric"
-    gl("VOUT_INT", r30, 1, shape="input")
-    gl("VOUT_SW", r30, 2, shape="output")
-
-    u4 = sh.add(kg.Placed(INA240, "U4", "INA240A3", 76.2, 101.6,
-                          footprint="Package_SO:SOIC-8_3.9x4.9mm_P1.27mm"))
-    gl("VOUT_INT", u4, 8, shape="input")            # IN+ Kelvin to shunt
-    gl("VOUT_SW", u4, 1, shape="input")             # IN-
-    sh.power("5V0", *u4.pin_pos(6))
-    for p in ("2", "4", "3", "7"):                  # GND x2 + REF1/REF2 -> unidirectional
-        sh.power("AGND", *u4.pin_pos(p), ground=True)
-    r31 = res("R31", "1K", 104.14, 96.52, rot=90)
-    ll("INA240_OUT", u4, 5)
-    ll("INA240_OUT", r31, 1)
-    gl("I_MEAS", r31, 2, shape="output")
-    c31 = cap("C31", "1n", 118.11, 106.68)
-    gl("I_MEAS", c31, 1)
-    sh.power("AGND", *c31.pin_pos(2), ground=True)
-    c33 = cap("C33", "100n", 55.88, 106.68)
-    sh.power("5V0", *c33.pin_pos(1))
-    sh.power("AGND", *c33.pin_pos(2), ground=True)
-
-    u5 = sh.add(kg.Placed(INA228, "U5", "INA228", 76.2, 152.4,
-                          footprint="Package_SO:VSSOP-10_3x3mm_P0.5mm"))
-    gl("VOUT_INT", u5, 10, shape="input")           # IN+ same Kelvin pads
-    gl("VOUT_SW", u5, 9, shape="input")             # IN-
-    gl("VOUT", u5, 8, shape="input")                # VBUS: true terminal voltage
-    sh.power("3V3", *u5.pin_pos(6))
-    sh.power("AGND", *u5.pin_pos(7), ground=True)
-    sh.power("AGND", *u5.pin_pos(1), ground=True)   # A1 -> addr 0x40
-    sh.power("AGND", *u5.pin_pos(2), ground=True)   # A0
-    gl("I2C_SDA", u5, 4)
-    gl("I2C_SCL", u5, 5)
-    gl("INA_ALERT", u5, 3, shape="output")
-    c34 = cap("C34", "100n", 55.88, 157.48)
-    sh.power("3V3", *c34.pin_pos(1))
-    sh.power("AGND", *c34.pin_pos(2), ground=True)
-
-    r32 = res("R32", "69.8K 0.1%", 165.1, 88.9)
-    r33 = res("R33", "10.0K 0.1%", 165.1, 104.14)
-    gl("VOUT", r32, 1, shape="input")
-    gl("V_MEAS", r32, 2, shape="output")
-    gl("V_MEAS", r33, 1)
-    sh.power("AGND", *r33.pin_pos(2), ground=True)
-    c32 = cap("C32", "1n", 180.34, 106.68)
-    gl("V_MEAS", c32, 1)
-    sh.power("AGND", *c32.pin_pos(2), ground=True)
-
-    nt = sh.add(kg.Placed(NT, "NT1", "AGND-PGND tie", 165.1, 152.4, rot=90,
-                          footprint="NetTie:NetTie-2_SMD_Pad0.5mm"))
-    sh.power("AGND", *nt.pin_pos(1), ground=True)
-    sh.power("PGND", *nt.pin_pos(2), ground=True)
-
-    sh.text("SENSING: 2m shunt (Kelvin) between VOUT_INT and disconnect. INA240A3 (x100,\\n"
-            "0.2V/A, 1.6V @ 8A) feeds the CC loop; INA228 feeds telemetry. V divider /8 from\\n"
-            "VOUT terminals. NT1 = the single AGND-PGND tie point: at the shunt ground pad.", 33.02, 40.64)
-    return sh
-
-
-def build_disconnect():
-    sh, res, cap, gl, ll = _sheet("disconnect")
-    LTC = kg.get_symbol("labbench", "LTC7004EMSE#TRPBF")
-    CMP = kg.get_symbol("labbench", "TLV7011DBVR")
-    QN = kg.get_symbol("Device", "Q_NMOS_GDS")
-    Q2N = kg.get_symbol("Transistor_FET", "2N7002")
-
-    q3 = sh.add(kg.Placed(QN, "Q3", "60V NFET", 96.52, 63.5, footprint="labbench:PowerFET_SON5x6_GDS"))
-    q4 = sh.add(kg.Placed(QN, "Q4", "60V NFET", 134.62, 63.5, footprint="labbench:PowerFET_SON5x6_GDS"))
-    gl("VOUT_SW", q3, 2, shape="input")             # D
-    ll("DISC_SRC", q3, 3)                           # common sources
-    ll("DISC_SRC", q4, 3)
-    gl("VOUT", q4, 2, shape="output")               # D
-    ll("DISC_GATE", q3, 1)
-    ll("DISC_GATE", q4, 1)
-
-    u6 = sh.add(kg.Placed(LTC, "U6", "LTC7004", 76.2, 127.0,
-                          footprint="Package_SO:MSOP-10-1EP_3x3mm_P0.5mm_EP1.68x1.88mm"))
-    sh.power("5V0", *u6.pin_pos(1))                 # VCC
-    sh.power("5V0", *u6.pin_pos(2))                 # VCCUV tied high
-    sh.power("AGND", *u6.pin_pos(3), ground=True)
-    sh.power("AGND", *u6.pin_pos(5), ground=True)   # OVLO unused
-    sh.power("AGND", *u6.pin_pos(11), ground=True)  # EP
-    sh.no_connect(u6.pin_pos(10))
-    ll("DISC_GATE", u6, 6)                          # TGDN
-    ll("DISC_GATE", u6, 7)                          # TGUP
-    ll("DISC_SRC", u6, 8)                           # TS
-    c41 = cap("C41", "100n", 113.03, 121.92, rot=90)
-    ll("LTC_BST", u6, 9)
-    ll("LTC_BST", c41, 1)
-    ll("DISC_SRC", c41, 2)
-    c42 = cap("C42", "1u", 55.88, 132.08)
-    sh.power("5V0", *c42.pin_pos(1))
-    sh.power("AGND", *c42.pin_pos(2), ground=True)
-
-    # INP wired-AND: MCU requests, EN_KILL and OVP can veto
-    r43 = res("R43", "10K", 41.91, 111.76, rot=90)
-    gl("OUT_REQ", r43, 1, shape="input")
-    ll("DISC_INP", r43, 2)
-    ll("DISC_INP", u6, 4)
-    r44 = res("R44", "47K", 55.88, 111.76)
-    ll("DISC_INP", r44, 1)
-    sh.power("AGND", *r44.pin_pos(2), ground=True)
-    q7 = sh.add(kg.Placed(Q2N, "Q7", "2N7002", 33.02, 137.16, footprint=SOT23))
-    gl("EN_KILL", q7, 1, shape="input")
-    sh.power("AGND", *q7.pin_pos(2), ground=True)
-    ll("DISC_INP", q7, 3)
-
-    # OVP comparator: trips high above 22.25V -> Q9 pulls INP low
-    u7 = sh.add(kg.Placed(CMP, "U7", "TLV7011", 165.1, 127.0,
-                          footprint="Package_TO_SOT_SMD:SOT-23-5"))
-    r45 = res("R45", "158K 1%", 146.05, 96.52)
-    r46 = res("R46", "20K 1%", 146.05, 111.76)
-    gl("VOUT_INT", r45, 1, shape="input")
-    ll("OVP_DIV", r45, 2)
-    ll("OVP_DIV", r46, 1)
-    sh.power("AGND", *r46.pin_pos(2), ground=True)
-    ll("OVP_DIV", u7, 3)                            # IN+
-    c44 = cap("C44", "1n", 156.21, 111.76)
-    ll("OVP_DIV", c44, 1)
-    sh.power("AGND", *c44.pin_pos(2), ground=True)
-    r47 = res("R47", "10K 1%", 190.5, 96.52)
-    r48 = res("R48", "31.6K 1%", 190.5, 111.76)
-    sh.power("3V3", *r47.pin_pos(1))
-    ll("REF_2V5", r47, 2)
-    ll("REF_2V5", r48, 1)
-    sh.power("AGND", *r48.pin_pos(2), ground=True)
-    ll("REF_2V5", u7, 4)                            # IN-
-    sh.power("5V0", *u7.pin_pos(5))
-    sh.power("AGND", *u7.pin_pos(2), ground=True)
-    c43 = cap("C43", "100n", 177.8, 132.08)
-    sh.power("5V0", *c43.pin_pos(1))
-    sh.power("AGND", *c43.pin_pos(2), ground=True)
-    q9 = sh.add(kg.Placed(Q2N, "Q9", "2N7002", 190.5, 142.24, footprint=SOT23))
-    ll("OVP_TRIP", u7, 1)
-    ll("OVP_TRIP", q9, 1)
-    sh.power("AGND", *q9.pin_pos(2), ground=True)
-    ll("DISC_INP", q9, 3)
-
-    sh.text("OUTPUT DISCONNECT: back-to-back NFETs (blocks battery back-feed when off),\\n"
-            "LTC7004 charge-pump gate driver. INP = OUT_REQ AND NOT(EN_KILL) AND NOT(OVP).\\n"
-            "OVP: VOUT_INT/8.9 vs 2.5V ref -> trips at 22.25V, independent of firmware.", 33.02, 40.64)
-    return sh
 
 
 def build_power_stage():
@@ -551,165 +220,6 @@ def build_power_stage():
     return sh
 
 
-def build_mcu_can():
-    sh, res, cap, gl, ll = _sheet("mcu-can")
-    MCU = kg.get_symbol("MCU_ST_STM32G4", "STM32G431CBTx")
-    CAN = kg.get_symbol("labbench", "TCAN1042HGVDR")
-    XTAL = kg.get_symbol("Device", "Crystal_GND24")
-    LED = kg.get_symbol("Device", "LED")
-    NTC = kg.get_symbol("Device", "Thermistor_NTC")
-    C5 = kg.get_symbol("Connector_Generic", "Conn_01x05")
-    C3 = kg.get_symbol("Connector_Generic", "Conn_01x03")
-
-    u10 = sh.add(kg.Placed(MCU, "U10", "STM32G431CBT6", 88.9, 116.84,
-                           footprint="Package_QFP:LQFP-48_7x7mm_P0.5mm"))
-    # power
-    for p in ("1", "20", "21", "24", "36", "48"):   # VBAT, VREF+, VDDA, VDD x3
-        sh.power("3V3", *u10.pin_pos(p))
-    for p in ("19", "23", "35", "47"):              # VSSA, VSS x3
-        sh.power("AGND", *u10.pin_pos(p), ground=True)
-    for i, x in enumerate((15.24, 27.94, 40.64, 53.34)):
-        c = cap(f"C7{1 + i}", "100n", x, 190.5)
-        sh.power("3V3", *c.pin_pos(1))
-        sh.power("AGND", *c.pin_pos(2), ground=True)
-    c64 = cap("C64", "4.7u", 66.04, 190.5)
-    c65 = cap("C65", "1u VDDA", 78.74, 190.5)
-    for c in (c64, c65):
-        sh.power("3V3", *c.pin_pos(1))
-        sh.power("AGND", *c.pin_pos(2), ground=True)
-    # analog + housekeeping ins
-    gl("V_MEAS", u10, 8, shape="input")             # PA0
-    gl("I_MEAS", u10, 9, shape="input")             # PA1
-    gl("VBUS_SNS", u10, 14, shape="input")          # PA6
-    gl("NTC_FET", u10, 16, shape="input")           # PB0
-    gl("NTC_IND", u10, 17, shape="input")           # PB1
-    r60 = res("R60", "200K 1%", 190.5, 55.88)
-    r61 = res("R61", "10K 1%", 190.5, 71.12)
-    gl("VBUS_F", r60, 1, shape="input")
-    gl("VBUS_SNS", r60, 2)
-    gl("VBUS_SNS", r61, 1)
-    sh.power("AGND", *r61.pin_pos(2), ground=True)
-    c62 = cap("C62", "100n", 203.2, 73.66)
-    gl("VBUS_SNS", c62, 1)
-    sh.power("AGND", *c62.pin_pos(2), ground=True)
-    for i, (net, x) in enumerate((("NTC_FET", 218.44), ("NTC_IND", 233.68))):
-        rp = res(f"R6{7+i}", "10K 1%", x, 55.88)
-        rt = sh.add(kg.Placed(NTC, f"RT{1+i}", "10K B3950", x, 71.12,
-                              footprint="Resistor_SMD:R_0603_1608Metric"))
-        sh.power("3V3", *rp.pin_pos(1))
-        sh.label(net, rp.pin_pos(2), rot=rp.label_rot(2))
-        sh.label(net, rt.pin_pos(1), rot=rt.label_rot(1))
-        sh.power("AGND", *rt.pin_pos(2), ground=True)
-    # DAC SPI + control GPIOs
-    gl("DAC_NSYNC", u10, 12, shape="output")        # PA4
-    gl("DAC_SCLK", u10, 13, shape="output")         # PA5
-    gl("DAC_SDI", u10, 15, shape="output")          # PA7
-    gl("PS_FPWM", u10, 29, shape="output")          # PB15
-    gl("CAN_STB", u10, 32, shape="output")          # PA10
-    gl("PS_PGOOD", u10, 39, shape="input")          # PA15
-    gl("PS_OFF", u10, 40, shape="output")           # PB3
-    gl("AUX_PG", u10, 42, shape="input")            # PB5
-    gl("HW_EN", u10, 43, shape="input")             # PB6
-    gl("INA_ALERT", u10, 44, shape="input")         # PB7
-    gl("OUT_REQ", u10, 28, shape="output")          # PB14 (no reset pull - safe)
-    gl("FAN_PWM", u10, 22, shape="output")          # PB10 (TIM2_CH3)
-    sh.no_connect(u10.pin_pos(41))                  # PB4 spare (NJTRST pull-up at reset)
-    sh.no_connect(u10.pin_pos(2))                   # PC13
-    sh.no_connect(u10.pin_pos(3))
-    sh.no_connect(u10.pin_pos(4))
-    sh.no_connect(u10.pin_pos(46))                  # PB9 spare (PB8 sacrificed to BOOT0)
-    # I2C2 on PA8/PA9 - PB8 is the BOOT0 strap on STM32G4, unusable for I2C pullups
-    gl("I2C_SDA", u10, 30)                          # PA8  I2C2_SDA
-    gl("I2C_SCL", u10, 31)                          # PA9  I2C2_SCL
-    r62 = res("R62", "4.7K", 248.92, 55.88)
-    r63 = res("R63", "4.7K", 261.62, 55.88)
-    sh.power("3V3", *r62.pin_pos(1))
-    sh.power("3V3", *r63.pin_pos(1))
-    gl("I2C_SCL", r62, 2)
-    gl("I2C_SDA", r63, 2)
-    # slot straps
-    gl("SLOT_ID0", u10, 25, shape="input")          # PB11
-    gl("SLOT_ID1", u10, 26, shape="input")          # PB12
-    gl("SLOT_ID2", u10, 27, shape="input")          # PB13
-    # LED
-    d7 = sh.add(kg.Placed(LED, "D7", "STATUS", 218.44, 96.52, rot=90,
-                          footprint="LED_SMD:LED_0603_1608Metric"))
-    r66 = res("R66", "1K", 233.68, 96.52, rot=90)
-    ll("LED_A", d7, 2)
-    ll("LED_A", r66, 1)
-    sh.power("3V3", *r66.pin_pos(2))
-    ll("LED_SINK", d7, 1)
-    ll("LED_SINK", u10, 18)                         # PB2 sinks
-    # BOOT0 strap (PB8, pin 45) + NRST + crystal
-    r65 = res("R65", "10K", 27.94, 55.88)
-    ll("BOOT0", r65, 1)
-    sh.power("AGND", *r65.pin_pos(2), ground=True)
-    ll("BOOT0", u10, 45)                            # PB8-BOOT0 held low: boot from flash
-    y1 = sh.add(kg.Placed(XTAL, "Y1", "8MHz", 218.44, 127.0,
-                          footprint="Crystal:Crystal_SMD_3225-4Pin_3.2x2.5mm"))
-    gl("OSC_IN", u10, 5, shape="input")             # PF0
-    gl("OSC_OUT", u10, 6, shape="output")           # PF1
-    gl("OSC_IN", y1, 1)
-    gl("OSC_OUT", y1, 3)                            # GND24: 1/3 crystal, 2/4 shield
-    sh.power("AGND", *y1.pin_pos(2), ground=True)
-    sh.power("AGND", *y1.pin_pos(4), ground=True)
-    c66 = cap("C66", "10p", 210.82, 137.16)
-    c67 = cap("C67", "10p", 226.06, 137.16)
-    gl("OSC_IN", c66, 1)
-    gl("OSC_OUT", c67, 1)
-    sh.power("AGND", *c66.pin_pos(2), ground=True)
-    sh.power("AGND", *c67.pin_pos(2), ground=True)
-    c68 = cap("C68", "100n", 15.24, 71.12)
-    gl("NRST", u10, 7, shape="input")               # PG10
-    gl("NRST", c68, 1)
-    sh.power("AGND", *c68.pin_pos(2), ground=True)
-    # headers
-    j2 = sh.add(kg.Placed(C5, "J2", "SWD", 259.08, 127.0,
-                          footprint="Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical"))
-    sh.power("3V3", *j2.pin_pos(1))
-    gl("SWDIO", j2, 2)
-    gl("SWCLK", j2, 3)
-    gl("NRST", j2, 4)
-    sh.power("AGND", *j2.pin_pos(5), ground=True)
-    gl("SWDIO", u10, 37)                            # PA13
-    gl("SWCLK", u10, 38)                            # PA14
-    j3 = sh.add(kg.Placed(C3, "J3", "UART", 259.08, 154.94,
-                          footprint="Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical"))
-    sh.power("AGND", *j3.pin_pos(1), ground=True)
-    gl("UART_TX", j3, 2)
-    gl("UART_RX", j3, 3)
-    gl("UART_TX", u10, 10, shape="output")          # PA2
-    gl("UART_RX", u10, 11, shape="input")           # PA3
-    # CAN
-    u11 = sh.add(kg.Placed(CAN, "U11", "TCAN1042HGV", 174.5, 165.1,
-                           footprint="Package_SO:SOIC-8_3.9x4.9mm_P1.27mm"))
-    gl("CAN_TX", u10, 34, shape="output")           # PA12 FDCAN1_TX
-    gl("CAN_RX", u10, 33, shape="input")            # PA11 FDCAN1_RX
-    gl("CAN_TX", u11, 1, shape="input")             # TXD
-    gl("CAN_RX", u11, 4, shape="output")            # RXD
-    sh.power("5V0", *u11.pin_pos(3))
-    sh.power("3V3", *u11.pin_pos(5))                # VIO
-    sh.power("AGND", *u11.pin_pos(2), ground=True)
-    gl("CAN_H", u11, 7)
-    gl("CAN_L", u11, 6)
-    gl("CAN_STB", u11, 8, shape="input")
-    r64 = res("R64", "10K", 40.64, 55.88)
-    gl("CAN_STB", r64, 1)
-    sh.power("AGND", *r64.pin_pos(2), ground=True)
-    c69 = cap("C69", "100n", 148.59, 170.18)
-    sh.power("5V0", *c69.pin_pos(1))
-    sh.power("AGND", *c69.pin_pos(2), ground=True)
-    c70 = cap("C70", "100n", 148.59, 182.88)
-    sh.power("3V3", *c70.pin_pos(1))
-    sh.power("AGND", *c70.pin_pos(2), ground=True)
-
-    sh.text("MCU: STM32G431CBT6. SPI1->DAC, I2C1->INA228, FDCAN1->TCAN1042 (VCC 5V bus\\n"
-            "drive, VIO 3V3 logic). 8MHz crystal for CAN clock accuracy. OUT_REQ on PB14\\n"
-            "(PB4 NJTRST reset pull-up would close the disconnect at boot). Slot straps\\n"
-            "PB11-13 use internal pull-ups; backplane grounds them per slot.", 15.24, 33.02)
-    return sh
-
-
 def build_io():
     sh, res, cap, gl, ll = _sheet("io")
     C2 = kg.get_symbol("Connector_Generic", "Conn_01x02")
@@ -776,13 +286,63 @@ def build_io():
     return sh
 
 
+# ---- shared sheets (hardware/common/sheets_common.py) with Phase-1 values --
+
+def _shared(name, builder, params):
+    def build():
+        path = f"/{ROOT_UUID}/{dict((n, u) for n, u, _ in SHEETS)[name]}"
+        return builder(kg.Sheet(PROJECT, path), params)
+    return build
+
+
+P1_CONTROL_CORE = {
+    "r_top": "25.5K 0.1%",    # ceiling 0.8V x 26.5 = 21.2V (LM5145 FB = 0.8V)
+    "r_inj": "3.9K",
+    "note": "CONTROL CORE - dual error amps + diode-OR minimum selector into LM5145 FB node.\\n"
+            "Whichever amp demands the LOWER output wins -> automatic CV/CC crossover.\\n"
+            "Accuracy is owned by the 0.1% dividers + DAC + amp offset (see docs/06 s.4).",
+}
+P1_SENSING = {
+    "shunts": [("R30", "2m/1W Kelvin")],
+    "div_top": "69.8K 0.1%",
+    "droop": None,
+    "note": "SENSING: 2m shunt (Kelvin) between VOUT_INT and disconnect. INA240A3 (x100,\\n"
+            "0.2V/A, 1.6V @ 8A) feeds the CC loop; INA228 feeds telemetry. V divider /8 from\\n"
+            "VOUT terminals. NT1 = the single AGND-PGND tie point: at the shunt ground pad.",
+}
+P1_DISCONNECT = {
+    "extra_fets": [],
+    "fet_val": "60V NFET",
+    "ovp_top": "158K 1%",
+    "ovp_bot": "20K 1%",
+    "ref_tl431": False,
+    "note": "OUTPUT DISCONNECT: back-to-back NFETs (blocks battery back-feed when off),\\n"
+            "LTC7004 charge-pump gate driver. INP = OUT_REQ AND NOT(EN_KILL) AND NOT(OVP).\\n"
+            "OVP: VOUT_INT/8.9 vs 2.5V ref -> trips at 22.25V, independent of firmware.",
+}
+P1_AUX_RAILS = {
+    "vin_net": "VBUS_F",
+    "en_pgd": False,
+    "note": "AUX RAILS: VBUS 12-30V -> LMR36015 (60V, 400kHz, adj) -> 5V0 -> NCP1117 -> 3V3.\\n"
+            "FB divider 100K/24.9K -> 5.016V (VREF=1.0V). NC pin ties to SW per datasheet.\\n"
+            "Layout: CIN loop tight; BOOT cap adjacent; VCC LDO cap 1uF, no external loads.",
+}
+P1_MCU_CAN = {
+    "vbus_net": "VBUS_F",
+    "pb4": "nc",
+    "note": "MCU: STM32G431CBT6. SPI1->DAC, I2C1->INA228, FDCAN1->TCAN1042 (VCC 5V bus\\n"
+            "drive, VIO 3V3 logic). 8MHz crystal for CAN clock accuracy. OUT_REQ on PB14\\n"
+            "(PB4 NJTRST reset pull-up would close the disconnect at boot). Slot straps\\n"
+            "PB11-13 use internal pull-ups; backplane grounds them per slot.",
+}
+
 BUILDERS = {
-    "control-core": build_control_core,
-    "aux-rails": build_aux_rails,
-    "sensing": build_sensing,
-    "disconnect": build_disconnect,
+    "control-core": _shared("control-core", sc.build_control_core, P1_CONTROL_CORE),
+    "aux-rails": _shared("aux-rails", sc.build_aux_rails, P1_AUX_RAILS),
+    "sensing": _shared("sensing", sc.build_sensing, P1_SENSING),
+    "disconnect": _shared("disconnect", sc.build_disconnect, P1_DISCONNECT),
     "power-stage": build_power_stage,
-    "mcu-can": build_mcu_can,
+    "mcu-can": _shared("mcu-can", sc.build_mcu_can, P1_MCU_CAN),
     "io": build_io,
 }
 

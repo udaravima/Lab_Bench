@@ -1,5 +1,12 @@
 # Schematic / PCB generation pipeline
 
+> **Phase 2:** `hardware/phase2-module/tools/` follows this same pipeline
+> (gen_phase2.py + its own check wrappers); it shares this project's
+> `lib/` and everything in `hardware/common/`. merge_vendor.py also emits
+> the synthesized LM5143/LM5069 symbols (hardware/common/synth_symbols.py,
+> pin maps transcribed from local datasheets); build_fplib.py generates the
+> LM5143_RHA0040P land pattern (EP 3.3×3.3 — no stock RHA variant matches).
+
 Everything in this KiCad project is **generated and machine-verified** — no
 hand edits to `.kicad_sch`/`.kicad_pcb` (they'd be overwritten). The pipeline
 exists so that every electrical claim is checked mechanically instead of by
@@ -22,7 +29,8 @@ eyeball; it has caught >15 real hardware bugs before any board was ordered.
 
 | Script | Role |
 |---|---|
-| `kicad_gen.py` | KiCad 7 s-expression schematic writer: symbol extraction (extends-flattening, SnapMagic fallback), pin-position transform, label-at-pin connectivity, synthesized power ports |
+| `../../common/kicad_gen.py` | KiCad 7 s-expression schematic writer: symbol extraction (extends-flattening, SnapMagic fallback), pin-position transform, label-at-pin connectivity, synthesized power ports. **Shared with phase2-module** |
+| `../../common/sheets_common.py` | The five sheets both phases share (control-core, sensing, disconnect, aux-rails, mcu-can) as parameterized builders — extracted verbatim from the netlist-verified Phase-1 generator (netlist-equivalence-checked at extraction) |
 | `gen_phase1.py` | Draws all 7 sheets + `EXPECTED_NETS` (~90 nets). Run from tools/: `python3 gen_phase1.py` |
 | `check_netlist.py` | Asserts exact/superset (`~` prefix) net membership, pin leaks, duplicate refs, global/local split nets |
 | `check_footprints.py` | Every component has a resolvable footprint; every netted pin has a matching pad |

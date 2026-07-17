@@ -80,9 +80,16 @@ def run_fpcheck(path, fpdirs):
     for m in re.finditer(r'\(comp \(ref "([^"]+)"\)\s*\(value "[^"]*"\)\s*\(footprint "([^"]*)"\)', text):
         comps[m.group(1)] = m.group(2)
     allrefs = set(re.findall(r'\(comp \(ref "([^"]+)"\)', text))
+    # Only pins on REAL nets need pads. KiCad exports deliberately-open pins
+    # as single-node "unconnected-(...)" nets; a pin with no connection needs
+    # no pad (e.g. the 24-pin USB-C symbol on a 16-pad USB2.0 receptacle).
     used_pins = {}
-    for ref, pin in re.findall(r'\(node \(ref "([^"]+)"\) \(pin "([^"]+)"\)', text):
-        used_pins.setdefault(ref, set()).add(pin)
+    for part in re.split(r'\(net \(code "\d+"\) ', text)[1:]:
+        name = re.match(r'\(name "([^"]+)"\)', part).group(1)
+        if name.startswith("unconnected-"):
+            continue
+        for ref, pin in re.findall(r'\(node \(ref "([^"]+)"\) \(pin "([^"]+)"\)', part):
+            used_pins.setdefault(ref, set()).add(pin)
 
     fails = 0
     for ref in sorted(allrefs):

@@ -46,6 +46,8 @@ hardware/phase1-module/       KiCad 7 project — GENERATED, do not hand-edit
   tools/                      Generators + mechanical checkers (see README)
   lib/                        Vetted symbol + footprint libraries (shared by phase 2)
 hardware/phase2-module/       KiCad 7 project — GENERATED (600 W module, docs/08)
+hardware/phase3-backplane/    KiCad 7 project — GENERATED (8-slot backplane, docs/09)
+hardware/phase3-manager/      KiCad 7 project — GENERATED (ESP32-S3 manager, docs/09)
 firmware/
   common/labbench_can.h       CAN codec, shared module <-> manager
   module/core/                Portable control core (host-tested)

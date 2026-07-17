@@ -78,7 +78,18 @@ def lm5069mm2():
                       descr="lm5069.pdf Pin Functions (pin map verified 2026-07-16)")
 
 
+def tpd2e001drl():
+    """TPD2E001 2-channel USB ESD, DRL (SOT-5X3).
+    Pin map: tpd2e001.pdf Pin Functions, DRL column (verified 2026-07-17):
+    1=VCC, 2=NC, 3=IO1, 4=GND, 5=IO2."""
+    left = [("3", "IO1"), ("5", "IO2")]
+    right = [("1", "VCC"), ("4", "GND"), ("2", "NC")]
+    return box_symbol("TPD2E001DRL", left, right, width=12.7,
+                      descr="tpd2e001.pdf Pin Functions DRL (verified 2026-07-17)")
+
+
 SYNTH = {
     "LM5143RHAR": (lm5143rhar, "lm5143.pdf Table 7-1 (2026-07-16)"),
     "LM5069MM-2": (lm5069mm2, "lm5069.pdf Pin Functions (2026-07-16)"),
+    "TPD2E001DRL": (tpd2e001drl, "tpd2e001.pdf Pin Functions DRL (2026-07-17)"),
 }

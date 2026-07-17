@@ -37,7 +37,7 @@ manager, CAN 2.0B @500k. Docs 01–07 are the spec; read 05 (build plan) first
 | Phase-2 circuit design | **complete (docs/08, 2026-07-16)**: all values worked + datasheet-verified; LM5143/LM5069/CSD18540Q5B/CSD19536KTT/XAL1510/TMUX1101/TL431 PDFs now in docs/datasheets/ |
 | Phase-2 schematic | **complete, v1, audited (2026-07-17)**: 8 sheets, 171 components, 116 nets machine-verified; kicad-happy audit triaged (all errors = known false-positive classes or the deferred MPN pass — same baseline as Phase-1); ngspice **45/47 pass** (crystal warn + bridge skip = same model limitations as Phase-1's 38/40) |
 | Phase-3 schematics | **complete, v1, audited (2026-07-17)**: backplane (29 comps, EXACT net assertions) + manager (80 comps) — audit caught a real omission (manager I²C pull-ups specified in docs/09 but not drawn; fixed, PR-001 clear). SPICE: manager 16/16, backplane 3/3. Backplane "missing I²C pull-up" findings = by design (manager owns them) |
-| Manager firmware | not started — **this is the next work** (docs/10 architecture then implementation; reuses firmware/common/labbench_can.h) |
+| Manager firmware | **core v0.1 host-tested (2026-07-18)**: manager_core (discovery, #15 supervision, docs/03 §3 ack/retry, #17 budget arbiter, §7 charge sequencer) green in firmware/tests; ESP-IDF shell committed as an UNBUILT skeleton (no IDF toolchain here — UI/SCPI are TODO stubs) |
 | Ordering/BOM | prices verified (PARTS-TO-DOWNLOAD.md §E); MPN-properties pass into schematic symbols not done yet |
 
 ## Immediate next steps (agreed order)

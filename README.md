@@ -33,6 +33,7 @@ precision, usable for lab work, bulk DC power, and battery charging.
 | [docs/07-module-firmware.md](docs/07-module-firmware.md) | STM32G431 firmware architecture, pin map, bring-up |
 | [docs/08-phase2-circuit-design.md](docs/08-phase2-circuit-design.md) | Worked component values for the 600 W module (LM5143 + LM5069) |
 | [docs/09-phase3-circuit-design.md](docs/09-phase3-circuit-design.md) | Backplane + ESP32-S3 manager design (slots, E-stop chain, bus metering, UI) |
+| [docs/10-manager-firmware.md](docs/10-manager-firmware.md) | Manager firmware architecture (host-tested core + ESP-IDF shell) |
 | [HANDOVER.md](HANDOVER.md) | Session handover: state, decisions, gotchas, next steps |
 | [hardware/phase1-module/tools/README.md](hardware/phase1-module/tools/README.md) | Schematic/PCB generation + verification pipeline |
 | [hardware/phase1-module/lib/PARTS-TO-DOWNLOAD.md](hardware/phase1-module/lib/PARTS-TO-DOWNLOAD.md) | Exact orderables, package corrections, verified pricing |
@@ -52,7 +53,8 @@ firmware/
   common/labbench_can.h       CAN codec, shared module <-> manager
   module/core/                Portable control core (host-tested)
   module/                     STM32G431 bare-metal firmware (Makefile+arm-gcc)
-  manager/                    ESP32-S3 manager firmware          [not started]
+  manager/core/               Portable manager core (host-tested)
+  manager/idf/                ESP-IDF shell (needs IDF >= 5.1; unproven on silicon)
   tests/                      Host unit tests — `cd firmware/tests && make test`
 ```
 

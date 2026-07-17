@@ -60,7 +60,7 @@
     (property "Sheetfile" "io.kicad_sch" (at 190.5 84.41999999999999 0) (effects (font (size 1.27 1.27)) (justify left top)))
     (instances (project "phase2-module" (path "/f47c11d2-88b1-4e02-9d3a-7f10a2c50001" (page "9"))))
   )
-  (text "Lab_Bench phase-2 module - 600W two-phase CV/CC module (docs/08).\nGenerated schematic; run tools/gen_phase2.py, never hand-edit.\nControl core / sensing / disconnect / aux / MCU sheets are the verified\nPhase-1 blocks (hardware/common/sheets_common.py) with Phase-2 values." (at 38.1 139.7 0) (effects (font (size 1.27 1.27))) (uuid 7d2f176a-654e-4a42-9edf-0d2be1650aaa))
+  (text "Lab_Bench phase-2 module - 600W two-phase CV/CC module (docs/08).\nGenerated schematic; run tools/gen_phase2.py, never hand-edit.\nControl core / sensing / disconnect / aux / MCU sheets are the verified\nPhase-1 blocks (hardware/common/sheets_common.py) with Phase-2 values." (at 38.1 139.7 0) (effects (font (size 1.27 1.27))) (uuid 0f0f2c59-74e9-4c0c-a4cf-e812426a72c2))
 
   (sheet_instances (path "/" (page "1")))
 )

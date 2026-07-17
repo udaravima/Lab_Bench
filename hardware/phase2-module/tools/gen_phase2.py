@@ -288,22 +288,30 @@ def build_power_stage():
     # -- inductors + per-phase shunts (CS Kelvin to inductor side, VOUT to
     #    output side; 73mV/3.5m: peak limit 20.9A typ, 18.9A min > 16.6A max
     #    normal peak, 23.4A max << 36A Isat)
-    l1 = sh.add(kg.Placed(L, "L1", "XAL1510-682ME 6.8u", 190.5, 71.12, rot=90,
+    l1 = sh.add(kg.Placed(L, "L1", "6.8u MWSA1707S/XAL1510", 190.5, 71.12, rot=90,
                           footprint="Inductor_SMD:L_Coilcraft_XAL1510-682"))
-    l3 = sh.add(kg.Placed(L, "L3", "XAL1510-682ME 6.8u", 190.5, 109.22, rot=90,
+    l3 = sh.add(kg.Placed(L, "L3", "6.8u MWSA1707S/XAL1510", 190.5, 109.22, rot=90,
                           footprint="Inductor_SMD:L_Coilcraft_XAL1510-682"))
     gl("SW1", l1, 1)
     ll("PH_CS_A", l1, 2)
     gl("SW2", l3, 1)
     ll("PH_CS_B", l3, 2)
-    r36 = res("R36", "3m5 3W Kelvin", 215.9, 71.12, rot=90)
-    r37 = res("R37", "3m5 3W Kelvin", 215.9, 109.22, rot=90)
-    for r in (r36, r37):
-        r.footprint = "Resistor_SMD:R_2512_6332Metric"
-    ll("PH_CS_A", r36, 1)
-    gl("VOUT_INT", r36, 2, shape="output")
-    ll("PH_CS_B", r37, 1)
-    gl("VOUT_INT", r37, 2, shape="output")
+    # 3.75 mOhm per phase as 2x 7m5 1206 1W in parallel (sourcing pass
+    # 2026-07-18): pulls the worst-corner peak limit to 21.9 A, inside the
+    # Sunlord MWSA1707S-6R8MT's 22 A Isat while keeping 6% no-false-trip
+    # margin; also fine with the XAL1510 (36 A). Each 1206 carries I/2.
+    r36 = res("R36", "7m5 1W", 215.9, 71.12, rot=90)
+    r42 = res("R42", "7m5 1W", 222.25, 71.12, rot=90)
+    r37 = res("R37", "7m5 1W", 215.9, 109.22, rot=90)
+    r57 = res("R57", "7m5 1W", 222.25, 109.22, rot=90)
+    for r in (r36, r42, r37, r57):
+        r.footprint = "Resistor_SMD:R_1206_3216Metric"
+    for r in (r36, r42):
+        ll("PH_CS_A", r, 1)
+        gl("VOUT_INT", r, 2, shape="output")
+    for r in (r37, r57):
+        ll("PH_CS_B", r, 1)
+        gl("VOUT_INT", r, 2, shape="output")
     ll("PH_CS_A", u3, 27)                           # CS1
     ll("PH_CS_B", u3, 4)                            # CS2
     gl("VOUT_INT", u3, 26)                          # VOUT1
@@ -344,7 +352,8 @@ def build_power_stage():
     sh.power("PGND", *c58.pin_pos(2), ground=True)
 
     sh.text("POWER STAGE: LM5143 two-phase interleaved (MODE=VDDA, FB2=AGND, COMP1=COMP2,\\n"
-            "SS1=SS2), 347kHz/phase (RT 63.4K), peak-current-mode with 3.5m shunt sense.\\n"
+            "SS1=SS2), 347kHz/phase (RT 63.4K), peak-current-mode, 3.75m sense (2x 7m5 1206:\\n"
+            "worst-corner peak 21.9A fits the 22A-Isat Sunlord AND the 36A XAL1510).\\n"
             "L = 6.8uH NOT 4.7uH: internal slope comp (~100mV/us) needs it for subharmonic\\n"
             "stability at D->0.93 (docs/08 s.2). VCCX <- 5V0. DEMB low = DEM (battery-safe).\\n"
             "EN: 5V0 pull-up (rail itself is PGD-sequenced) AND NOT(EN_KILL).", 15.24, 27.94)
@@ -544,7 +553,7 @@ EXPECTED_NETS = {
     "FB":        {"R5.2", "R8.2", "R1.2", "R2.1", "U3.28"},
     "V_MEAS":    {"U2.3", "R32.2", "R33.1", "C32.1", "U10.8", "U13.2"},
     "I_MEAS":    {"U2.5", "R31.2", "C31.1", "U10.9", "R35.1"},
-    "~VOUT_INT": {"R36.2", "R37.2", "U3.26", "U3.5",
+    "~VOUT_INT": {"R36.2", "R42.2", "R37.2", "R57.2", "U3.26", "U3.5",
                   "C15.1", "C16.1", "C36.1", "C37.1", "C38.1", "C40.1",
                   "C45.1", "C46.1", "C47.1", "C48.1", "R27.1",
                   "R1.1", "R30.1", "R34.1", "U4.8", "U5.10", "R45.1"},
@@ -588,8 +597,8 @@ EXPECTED_NETS = {
     "G_LS_B":    {"U3.13", "U3.12", "Q13.1"},
     "~SW2":      {"U3.10", "Q12.3", "Q13.2", "L3.1", "C35.2", "R41.1"},
     "BST_B":     {"U3.11", "C35.1"},
-    "PH_CS_A":   {"L1.2", "R36.1", "U3.27"},
-    "PH_CS_B":   {"L3.2", "R37.1", "U3.4"},
+    "PH_CS_A":   {"L1.2", "R36.1", "R42.1", "U3.27"},
+    "PH_CS_B":   {"L3.2", "R37.1", "R57.1", "U3.4"},
     "SNUB_A":    {"R40.2", "C49.1"},
     "SNUB_B":    {"R41.2", "C58.1"},
     # -- sensing

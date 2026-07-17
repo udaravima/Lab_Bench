@@ -95,17 +95,27 @@ trips at V_CS = 73 mV (66 min / 82 max), G_CS = 12.
 > alone can blow the 10 % balance exit criterion. The ~1.6 W total shunt
 > loss (0.27 % of 600 W) is the price of a criterion we can pass.
 
-Sizing (datasheet Eq. 11, R_S = V_CS/(I_OC + ΔI/2)) with R_S = **3.5 mΩ**:
+Sizing (datasheet Eq. 11, R_S = V_CS/(I_OC + ΔI/2)) with R_S = **3.75 mΩ,
+implemented as 2 × 7.5 mΩ 1206 1 W in parallel** (sourcing pass 2026-07-18:
+the value is chosen so BOTH inductor options work — see the inductor note):
 
 | Tolerance case | Peak-current limit | Comment |
 |---|---|---|
-| V_CS min 66 mV | 18.9 A | vs worst normal peak 15 + 1.6 = 16.6 A → 2.3 A (14 %) no-false-trip margin |
-| V_CS typ 73 mV | 20.9 A | DC-equivalent OCP ≈ 19.3 A/phase (129 % of rated) |
-| V_CS max 82 mV | 23.4 A | < XAL1510-682 I_sat 36 A ✓ |
+| V_CS min 66 mV | 17.6 A | vs worst normal peak 15 + 1.6 = 16.6 A → 6 % no-false-trip margin |
+| V_CS typ 73 mV | 19.5 A | DC-equivalent OCP ≈ 17.9 A/phase (119 % of rated) |
+| V_CS max 82 mV | 21.9 A | ≤ Sunlord I_sat 22 A (0.6 %) and ≪ XAL1510 36 A ✓ |
 
-Dissipation 15² × 3.5 mΩ = 0.79 W → **2512/2726 wide-terminal ≥ 3 W, ±1 %**,
-Kelvin pads (3.0 mΩ is an acceptable substitute if 3.5 mΩ sources poorly:
-margins shift to 22.0 A no-trip / 27.3 A max, still < I_sat).
+Each 1206 carries half the phase current: (7.5 A)² × 7.5 mΩ = 0.42 W on a
+1 W part. Subharmonic stability re-checked at the higher sense gain
+(45 mV/A): worst m_c(1−D) = 0.577 > 0.5 ✓.
+
+> **Budget-inductor note (2026-07-18):** the China-market 17×17 mm molded
+> class tops out at I_sat ≈ 22 A at 6.8 µH (Sunlord MWSA1707S-6R8MT:
+> 17 A Irms, 22 A Isat, 7.5 mΩ DCR, $1.72 — JLCPCB-verified; Bourns
+> SRP1265A-6R8M **rejected**, 18 A/11.5 A). The 3.75 mΩ shunt puts the
+> worst-corner limit inside 22 A. Decision: build with Sunlord + buy two
+> XAL1510-682 spares, A/B thermals at Phase-2 bring-up (Sunlord runs
+> ~+40 °C at full load per its Irms rating; DCR costs ~0.25 % efficiency).
 
 ### FETs — CSD18540Q5B ×4 (verified csd18540q5b.pdf)
 
@@ -352,7 +362,7 @@ stock — jlcsearch first, then Mouser):
 
 | Item | Requirement |
 |---|---|
-| Phase shunts | 3.5 mΩ (alt 3.0 mΩ) ±1 % ≥3 W 2512/2726 Kelvin ×2 |
+| Phase shunts | 7.5 mΩ ±1 % 1206 1 W ×4 (parallel pairs = 3.75 mΩ/phase, §2) |
 | Output shunt | 1.0 mΩ ±1 % ≥3 W 2512 ×2 (parallel pair = 0.5 mΩ, §4) |
 | Hot-swap R_SNS | 1.5 mΩ ±1 % ≥3 W Kelvin |
 | Output caps | 220 µF 35 V hybrid polymer ×4 (ESR ≤ 25 mΩ each) |

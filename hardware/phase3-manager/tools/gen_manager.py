@@ -81,6 +81,14 @@ def build_power_can():
     sh.power("3V3", *j1.pin_pos(10))                # manager SOURCES this rail
     gl("I2C_SDA", j1, 11)
     gl("I2C_SCL", j1, 12)
+    # manager owns the bus pull-ups (docs/09 s.3) - the backplane INA228 and
+    # the TCA9535 both hang off this pair
+    r62 = res("R62", "4.7K", 55.88, 137.16)
+    r63 = res("R63", "4.7K", 68.58, 137.16)
+    sh.power("3V3", *r62.pin_pos(1))
+    sh.power("3V3", *r63.pin_pos(1))
+    gl("I2C_SCL", r62, 2)
+    gl("I2C_SDA", r63, 2)
     for n in range(8):
         gl(f"PRESENT{n}", j1, str(13 + n), shape="input")
 
@@ -498,8 +506,8 @@ EXPECTED_NETS = {
     "CAN_L":     {"U11.6", "J1.8"},
     "HW_EN":     {"J1.9", "Q8.3", "U10.31"},
     "HW_KILL":   {"U10.23", "Q8.1", "R71.1"},
-    "I2C_SDA":   {"J1.11", "U10.12", "U13.23"},
-    "I2C_SCL":   {"J1.12", "U10.17", "U13.22"},
+    "I2C_SDA":   {"J1.11", "U10.12", "U13.23", "R63.2"},
+    "I2C_SCL":   {"J1.12", "U10.17", "U13.22", "R62.2"},
     # -- mcu
     "ESP_EN":    {"U10.3", "R65.2", "C68.1", "SW1.1"},
     "BOOT0":     {"U10.27", "R66.2", "SW2.1"},
@@ -538,7 +546,7 @@ EXPECTED_NETS = {
     "BUZZ":      {"U10.34", "Q9.1", "R98.1"},
     "BUZZ_N":    {"BZ1.2", "D9.2", "Q9.3"},
     # -- rails (superset)
-    "~3V3":      {"J1.10", "R52.1", "U9.2", "C57.1", "U11.5", "C70.1",
+    "~3V3":      {"J1.10", "R52.1", "R62.1", "R63.1", "U9.2", "C57.1", "U11.5", "C70.1",
                   "U10.2", "C64.1", "C65.1", "R65.1", "R66.1", "U12.1", "C66.1",
                   "U13.24", "C73.1", "R72.1", "J6.1", "R73.2", "Q11.2",
                   "R75.1", "R76.1", "R79.1", "R69.2", "R70.2",

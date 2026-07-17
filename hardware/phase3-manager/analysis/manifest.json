@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "project": "phase3-manager.kicad_pro",
+  "current": "2026-07-17_2102",
+  "runs": {
+    "2026-07-17_2101": {
+      "source_hashes": {
+        "phase3-manager.kicad_sch": "sha256:d5dafb1880a018410284700eaa328418d9aa9daaed02daf1d64ff1c9d1acc824"
+      },
+      "outputs": {
+        "schematic": "schematic.json"
+      },
+      "scripts": {
+        "schematic": "analyze_schematic.py phase3-manager.kicad_sch"
+      },
+      "generated": "2026-07-17T21:01:35+05:30",
+      "pinned": false
+    },
+    "2026-07-17_2102": {
+      "source_hashes": {
+        "phase3-manager.kicad_sch": "sha256:d2ecfb4cc8dfcd818437eb2c3459ebf934672dc81f36b8011fc99e4b3a63eb0d",
+        "schematic.json": "sha256:651157357b08edf99257b9111e1237f871fc2c27698d23941e6ef741e73514a2"
+      },
+      "outputs": {
+        "schematic": "schematic.json",
+        "spice": "spice.json"
+      },
+      "scripts": {
+        "schematic": "analyze_schematic.py phase3-manager.kicad_sch"
+      },
+      "generated": "2026-07-17T21:02:36+05:30",
+      "pinned": false
+    }
+  }
+}

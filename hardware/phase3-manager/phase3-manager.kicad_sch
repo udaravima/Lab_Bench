@@ -25,7 +25,7 @@
     (property "Sheetfile" "ui.kicad_sch" (at 139.7 53.94 0) (effects (font (size 1.27 1.27)) (justify left top)))
     (instances (project "phase3-manager" (path "/b52e91a7-1c44-4a30-b6f2-91c4e8d50001" (page "4"))))
   )
-  (text "Lab_Bench phase-3 manager - ESP32-S3 rack controller (docs/09).\nGenerated schematic; run tools/gen_manager.py, never hand-edit." (at 38.1 88.9 0) (effects (font (size 1.27 1.27))) (uuid 362ee9db-ff14-400f-a862-0d27ae6ebdec))
+  (text "Lab_Bench phase-3 manager - ESP32-S3 rack controller (docs/09).\nGenerated schematic; run tools/gen_manager.py, never hand-edit." (at 38.1 88.9 0) (effects (font (size 1.27 1.27))) (uuid 389773e8-63bb-4bbe-9b62-a0c92cb56b14))
 
   (sheet_instances (path "/" (page "1")))
 )

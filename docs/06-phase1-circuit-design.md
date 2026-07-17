@@ -196,8 +196,11 @@ Two nested loops, deliberately decoupled by frequency:
   B3950: FET area, inductor); GPIO → LM5145 EN, DEM/FPWM, disconnect request,
   droop enable (fitted but unused in Phase 1), status LED; UART debug header;
   SWD header.
-- **Slot straps:** 3 GPIO with pull-ups read at boot (grounded on the bench
-  harness = slot 0).
+- **Slot straps:** 3 GPIO with pull-ups read at boot. Firmware inverts the
+  raw pins (`SLOT_ID_IN() = ~PB[13:11]`): a grounded strap sets a bit, so
+  **all-open = slot 0** — the bare bench harness needs no strap wiring.
+  (Earlier revision said "grounded = slot 0"; that was backwards vs the
+  host-tested firmware, caught at Phase-3 backplane design.)
 
 ## 8. Test points (bring-up is the point of this board)
 

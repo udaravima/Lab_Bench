@@ -32,6 +32,7 @@ precision, usable for lab work, bulk DC power, and battery charging.
 | [docs/06-phase1-circuit-design.md](docs/06-phase1-circuit-design.md) | Worked component values for the 150 W prototype |
 | [docs/07-module-firmware.md](docs/07-module-firmware.md) | STM32G431 firmware architecture, pin map, bring-up |
 | [docs/08-phase2-circuit-design.md](docs/08-phase2-circuit-design.md) | Worked component values for the 600 W module (LM5143 + LM5069) |
+| [docs/09-phase3-circuit-design.md](docs/09-phase3-circuit-design.md) | Backplane + ESP32-S3 manager design (slots, E-stop chain, bus metering, UI) |
 | [HANDOVER.md](HANDOVER.md) | Session handover: state, decisions, gotchas, next steps |
 | [hardware/phase1-module/tools/README.md](hardware/phase1-module/tools/README.md) | Schematic/PCB generation + verification pipeline |
 | [hardware/phase1-module/lib/PARTS-TO-DOWNLOAD.md](hardware/phase1-module/lib/PARTS-TO-DOWNLOAD.md) | Exact orderables, package corrections, verified pricing |

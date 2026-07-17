@@ -35,17 +35,21 @@ manager, CAN 2.0B @500k. Docs 01–07 are the spec; read 05 (build plan) first
 | Host tests | `cd firmware/tests && make test` — must stay green |
 | Manager firmware | not started |
 | Phase-2 circuit design | **complete (docs/08, 2026-07-16)**: all values worked + datasheet-verified; LM5143/LM5069/CSD18540Q5B/CSD19536KTT/XAL1510/TMUX1101/TL431 PDFs now in docs/datasheets/ |
-| Phase-2 schematic | **complete, v1 (2026-07-16)**: 8 generated sheets, 171 components, 116 nets machine-verified (gen_phase2.py + shared hardware/common/sheets_common.py; extraction proven netlist-identical for Phase 1). Not yet audited (kicad-happy/SPICE) |
+| Phase-2 schematic | **complete, v1, audited (2026-07-17)**: 8 sheets, 171 components, 116 nets machine-verified; kicad-happy audit triaged (all errors = known false-positive classes or the deferred MPN pass — same baseline as Phase-1); ngspice **45/47 pass** (crystal warn + bridge skip = same model limitations as Phase-1's 38/40) |
 | Phase-3 schematics | not started — **this is the next work** (backplane + ESP32-S3 manager) |
 | Ordering/BOM | prices verified (PARTS-TO-DOWNLOAD.md §E); MPN-properties pass into schematic symbols not done yet |
 
 ## Immediate next steps (agreed order)
 
-1. **Audit the Phase-2 schematic** (kicad-happy analyzers + ngspice like the
-   Phase-1 audit) — the netlist/footprint checkers are green but no
-   analyzer pass has run yet. Rebuild chain:
-   `cd hardware/phase2-module/tools && python3 gen_phase2.py`, export
-   netlist, `check_netlist.py` + `check_footprints.py`.
+1. **Phase-3 backplane + ESP32-S3 manager schematics** (docs/01 §3/§6:
+   bus bars, 8 slots, slot-ID straps, CAN end terminations, /HW_ENABLE +
+   panel E-stop, bus-entry INA228; manager board with display/encoder/USB).
+   Reuse hardware/common; new gen_phase3 generators follow the same
+   pipeline. Phase-2 audit notes (2026-07-17): VM-001 on
+   CAN_*/DROOP_EN/PS_FPWM/PS_PGOOD/I_MEAS/V_MEAS all false positives
+   (VIO-variant / verified V_IH / R31-mitigated / divider-bounded);
+   FS-001 "FB divider too low-Z" is the injection scheme working as
+   designed; RS-001 set identical to the audited Phase-1 baseline.
 2. **Phase-3 backplane + ESP32-S3 manager schematics** (bus bars, slot IDs,
    CAN termination, E-stop; manager board with display/encoder/USB).
 3. **ESP32-S3 manager firmware** (discovery, UI, SCPI, budget arbiter,

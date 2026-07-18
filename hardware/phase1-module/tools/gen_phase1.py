@@ -183,7 +183,7 @@ def build_power_stage():
     ll("PS_ILIM", c19, 1)
     sh.power("PGND", *c19.pin_pos(2), ground=True)
 
-    l1 = sh.add(kg.Placed(L, "L1", "XAL1350-103ME 10u/14A", 180.34, 96.52, rot=90,
+    l1 = sh.add(kg.Placed(L, "L1", "10u MWSA1707S-100/XAL1350", 180.34, 96.52, rot=90,
                           footprint="Inductor_SMD:L_Coilcraft_XAL1350-XXX"))
     gl("SW", l1, 1)
     gl("VOUT_INT", l1, 2, shape="output")

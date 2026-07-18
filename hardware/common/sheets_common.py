@@ -220,19 +220,21 @@ def build_sensing(sh, p):
         # through an analog switch (docs/08 s.7). Switch open = no droop and
         # no divider loading; closed = droop + a fixed +3.4% gain shift the
         # firmware corrects (x0.9668 on V_ref in droop modes).
-        # TMUX1101 DBV = SOT-23-5: 1=D, 2=S, 3=GND, 4=SEL, 5=VDD
-        # (tmux1101.pdf Table 5-1; V_IH <= 1.49 V so 3.3 V GPIO drives SEL)
-        MUX = kg.get_symbol("Analog_Switch", "TMUX1101DBV")
+        # TS5A3166 DBV = SOT-23-5: 1=NO, 2=COM, 3=GND, 4=IN, 5=V+
+        # (ts5a3166.pdf Pin Functions; VIH <= 2.4 V at V+ 5 V so 3.3 V GPIO
+        # drives IN). Swapped from TMUX1101 2026-07-18 - not stocked on
+        # LCSC; pin POSITIONS are identical so only the symbol changed.
+        MUX = kg.get_symbol("Analog_Switch", "TS5A3166DBVR")
         r35 = res("R35", p["droop"]["r_droop"], 203.2, 152.4, rot=90)
         gl("I_MEAS", r35, 1, shape="input")
         ll("DROOP_R", r35, 2)
-        u13 = sh.add(kg.Placed(MUX, "U13", "TMUX1101", 226.06, 152.4,
+        u13 = sh.add(kg.Placed(MUX, "U13", "TS5A3166", 226.06, 152.4,
                                footprint="Package_TO_SOT_SMD:SOT-23-5"))
-        ll("DROOP_R", u13, 1)                       # D
-        gl("V_MEAS", u13, 2, shape="output")        # S
-        sh.power("5V0", *u13.pin_pos(5))            # VDD
+        ll("DROOP_R", u13, 1)                       # NO
+        gl("V_MEAS", u13, 2, shape="output")        # COM
+        sh.power("5V0", *u13.pin_pos(5))            # V+
         sh.power("AGND", *u13.pin_pos(3), ground=True)
-        gl("DROOP_EN", u13, 4, shape="input")       # SEL
+        gl("DROOP_EN", u13, 4, shape="input")       # IN
         r38 = res("R38", "100K", 226.06, 172.72, rot=90)
         gl("DROOP_EN", r38, 1)                      # default open (SEL low)
         sh.power("AGND", *r38.pin_pos(2), ground=True)
@@ -307,8 +309,11 @@ def build_disconnect(sh, p):
     ll("DISC_INP", q7, 3)
 
     # OVP comparator: trips above the fixed threshold -> Q9 pulls INP low
-    u7 = sh.add(kg.Placed(CMP, "U7", "TLV7011", 165.1, 127.0,
-                          footprint="Package_TO_SOT_SMD:SOT-23-5"))
+    # DCK (SC-70-5) since 2026-07-18: same pinout as DBV per tlv7022.pdf
+    # ("DBV and DCK Package" share one diagram); SOT-23-5 stock on LCSC is
+    # nearly gone while DCKR has depth (hardware/SOURCING.md).
+    u7 = sh.add(kg.Placed(CMP, "U7", "TLV7011DCK", 165.1, 127.0,
+                          footprint="Package_TO_SOT_SMD:SOT-353_SC-70-5"))
     r45 = res("R45", p["ovp_top"], 146.05, 96.52)
     r46 = res("R46", p["ovp_bot"], 146.05, 111.76)
     gl("VOUT_INT", r45, 1, shape="input")
@@ -543,8 +548,10 @@ def build_mcu_can(sh, p):
     gl("OSC_OUT", y1, 3)                            # GND24: 1/3 crystal, 2/4 shield
     sh.power("AGND", *y1.pin_pos(2), ground=True)
     sh.power("AGND", *y1.pin_pos(4), ground=True)
-    c66 = cap("C66", "10p", 210.82, 137.16)
-    c67 = cap("C67", "10p", 226.06, 137.16)
+    # 18p for CL=12pF crystals (the cheap China-market 3225 parts; the
+    # HANDOVER-blessed alternative to hunting CL=8pF). 2*(12-3) = 18.
+    c66 = cap("C66", "18p", 210.82, 137.16)
+    c67 = cap("C67", "18p", 226.06, 137.16)
     gl("OSC_IN", c66, 1)
     gl("OSC_OUT", c67, 1)
     sh.power("AGND", *c66.pin_pos(2), ground=True)

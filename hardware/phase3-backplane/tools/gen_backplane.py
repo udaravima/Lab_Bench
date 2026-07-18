@@ -58,10 +58,15 @@ def build():
                             footprint="MountingHole:MountingHole_6.4mm_M6_Pad_TopBottom"))
     ll("VBUS_IN", lug1, 1)
     sh.power("PGND", *lug2.pin_pos(1), ground=True)
-    rs1 = res("RS1", "250u 8W bar", 45.72, 40.64, rot=90,
-              fp="Resistor_SMD:R_2512_6332Metric")   # placeholder fp: bar shunt at PCB pass
-    ll("VBUS_IN", rs1, 1)
-    gl("VBUS", rs1, 2, shape="output")
+    # 2x BVS-M-R0005 (0.5 mOhm 3920) in parallel = 0.25 mOhm (sourcing
+    # pass 2026-07-18, $1.21 total); 3920 land pattern at the footprint
+    # pass (2512 placeholder). Verify the BVS power rating at order.
+    rs1 = res("RS1", "0m5 3920", 45.72, 40.64, rot=90)
+    rs2 = res("RS2", "0m5 3920", 58.42, 40.64, rot=90)
+    for r in (rs1, rs2):
+        r.footprint = "Resistor_SMD:R_2512_6332Metric"
+        ll("VBUS_IN", r, 1)
+        gl("VBUS", r, 2, shape="output")
     d5 = sh.add(kg.Placed(TVS, "D5", "SMBJ33A", 66.04, 55.88,
                           footprint="Diode_SMD:D_SMB"))
     gl("VBUS", d5, 1, shape="input")
@@ -132,12 +137,10 @@ def build():
     for n in range(N_SLOTS):
         x = 172.72 + (n % 4) * 30.48
         y = 40.64 + (n // 4) * 76.2
-        jp = sh.add(kg.Placed(C4P, f"J1{n}", f"SLOT{n} PWR", x, y,
-                              footprint="Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"))
+        jp = sh.add(kg.Placed(C2P, f"J1{n}", f"SLOT{n} XT60PW-F", x, y,
+                              footprint="Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"))
         gl("VBUS", jp, 1, shape="output")
-        gl("VBUS", jp, 2, shape="output")
-        sh.power("PGND", *jp.pin_pos(3), ground=True)
-        sh.power("PGND", *jp.pin_pos(4), ground=True)
+        sh.power("PGND", *jp.pin_pos(2), ground=True)
         js = sh.add(kg.Placed(C8P, f"J2{n}", f"SLOT{n} SIG", x, y + 27.94,
                               footprint="Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical"))
         gl("CAN_H", js, 1)
@@ -198,9 +201,9 @@ EXPECTED_NETS = {
     # All nets EXACT (no "~" supersets): on a near-passive board the full
     # membership is enumerable, and exactness means a slot-ID strap pin
     # grounded in error cannot hide as an allowed extra in PGND.
-    "VBUS_IN":   {"J30.1", "RS1.1", "U1.10"},
-    "VBUS":      {"RS1.2", "U1.9", "U1.8", "D5.1", "C2.1", "C3.1", "J1.1", "J1.2",
-                  *{f"J1{n}.{p}" for n in range(N_SLOTS) for p in ("1", "2")}},
+    "VBUS_IN":   {"J30.1", "RS1.1", "RS2.1", "U1.10"},
+    "VBUS":      {"RS1.2", "RS2.2", "U1.9", "U1.8", "D5.1", "C2.1", "C3.1",
+                  "J1.1", "J1.2", *{f"J1{n}.1" for n in range(N_SLOTS)}},
     "ESTOP_RET": {"J2.2", "R1.1"},
     "HW_EN":     {"R1.2", "J1.9", *{f"J2{n}.3" for n in range(N_SLOTS)}},
     "CAN_H":     {"R2.1", "R3.1", "J1.7", *{f"J2{n}.1" for n in range(N_SLOTS)}},
@@ -211,7 +214,7 @@ EXPECTED_NETS = {
     "3V3":       {"U1.6", "C1.1", "J1.10", "J2.1"},
     "PGND":      {"J31.1", "D5.2", "C2.2", "C3.2", "C1.2", "U1.7", "U1.1", "U1.2",
                   "J1.3", "J1.4", "J1.5", "J1.6",
-                  *{f"J1{n}.{p}" for n in range(N_SLOTS) for p in ("3", "4")},
+                  *{f"J1{n}.2" for n in range(N_SLOTS)},
                   *{f"J2{n}.8" for n in range(N_SLOTS)},
                   *{f"J2{n}.{4 + b}" for n in range(N_SLOTS) for b in range(3) if (n >> b) & 1}},
 }

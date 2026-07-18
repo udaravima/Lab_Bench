@@ -425,8 +425,8 @@ def build_ui():
         sh.label(f"{net}_A", r.pin_pos(1), rot=r.label_rot(1))
         sh.label(f"{net}_A", d.pin_pos(2), rot=d.label_rot(2))
         sh.glabel(net, d.pin_pos(1), rot=d.label_rot(1))   # GPIO sinks
-    bz = sh.add(kg.Placed(BUZ, "BZ1", "magnetic 5V", 254.0, 137.16,
-                          footprint="Buzzer_Beeper:MagneticBuzzer_CUI_CST-931RP-A"))
+    bz = sh.add(kg.Placed(BUZ, "BZ1", "MLT-8530", 254.0, 137.16,
+                          footprint="Buzzer_Beeper:MagneticBuzzer_CUI_CST-931RP-A"))  # fp placeholder: MLT-8530 land at footprint pass
     sh.power("5V0", *bz.pin_pos(1))
     ll("BUZZ_N", bz, 2)
     d9 = sh.add(kg.Placed(DF, "D9", "1N4148W", 266.7, 137.16, rot=90,

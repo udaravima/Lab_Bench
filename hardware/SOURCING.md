@@ -36,7 +36,7 @@ Decisions taken this pass (user-approved 2026-07-18):
 | LTC7004EMSE#PBF | C690105 | 5.77 | **5** | thinnest stock in the BOM; 3 needed + spares. **Order early** (IMSE $6.98/30 as fallback) |
 | TLV7011DCKR | C193688 | 0.27 | 838 | **SC-70-5** — footprint changes from DBVR (SOT-23-5, $0.52, only 42 left) at the PCB pass |
 | TL431BIDBZR | C41283 | 0.054 | 7.9k | |
-| TS5A3166DBVR | C353035 | 0.28 | 7.6k | replaces TMUX1101 (not stocked on LCSC). **Pin map differs — verify vs TI ds + update gen_phase2 at swap** |
+| TS5A3166DBVR | C353035 | 0.28 | 7.6k | replaces TMUX1101 (not stocked on LCSC). Verified + applied 2026-07-18 (§F) |
 | TCA9535PWR | C130204 | 0.44 | 11k | UMW clone $0.33 acceptable here (non-critical) |
 | ESP32-S3-WROOM-1-N8R2 | C2913204 | 5.01 | 18k | |
 | TPD2E001DRLR | C150526 | 0.16 | 14k | |
@@ -50,7 +50,7 @@ Decisions taken this pass (user-approved 2026-07-18):
 |---|---|---|---|---|
 | MWSA1707S-6R8MT ×2 (P2) | C6238332 | 1.72 | 67 | **17 A Irms / 22 A Isat / 7.5 mΩ** (JLCPCB page) |
 | XAL1510-682MED ×2 spares | C3911560 | 6.13 | 5 | 36 A Isat (Coilcraft pdf) — A/B test pair |
-| MWSA1707S-100MT (P1 10 µH) | C5240401 | 1.68 | 51 | **verify Isat/Irms at order** (needs ≥12 A sat, ≥8 A rms; the 1265S-100MT is REJECTED: 12 A/7.5 A) |
+| MWSA1707S-100MT (P1 10 µH) | C5240401 | 1.68 | 51 | **verified: 16.5 A Isat / 10.5 A Irms / 9.9 mΩ ✓** (1265S-100MT REJECTED: 12 A/7.5 A) |
 | 7.5 mΩ 1206 1 W 1 % ×4 | C49837985 | 0.025 | 5k | phase-shunt pairs (docs/08 §2) |
 | 1.0 mΩ 2512 3 W 1 % ×2 | C46634444 | 0.058 | 27k | output shunt pair; alloy-strip series — check TCR ≤ ±75 ppm on ds; Vishay WSLP upgrade path if cal drifts at bench |
 | 1.5 mΩ 2512 3 W 1 % | C49837991 | 0.044 | 4k | LM5069 R_SNS |
@@ -59,7 +59,7 @@ Decisions taken this pass (user-approved 2026-07-18):
 | 220 µF 35 V polymer ×4 | C2923769 | 0.28 | 3.1k | Lelon SVZ SMD D8×11.5 — verify ESR ≤ 25 mΩ on ds; Panasonic EEHZK1V221UP hybrid $0.64/1.8k as upgrade |
 | 470 µF 50 V bulk | C106666 | 0.10 | 73k | **THT radial D10×20** — cheaper + stronger than SMD; footprint changes at PCB pass |
 | 10 µF 50 V X7S 1210 ×8+6 | C126612 | 0.144 | 43k | GCM32EC71H106KA03L; also replaces the 22 µF/50 V output MLCCs (that value barely exists) |
-| 8 MHz 3225 crystal | C400090 | 0.105 | 200k | cheap parts are CL=12 pF → **C66/C67 change 10 p→18 p** (HANDOVER-blessed path) — fold into gen at PCB pass |
+| 8 MHz 3225 crystal | C400090 | 0.105 | 200k | cheap parts are CL=12 pF → C66/C67 = 18 p (APPLIED, both phases) |
 
 ## C. Connectors & electromechanical
 
@@ -105,14 +105,28 @@ US$300–380** including boards, spares and the Coilcraft A/B pair.
 4. Clones: FET clones rejected for the power path; UMW TCA9535 and generic
    EC11/2N7002/diodes accepted.
 5. Ratings still to verify from datasheets **at order time** (flagged
-   above): MWSA1707S-100MT Isat/Irms, BVS power rating, Lelon SVZ ESR,
+   above): BVS power rating, Lelon SVZ ESR,
    alloy-shunt TCR, MLT-8530 drive voltage, TS5A3166 pin map.
 
-## F. Engineering changes queued by this pass (fold in at the batch PCB pass)
+## F. Engineering changes from this pass — APPLIED 2026-07-18
 
-Already applied: phase shunts → 2×7m5 1206 (gen_phase2 + docs/08, checkers
-green). Queued for the PCB pass: TLV7011 DBVR→DCKR footprint,
-TMUX1101→TS5A3166 (pin-map re-verify + gen edit), crystal load caps
-10 p→18 p, buzzer CST-931RP→MLT-8530 footprint, 470 µF SMD→THT radial,
-22 µF/50 V→10 µF/50 V output MLCCs, XT60PW + 2.54 slot connector footprints
-(module io + backplane), bus shunt 2×BVS-M-R0005.
+All schematic-level changes are in the generators, all four checker chains
+green (137/173/30/80 components):
+- phase shunts → 2×7m5 1206 parallel (gen_phase2 + docs/08)
+- TMUX1101 → **TS5A3166DBVR** (ts5a3166.pdf verified: 1=NO 2=COM 3=GND
+  4=IN 5=V+ — pin POSITIONS identical to TMUX1101, symbol-only swap;
+  VIH 2.4 V ≤ 3.3 V GPIO ✓)
+- TLV7011 DBVR → **DCKR** (tlv7022.pdf: DBV and DCK share one pinout —
+  footprint-only, SOT-353_SC-70-5; applies to Phase 1 AND 2)
+- crystal load caps 10 p → **18 p** for CL=12 pF China crystals (both phases)
+- Phase-1 inductor → **MWSA1707S-100MT** (JLCPCB-verified 16.5 A Isat /
+  10.5 A Irms / 9.9 mΩ ✓ vs 12 A/8 A required; MWSA1265S-100MT REJECTED)
+- 470 µF bulk → THT radial D10; output MLCCs 22 µF→10 µF/50 V X7S
+- module slot power + P2 output → XT60PW-M (2-pin); backplane slots →
+  XT60PW-F; bus shunt → 2× BVS-M-R0005 parallel
+- buzzer value → MLT-8530
+
+Placeholder FOOTPRINTS remain for: XT60PW, MWSA1707S (17.2×17.2), BVS
+3920, MLT-8530 — land patterns from vendor drawings at the footprint pass
+(hardware/MECHANICAL.md lists them; the JLC datasheet CDN links expire,
+fetch fresh from part pages at that point).

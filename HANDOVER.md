@@ -112,6 +112,16 @@ manager, CAN 2.0B @500k. Docs 01–07 are the spec; read 05 (build plan) first
     it eats the P_LIM budget and can fault the start (TI rule). Don't tie
     LMR36015 EN high.
 
+## Deferred requirement (2026-07-18, user decision)
+
+Sub-0.5 V / millivolt-accurate output for laptop/CPU-rail work is wanted
+**later**, as a future dedicated module (linear post-regulator card in a
+rack slot — the "Option B" analysis: buck pre-regulator tracking
+V_out+1.5 V, D2PAK pass stage with DC SOA, ~$5–12 BOM, remote sense
+mandatory). Current modules keep their buck floors: P2 guarantees clean
+output from 0.7 V (30 V bus; ~0.55 V at 24 V bus), P1 from 0.5 V — below
+that the average is servo'd but ripple is skip-mode coarse.
+
 ## Open items / known warts
 
 - `autoroute.py`: 33 unconnected, router-via self-spacing bug, congested

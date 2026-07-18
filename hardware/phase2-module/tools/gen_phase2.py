@@ -321,7 +321,7 @@ def build_power_stage():
     cin = [cap(f"C{6+i}", "10u/50V X7S", 15.24 + 10.16 * i, 170.18, fp=C_BULK)
            for i in range(8)]
     c14 = sh.add(kg.Placed(CPOL, "C14", "470u/50V", 99.06, 170.18,
-                           footprint="Capacitor_SMD:CP_Elec_16x17.5"))
+                           footprint="Capacitor_THT:CP_Radial_D10.0mm_P5.00mm"))
     for c in cin + [c14]:
         gl("VBUS_P", c, 1, shape="input")
         sh.power("PGND", *c.pin_pos(2), ground=True)
@@ -329,7 +329,7 @@ def build_power_stage():
     cpoly = [sh.add(kg.Placed(CPOL, r, "220u/35V hybrid", x, 152.4,
                               footprint="Capacitor_SMD:CP_Elec_10x10.5"))
              for r, x in (("C15", 124.46), ("C16", 134.62), ("C36", 144.78), ("C37", 154.94))]
-    cout = [cap(r, "22u/50V X7R", x, 152.4, fp=C_BULK)
+    cout = [cap(r, "10u/50V X7S", x, 152.4, fp=C_BULK)
             for r, x in (("C38", 167.64), ("C40", 177.8), ("C45", 187.96),
                          ("C46", 198.12), ("C47", 208.28), ("C48", 218.44))]
     r27 = res("R27", "4.7K 0.5W preload", 231.14, 152.4)
@@ -370,15 +370,16 @@ def build_io():
     Q2N = kg.get_symbol("Transistor_FET", "2N7002")
     DF = kg.get_symbol("Diode", "1N4148W")
 
-    j1 = sh.add(kg.Placed(C4, "J1", "SLOT PWR BLADES", 38.1, 78.74,
-                          footprint="Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"))
-    gl("VBUS", j1, 1, shape="input")                # blades first-mate/last-break;
-    gl("VBUS", j1, 2, shape="input")                # global: the fuse lives on hot-swap
-    sh.power("PGND", *j1.pin_pos(3), ground=True)
-    sh.power("PGND", *j1.pin_pos(4), ground=True)
+    # XT60PW-M (sourcing pass 2026-07-18): 1=+, 2=-. Power-first mating
+    # comes from connector height stagger vs the signal row; land pattern
+    # from the Amass drawing at the footprint pass (placeholder fp here).
+    j1 = sh.add(kg.Placed(C2, "J1", "XT60PW-M SLOT PWR", 38.1, 78.74,
+                          footprint="Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"))
+    gl("VBUS", j1, 1, shape="input")
+    sh.power("PGND", *j1.pin_pos(2), ground=True)
 
-    j4 = sh.add(kg.Placed(C2, "J4", "OUTPUT 30A", 38.1, 116.84,
-                          footprint="TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-2-5.0-H_1x02_P5.00mm_Horizontal"))
+    j4 = sh.add(kg.Placed(C2, "J4", "XT60PW-M OUTPUT", 38.1, 116.84,
+                          footprint="Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"))
     gl("VOUT", j4, 1, shape="input")
     sh.power("PGND", *j4.pin_pos(2), ground=True)
 
@@ -563,7 +564,7 @@ EXPECTED_NETS = {
     "DROOP_R":   {"R35.2", "U13.1"},
     "DROOP_EN":  {"U13.4", "R38.1", "U10.41"},
     # -- hot-swap front end
-    "VBUS":       {"J1.1", "J1.2", "F1.1"},
+    "VBUS":       {"J1.1", "F1.1"},
     "VBUS_FUSED": {"F1.2", "D5.1", "C91.1", "R70.1", "U12.2", "R71.1"},
     "HS_SENSE":   {"R70.2", "U12.1", "Q14.2"},
     "HS_GATE":    {"U12.10", "Q14.1"},
@@ -679,7 +680,7 @@ EXPECTED_NETS = {
                   "U12.5", "R73.2", "R74.2", "C90.2", "C91.2", "D5.2",
                   "U8.1", "U8.6", "U8.11", "C50.2", "C51.2", "C53.2", "C54.2",
                   "C55.2", "U9.1", "C56.2", "C57.2", "R51.2",
-                  "J1.3", "J1.4", "J4.2", "J5.7", "J5.8", "Q8.2", "NT1.2"},
+                  "J1.2", "J4.2", "J5.7", "J5.8", "Q8.2", "NT1.2"},
 }
 
 if __name__ == "__main__":

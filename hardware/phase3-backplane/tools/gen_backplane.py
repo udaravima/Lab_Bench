@@ -64,7 +64,7 @@ def build():
     rs1 = res("RS1", "0m5 3920", 45.72, 40.64, rot=90)
     rs2 = res("RS2", "0m5 3920", 58.42, 40.64, rot=90)
     for r in (rs1, rs2):
-        r.footprint = "Resistor_SMD:R_2512_6332Metric"
+        r.footprint = "labbench:R3920_BVS"
         ll("VBUS_IN", r, 1)
         gl("VBUS", r, 2, shape="output")
     d5 = sh.add(kg.Placed(TVS, "D5", "SMBJ33A", 66.04, 55.88,
@@ -138,7 +138,7 @@ def build():
         x = 172.72 + (n % 4) * 30.48
         y = 40.64 + (n // 4) * 76.2
         jp = sh.add(kg.Placed(C2P, f"J1{n}", f"SLOT{n} XT60PW-F", x, y,
-                              footprint="Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"))
+                              footprint="labbench:XT60PW-F"))
         gl("VBUS", jp, 1, shape="output")
         sh.power("PGND", *jp.pin_pos(2), ground=True)
         js = sh.add(kg.Placed(C8P, f"J2{n}", f"SLOT{n} SIG", x, y + 27.94,

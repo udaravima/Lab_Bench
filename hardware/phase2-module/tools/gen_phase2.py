@@ -289,9 +289,9 @@ def build_power_stage():
     #    output side; 73mV/3.5m: peak limit 20.9A typ, 18.9A min > 16.6A max
     #    normal peak, 23.4A max << 36A Isat)
     l1 = sh.add(kg.Placed(L, "L1", "6.8u MWSA1707S/XAL1510", 190.5, 71.12, rot=90,
-                          footprint="Inductor_SMD:L_Coilcraft_XAL1510-682"))
+                          footprint="labbench:L_1707_XAL1510"))
     l3 = sh.add(kg.Placed(L, "L3", "6.8u MWSA1707S/XAL1510", 190.5, 109.22, rot=90,
-                          footprint="Inductor_SMD:L_Coilcraft_XAL1510-682"))
+                          footprint="labbench:L_1707_XAL1510"))
     gl("SW1", l1, 1)
     ll("PH_CS_A", l1, 2)
     gl("SW2", l3, 1)
@@ -374,12 +374,12 @@ def build_io():
     # comes from connector height stagger vs the signal row; land pattern
     # from the Amass drawing at the footprint pass (placeholder fp here).
     j1 = sh.add(kg.Placed(C2, "J1", "XT60PW-M SLOT PWR", 38.1, 78.74,
-                          footprint="Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"))
+                          footprint="labbench:XT60PW-M"))
     gl("VBUS", j1, 1, shape="input")
     sh.power("PGND", *j1.pin_pos(2), ground=True)
 
     j4 = sh.add(kg.Placed(C2, "J4", "XT60PW-M OUTPUT", 38.1, 116.84,
-                          footprint="Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"))
+                          footprint="labbench:XT60PW-M"))
     gl("VOUT", j4, 1, shape="input")
     sh.power("PGND", *j4.pin_pos(2), ground=True)
 

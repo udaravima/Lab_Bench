@@ -204,6 +204,133 @@ def lm5143_rha0040p():
     print("  generated labbench:LM5143_RHA0040P")
 
 
+def _mk_fp(name, descr, keywords=""):
+    fp = pcbnew.FOOTPRINT(pcbnew.BOARD())
+    fp.SetFPID(pcbnew.LIB_ID("labbench", name))
+    fp.SetDescription(descr)
+    if keywords:
+        fp.SetKeywords(keywords)
+    return fp
+
+
+def _pad_smd(fp, num, x, y, w, h):
+    p = pcbnew.PAD(fp)
+    p.SetNumber(str(num))
+    p.SetShape(pcbnew.PAD_SHAPE_ROUNDRECT)
+    p.SetRoundRectRadiusRatio(0.1)
+    p.SetAttribute(pcbnew.PAD_ATTRIB_SMD)
+    p.SetLayerSet(pcbnew.PAD.SMDMask())
+    p.SetPos0(pcbnew.VECTOR2I(pcbnew.FromMM(x), pcbnew.FromMM(y)))
+    p.SetSize(pcbnew.VECTOR2I(pcbnew.FromMM(w), pcbnew.FromMM(h)))
+    p.SetDrawCoord()
+    fp.Add(p)
+
+
+def _pad_tht(fp, num, x, y, w, h, dw, dh=None):
+    p = pcbnew.PAD(fp)
+    p.SetNumber(str(num))
+    p.SetAttribute(pcbnew.PAD_ATTRIB_PTH)
+    p.SetLayerSet(pcbnew.PAD.PTHMask())
+    if dh is None:
+        p.SetShape(pcbnew.PAD_SHAPE_CIRCLE)
+        p.SetDrillSize(pcbnew.VECTOR2I(pcbnew.FromMM(dw), pcbnew.FromMM(dw)))
+    else:
+        p.SetShape(pcbnew.PAD_SHAPE_OVAL)
+        p.SetDrillShape(pcbnew.PAD_DRILL_SHAPE_OBLONG)
+        p.SetDrillSize(pcbnew.VECTOR2I(pcbnew.FromMM(dw), pcbnew.FromMM(dh)))
+    p.SetPos0(pcbnew.VECTOR2I(pcbnew.FromMM(x), pcbnew.FromMM(y)))
+    p.SetSize(pcbnew.VECTOR2I(pcbnew.FromMM(w), pcbnew.FromMM(h)))
+    p.SetDrawCoord()
+    fp.Add(p)
+
+
+def _finish(fp, cy):
+    """courtyard rectangle + ref/val text, then save."""
+    def line(x1, y1, x2, y2):
+        s = pcbnew.FP_SHAPE(fp)
+        s.SetShape(pcbnew.SHAPE_T_SEGMENT)
+        s.SetStart0(pcbnew.VECTOR2I(pcbnew.FromMM(x1), pcbnew.FromMM(y1)))
+        s.SetEnd0(pcbnew.VECTOR2I(pcbnew.FromMM(x2), pcbnew.FromMM(y2)))
+        s.SetLayer(pcbnew.F_CrtYd)
+        s.SetWidth(pcbnew.FromMM(0.05))
+        s.SetDrawCoord()
+        fp.Add(s)
+    x, y = cy
+    line(-x, -y, x, -y); line(x, -y, x, y); line(x, y, -x, y); line(-x, y, -x, -y)
+    ref = fp.Reference()
+    ref.SetPos0(pcbnew.VECTOR2I(0, pcbnew.FromMM(-y - 1.0)))
+    ref.SetDrawCoord()
+    val = fp.Value()
+    val.SetPos0(pcbnew.VECTOR2I(0, pcbnew.FromMM(y + 1.0)))
+    val.SetLayer(pcbnew.F_Fab)
+    val.SetDrawCoord()
+    pcbnew.FootprintSave(PRETTY, fp)
+    print(f"  generated labbench:{fp.GetFPID().GetLibItemName()}")
+
+
+def sourcing_footprints():
+    """China-sourcing footprints (SOURCING.md sF). Geometry vetted from the
+    LCSC/EasyEDA library pulls 2026-07-18 (drills/pads cross-checked); the
+    XT60 +/- pad assignment is an ASSUMPTION until verified by continuity
+    on a mated pair - hard gate in MECHANICAL.md before gerbers."""
+    # XT60PW-M (module edge / P2 output): power pins 1,2 = 3.8mm pads /
+    # 2.9mm drills on 7.2mm pitch; retention legs 3,4 = 0.6x1.6 slots.
+    fp = _mk_fp("XT60PW-M", "Amass XT60PW-M right-angle PCB male; pads 1=+ 2=- "
+                "ASSUMED - verify continuity with mated pair BEFORE gerbers "
+                "(geometry: LCSC C98732 library pull, vetted 2026-07-18)",
+                "xt60 amass power")
+    _pad_tht(fp, 1, 3.0, 3.6, 3.8, 3.8, 2.9)
+    _pad_tht(fp, 2, 3.0, -3.6, 3.8, 3.8, 2.9)
+    _pad_tht(fp, 3, -3.0, -6.75, 1.2, 2.2, 0.6, 1.6)
+    _pad_tht(fp, 4, -3.0, 6.75, 1.2, 2.2, 0.6, 1.6)
+    _finish(fp, (8.5, 8.5))
+
+    # XT60PW-F (backplane slots): EasyEDA numbering had the RETENTION legs
+    # as 1,2 - RENUMBERED here so power = 1,2 like the -M (the trap the
+    # netlist would never catch: legs wired as power).
+    fp = _mk_fp("XT60PW-F", "Amass XT60PW-F right-angle PCB female; pads 1=+ 2=- "
+                "ASSUMED, mates XT60PW-M pad-for-pad - verify continuity "
+                "BEFORE gerbers (LCSC C428722 pull, renumbered+vetted 2026-07-18)",
+                "xt60 amass power")
+    _pad_tht(fp, 1, -3.6, 3.0, 3.8, 3.8, 2.8)
+    _pad_tht(fp, 2, 3.6, 3.0, 3.8, 3.8, 2.8)
+    _pad_tht(fp, 3, -6.75, -3.0, 2.2, 1.3, 1.5, 0.6)
+    _pad_tht(fp, 4, 6.75, -3.0, 2.2, 1.3, 1.5, 0.6)
+    _finish(fp, (8.5, 8.5))
+
+    # Superset inductor pad: covers Coilcraft XAL1510 (3.18x13.2 @ +/-5.3)
+    # AND Sunlord MWSA1707S (3.5x12.8 @ +/-7.35) so the A/B thermal pair is
+    # a pure part swap (MECHANICAL.md). Stencil note: paste only over the
+    # fitted part's terminal zone.
+    fp = _mk_fp("L_1707_XAL1510", "Superset 2-pad power inductor land: "
+                "Sunlord MWSA1707S 17.2x17.2 + Coilcraft XAL1510 15.2x15.2 "
+                "(pads span both terminal zones; vetted 2026-07-18)",
+                "inductor superset mwsa1707s xal1510")
+    _pad_smd(fp, 1, -6.405, 0, 5.39, 13.2)
+    _pad_smd(fp, 2, 6.405, 0, 5.39, 13.2)
+    _finish(fp, (9.35, 8.85))
+
+    # BVS 3920 bar shunt (backplane bus meter pair)
+    fp = _mk_fp("R3920_BVS", "3920 bar shunt (BVS-M-R0005 class), pads "
+                "3.5x5.2 @ +/-3.81 (LCSC C466580 pull, vetted 2026-07-18)",
+                "shunt 3920")
+    _pad_smd(fp, 1, -3.81, 0, 3.5, 5.2)
+    _pad_smd(fp, 2, 3.81, 0, 3.5, 5.2)
+    _finish(fp, (5.8, 3.0))
+
+    # MLT-8530 buzzer: two edge terminals, each spanning a corner-pad pair
+    # in the library pull - pads renumbered 1,1 / 2,2 per edge (electrically
+    # one terminal each; polarity marked at silk/assembly).
+    fp = _mk_fp("MLT-8530", "MLT-8530 8.5x8.5 SMD magnetic buzzer; left "
+                "pads=1 right pads=2 (LCSC C94599 pull, renumbered 2026-07-18)",
+                "buzzer mlt8530")
+    _pad_smd(fp, 1, -3.6, 3.6, 2.4, 2.4)
+    _pad_smd(fp, 1, -3.6, -3.6, 2.4, 2.4)
+    _pad_smd(fp, 2, 3.6, 3.6, 2.4, 2.4)
+    _pad_smd(fp, 2, 3.6, -3.6, 2.4, 2.4)
+    _finish(fp, (4.9, 4.9))
+
+
 def write_fp_lib_table():
     path = os.path.join(LIB, "..", "fp-lib-table")
     with open(path, "w") as f:
@@ -218,5 +345,6 @@ if __name__ == "__main__":
     import_vendor()
     powerfet_son5x6()
     lm5143_rha0040p()
+    sourcing_footprints()
     write_fp_lib_table()
     print("build_fplib: done")

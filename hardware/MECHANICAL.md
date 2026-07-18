@@ -6,8 +6,12 @@ outlines are drawn. Everything follows from the XT60PW slot decision
 
 ## Slot pitch: 30 mm
 
-Modules are vertical cards plugging down onto a horizontal backplane.
-Pitch is set by the tallest module component + airflow:
+**Server-PSU style insertion** (follows from the right-angle XT60PW):
+the backplane stands vertically at the rear, modules are vertical cards
+sliding in horizontally from the front; XT60PW-M on each module's rear
+edge mates XT60PW-F on the backplane face, signal header rows beside
+them (shorter, so power mates first). Pitch is set by the tallest module
+component + airflow:
 
 - XAL1510 inductor (the A/B spare) is 11.3 mm tall — the Sunlord 1707 is
   ~8 mm, but the pitch must fit BOTH;
@@ -37,13 +41,19 @@ Pitch is set by the tallest module component + airflow:
   nearest slots.
 - Manager: plain 2-layer 1 oz.
 
-## Still to fetch before footprints are drawn (land patterns)
+## Land patterns — DONE 2026-07-18 (build_fplib.py `sourcing_footprints`)
 
-XT60PW-M/-F (Amass drawing), MWSA1707S (Sunlord), BVS 3920 bar shunt,
-MLT-8530 buzzer. Everything else is stock or already generated.
+All generated into labbench.pretty from vetted LCSC/EasyEDA library pulls:
+`XT60PW-M`, `XT60PW-F` (power pads RENUMBERED to 1,2 — the library pull
+had the retention legs as 1,2 on the F!), `L_1707_XAL1510` (**superset**
+pad 5.39×13.2 @ ±6.405 covering Sunlord MWSA1707S AND Coilcraft XAL1510,
+so the A/B thermal pair — and the P1 10 µH — are pure part swaps; stencil
+note: paste only the fitted part's terminal zone), `R3920_BVS`, `MLT-8530`.
 
-**Inductor footprint must be a SUPERSET pattern**: pads accepting both the
-Sunlord MWSA1707S (17.2×17.2) and Coilcraft XAL1510 (15.2×15.2) land
-patterns, so the A/B thermal pair is a pure part swap on the same board
-(applies to L1/L3 on phase-2 and L1 on phase-1 — the 10 µH/6.8 µH parts
-share the 1707 body; XAL1350 is the P1 alt).
+## ⚠ HARD GATE before submitting gerbers
+
+**XT60 polarity: pads 1=+ on both M and F, and 1↔1 mating, are ASSUMED**
+(no Amass drawing was fetchable). When the connector order arrives, mate
+an M+F pair and buzz out which M pad connects to which F pad, and which
+cavity the shell marks "+". Fix the two footprints/netlists if wrong —
+a $1 check that prevents a reversed-bus rack.

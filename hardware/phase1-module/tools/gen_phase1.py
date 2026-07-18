@@ -184,7 +184,7 @@ def build_power_stage():
     sh.power("PGND", *c19.pin_pos(2), ground=True)
 
     l1 = sh.add(kg.Placed(L, "L1", "10u MWSA1707S-100/XAL1350", 180.34, 96.52, rot=90,
-                          footprint="Inductor_SMD:L_Coilcraft_XAL1350-XXX"))
+                          footprint="labbench:L_1707_XAL1510"))
     gl("SW", l1, 1)
     gl("VOUT_INT", l1, 2, shape="output")
     # input/output banks + preload + snubber (DNP); one component per physical cap

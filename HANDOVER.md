@@ -42,10 +42,14 @@ manager, CAN 2.0B @500k. Docs 01–07 are the spec; read 05 (build plan) first
 
 ## Immediate next steps (agreed order)
 
-1. **Manager firmware** (docs/10 architecture doc first): discovery, UI,
-   SCPI-over-USB, budget arbiter, charge sequencer — reuses
-   firmware/common/labbench_can.h verbatim; ESP-IDF, TWAI @500k.
-   GPIO map is in docs/09 §3 (matches the generated schematic exactly).
+1. **Batch PCB layout** — every pre-layout gate is now cleared (sourcing
+   d281f94, mechanical frame frozen, all footprints real). Order of work:
+   gen_board-style placement generators for phase2/phase3 boards (reuse
+   phase-1's pour/courtyard/edge assertion machinery), finish autoroute.py
+   (fix list in its header), PGND-island recheck (PS-002), silk cleanup,
+   gerbers + analyzer, MPN-properties pass → BOM CSVs → order files.
+   **Gates before gerber submission**: XT60 polarity continuity check
+   (MECHANICAL.md), re-verify LCSC stock of the order-early parts.
    Phase-2 audit notes (2026-07-17): VM-001 on CAN_*/DROOP_EN/PS_FPWM/
    PS_PGOOD/I_MEAS/V_MEAS all false positives (VIO-variant / verified
    V_IH / R31-mitigated / divider-bounded); FS-001 "FB divider too low-Z"

@@ -28,3 +28,7 @@ __pycache__/
 *.pyc
 hardware/phase1-module/analysis/2*/
 hardware/phase1-module/drc-report.txt
+
+.vscode/
+# Claude working state for PCB layout (persisted, regenerable)
+hardware/**/tools/wip/

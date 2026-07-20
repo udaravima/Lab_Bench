@@ -127,9 +127,13 @@ def powerfet_son5x6():
 
 def lm5143_rha0040p():
     """TI RHA0040P (VQFNP 6x6, 40 pin) land pattern, lm5143.pdf p.68:
-    40 pads 0.25x0.6 on 0.5 pitch (10/side, centers +/-2.6 from center,
-    row -2.25..+2.25), EP 3.3x3.3 = pad 41. None of the stock Texas_RHA
-    variants match (EP 4.6/4.15/2.9/3.52x2.62 vs 3.3 square)."""
+    40 pads 0.25x0.6 on 0.5 pitch (10/side, row -2.25..+2.25), EP 3.3x3.3
+    = pad 41. Perimeter pad CENTERS at +/-2.9: the drawing's (5.8) is the
+    pad centre-to-centre span (6.0 body, leads under 2.6..3.0, pad 2.6..3.2)
+    -- at the +/-2.6 misread the perpendicular corner pads overlap 0.075mm
+    (caught by phase-2 DRC 2026-07-20); at 2.9 the corner gap is 0.318mm.
+    None of the stock Texas_RHA variants match (EP 4.6/4.15/2.9/3.52x2.62
+    vs 3.3 square)."""
     fp = pcbnew.FOOTPRINT(pcbnew.BOARD())
     fp.SetFPID(pcbnew.LIB_ID("labbench", "LM5143_RHA0040P"))
     fp.SetAttributes(pcbnew.FP_SMD)
@@ -153,13 +157,13 @@ def lm5143_rha0040p():
 
     row = [round(-2.25 + 0.5 * i, 2) for i in range(10)]
     for i, y in enumerate(row):                 # 1-10 left column, top->bottom
-        pad(1 + i, -2.6, y, 0.6, 0.25)
+        pad(1 + i, -2.9, y, 0.6, 0.25)
     for i, x in enumerate(row):                 # 11-20 bottom row, left->right
-        pad(11 + i, x, 2.6, 0.25, 0.6)
+        pad(11 + i, x, 2.9, 0.25, 0.6)
     for i, y in enumerate(reversed(row)):       # 21-30 right column, bottom->top
-        pad(21 + i, 2.6, y, 0.6, 0.25)
+        pad(21 + i, 2.9, y, 0.6, 0.25)
     for i, x in enumerate(reversed(row)):       # 31-40 top row, right->left
-        pad(31 + i, x, -2.6, 0.25, 0.6)
+        pad(31 + i, x, -2.9, 0.25, 0.6)
     pad(41, 0, 0, 3.3, 3.3, paste_ratio=-0.2)   # EP, reduced paste
 
     def line(layer, x1, y1, x2, y2, w=0.12):
@@ -180,8 +184,8 @@ def lm5143_rha0040p():
     rect(pcbnew.F_Fab, -3.0, -3.0, 3.0, 3.0, 0.1)
     # silk corners only (pads occupy all four sides); pin-1 dot at top-left
     for sx, sy in ((-1, -1), (1, -1), (1, 1), (-1, 1)):
-        line(pcbnew.F_SilkS, sx * 3.11, sy * 3.11, sx * 3.11, sy * 2.75)
-        line(pcbnew.F_SilkS, sx * 3.11, sy * 3.11, sx * 2.75, sy * 3.11)
+        line(pcbnew.F_SilkS, sx * 3.31, sy * 3.31, sx * 3.31, sy * 2.95)
+        line(pcbnew.F_SilkS, sx * 3.31, sy * 3.31, sx * 2.95, sy * 3.31)
     c = pcbnew.FP_SHAPE(fp)
     c.SetShape(pcbnew.SHAPE_T_CIRCLE)
     c.SetStart0(pcbnew.VECTOR2I(pcbnew.FromMM(-3.6), pcbnew.FromMM(-2.25)))
@@ -190,7 +194,7 @@ def lm5143_rha0040p():
     c.SetWidth(pcbnew.FromMM(0.2))
     c.SetDrawCoord()
     fp.Add(c)
-    rect(pcbnew.F_CrtYd, -3.25, -3.25, 3.25, 3.25)
+    rect(pcbnew.F_CrtYd, -3.45, -3.45, 3.45, 3.45)
 
     ref = fp.Reference()
     ref.SetPos0(pcbnew.VECTOR2I(0, pcbnew.FromMM(-4.1)))

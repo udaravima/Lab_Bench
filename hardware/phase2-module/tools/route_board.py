@@ -226,12 +226,16 @@ EXTRA_VIAS = [
     ("3V3", 50.15, 68.5),
 ]
 
+# PS-002 island stitching does NOT belong here. tools/check_planes.py
+# finds F.Cu pour islands whose pads reach ground only through a pour arm,
+# and the obvious fix is a stitch via inside each — but island geometry is
+# a function of the FINISHED copper: autoroute's tracks carve the pours, so
+# the islands move (pre-route they sat at 70.5,45.2 / 96.3,43.8; post-route
+# at 96.6,46.1 / 45.3,33.5 / 47.8,30.0 ...). Coordinates captured here get
+# silently rejected by too_close() or land in the wrong place. Do the
+# stitching as a final pass once routing is frozen, and re-run
+# check_planes.py to confirm — see HANDOVER "PS-002".
 STITCH = (
-    # PS-002: two F.Cu PGND pour islands had no via of their own, so their
-    # pads reached ground the long way round through a pour arm. Both sit
-    # over PGND on In1 (SEAM 67.3) so the tie is domain-safe. Coordinates
-    # from tools/check_planes.py — rerun it after any pour reshape.
-    [("PGND", 70.5, 45.2), ("PGND", 96.3, 43.8)] +
     [("PGND", x, y) for x in range(30, 53, 6) for y in (21.5, 25.5)] +
     [("PGND", x, y) for x in (66, 75, 84, 93) for y in (28.2, 41.6)] +
     [("PGND", x, y) for x in (46, 54, 62, 70, 78, 86, 94) for y in (65.8,)] +

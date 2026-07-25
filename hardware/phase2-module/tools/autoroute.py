@@ -194,7 +194,9 @@ def build_grid(board):
             y2 = pcbnew.ToMM(t.GetEnd().y) - ORG[1]
             r = pcbnew.ToMM(t.GetWidth()) / 2 + infl
             g.add(L, cells_for_seg(x1, y1, x2, y2, r), net)
-            seed(net, cells_for_seg(x1, y1, x2, y2, 0.01), L)
+            # 0.07 > half a diagonal cell: off-grid route_board tracks
+            # (0.025 mm coords) still seed their nearest cell row
+            seed(net, cells_for_seg(x1, y1, x2, y2, 0.07), L)
     g.pour_cells = {}
     for pname, poly in PWR_POURS.items():
         pnet = "PGND" if pname.startswith("PGND") else pname
@@ -222,7 +224,7 @@ def build_grid(board):
     return g, net_copper
 
 
-def route_net(g, net, sources, targets):
+def route_net(g, net, sources, targets, pocket_map=None, allowed_mask=0):
     tset = targets
     if not tset:
         return None
@@ -272,6 +274,10 @@ def route_net(g, net, sources, targets):
                 pv = g.pourA[nx_ * NY + ny_]
                 if pv and pv != nid:
                     step_cost *= 6.0
+            if pocket_map:
+                pk = pocket_map.get(c, 0)
+                if pk and (pk & ~allowed_mask):
+                    step_cost *= 3.0    # foreign fine-pitch escape lanes
             if L == 0 and dy and not dx:
                 step_cost *= 1.25
             if L == 1 and dx and not dy:
@@ -315,14 +321,45 @@ def main():
 
     g, net_copper = build_grid(board)
 
-    # per-cell plane nets (In1 / In2), one precompute pass
+    # fine-pitch pockets (QFN/LQFP/WSON/MSOP escape fields): foreign nets
+    # pay 3x to travel there so through-traffic cannot consume the escape
+    # lanes (the U3/U1/U10 'no path' cluster was exactly that)
+    pocket_map = {}
+    net_pockets = {}
+    bit = 1
+    for fp in board.GetFootprints():
+        pos = {}
+        fine = False
+        for pad in fp.Pads():
+            x = pcbnew.ToMM(pad.GetPosition().x) - ORG[0]
+            y = pcbnew.ToMM(pad.GetPosition().y) - ORG[1]
+            for (ox, oy), onet in pos.items():
+                if onet != pad.GetNetname() and \
+                        (ox - x) ** 2 + (oy - y) ** 2 < 0.66 ** 2:
+                    fine = True
+            pos[(x, y)] = pad.GetNetname()
+        if not fine:
+            continue
+        xs = [p[0] for p in pos]
+        ys = [p[1] for p in pos]
+        for c in cells_for_bbox(min(xs) - 1.0, min(ys) - 1.0,
+                                max(xs) + 1.0, max(ys) + 1.0):
+            pocket_map[c] = pocket_map.get(c, 0) | bit
+        for net in pos.values():
+            if net:
+                net_pockets[net] = net_pockets.get(net, 0) | bit
+        bit <<= 1
+
+    # per-net plane cells (In1 / In2), inverted once so the route loop is a
+    # dict lookup instead of a 750k-cell scan per net
     print("precomputing plane maps...")
-    in1_map, in2_map = {}, {}
+    plane_cells = {}
     for gx in range(NX):
         for gy in range(NY):
             x, y = gx * STEP, gy * STEP
-            in1_map[(gx, gy)] = in1_net_at(x, y)
-            in2_map[(gx, gy)] = in2_net_at(x, y)
+            for pnet in (in1_net_at(x, y), in2_net_at(x, y)):
+                if pnet:
+                    plane_cells.setdefault(pnet, set()).add((gx, gy, 2))
 
     def pad_cells(pad):
         x = pcbnew.ToMM(pad.GetPosition().x) - ORG[0]
@@ -341,7 +378,19 @@ def main():
                 srcs += [(L, gx, gy - k), (L, gx, gy + k)]
         if pad.GetAttribute() != pcbnew.PAD_ATTRIB_SMD:
             srcs += [(1 - L, sx, sy) for (sl, sx, sy) in list(srcs)]
-        return srcs, (L, gx, gy), (x, y)
+        return srcs, (L, gx, gy), (x, y), w >= hgt
+
+    # pads that board connectivity already reports as connected (route_board
+    # copper) are targets, not route jobs -- kills the false 'no path' fails
+    conn = board.GetConnectivity()
+    for net, pads in todo.items():
+        s = net_copper.setdefault(net, set())
+        for pad in pads:
+            if len(conn.GetConnectedTracks(pad)) == 0:
+                continue
+            srcs, _, _, _ = pad_cells(pad)
+            for (sl, sx, sy) in srcs:
+                s.add((sx, sy, sl))
 
     def add_track_path(net, path, entry):
         pts = [s for s in path if s[0] != "VIA"]
@@ -371,6 +420,18 @@ def main():
             items.append(("T", prev[0], seg_start, mm(prev)))
         if path[-1][0] == "VIA":
             items.append(("V", mm(prev)))
+        gxy, pxy, L, horiz = entry
+        # snap the landing at the source pad onto the pad's long axis: the
+        # source cell rounds up to 0.0625 mm off-centre, which clips the
+        # 0.5 mm-pitch neighbour (same geometry as the entry-stub knee)
+        if items and items[0][0] == "T":
+            (ax, ay), (bx, by) = items[0][2], items[0][3]
+            if horiz and abs(ax - bx) < 1e-9 and abs(ay - pxy[1]) < STEP:
+                items[0] = ("T", items[0][1], (ax, pxy[1]), (bx, by))
+                gxy = (ax, pxy[1])
+            elif not horiz and abs(ay - by) < 1e-9 and abs(ax - pxy[0]) < STEP:
+                items[0] = ("T", items[0][1], (pxy[0], ay), (bx, by))
+                gxy = (pxy[0], ay)
         netcode = nets[net].GetNetCode()
         lay = (pcbnew.F_Cu, pcbnew.B_Cu)
         for it in items:
@@ -391,40 +452,51 @@ def main():
                 v.SetLayerPair(pcbnew.F_Cu, pcbnew.B_Cu)
                 v.SetNetCode(netcode)
                 board.Add(v)
-        gxy, pxy, L = entry
         if gxy is not None and (abs(gxy[0] - pxy[0]) > 1e-3 or abs(gxy[1] - pxy[1]) > 1e-3):
-            t = pcbnew.PCB_TRACK(board)
-            t.SetStart(P(*gxy))
-            t.SetEnd(P(*pxy))
-            t.SetWidth(FromMM(TRACK_W))
-            t.SetLayer(lay[L])
-            t.SetNetCode(netcode)
-            board.Add(t)
+            # constrain the stub to the pad's long axis: snap the off-axis
+            # grid rounding over the pad itself, run to centre on the axis
+            # (a diagonal stub clips the neighbour at 0.5 mm pitch)
+            knee = (gxy[0], pxy[1]) if horiz else (pxy[0], gxy[1])
+            for a, b in ((gxy, knee), (knee, pxy)):
+                if abs(a[0] - b[0]) < 1e-6 and abs(a[1] - b[1]) < 1e-6:
+                    continue
+                t = pcbnew.PCB_TRACK(board)
+                t.SetStart(P(*a))
+                t.SetEnd(P(*b))
+                t.SetWidth(FromMM(TRACK_W))
+                t.SetLayer(lay[L])
+                t.SetNetCode(netcode)
+                board.Add(t)
         return items
+
+    def net_extent(net):
+        xs, ys = [], []
+        for pad in todo[net]:
+            xs.append(pcbnew.ToMM(pad.GetPosition().x))
+            ys.append(pcbnew.ToMM(pad.GetPosition().y))
+        return (max(xs) - min(xs)) + (max(ys) - min(ys))
 
     routed = failed = 0
     fails = []
-    for net in sorted(todo, key=lambda n: len(todo[n])):
+    # local nets first: pocket-internal hops must claim their escape lanes
+    # before the long-haul nets sweep through
+    for net in sorted(todo, key=lambda n: (net_extent(n), len(todo[n]))):
         pads = todo[net]
         base_targets = set()
         for (gx, gy) in g.pour_cells.get(net, ()):
             base_targets.add((gx, gy, 0))
-        for c, pnet in in1_map.items():
-            if pnet == net:
-                base_targets.add((c[0], c[1], 2))
-        for c, pnet in in2_map.items():
-            if pnet == net:
-                base_targets.add((c[0], c[1], 2))
+        base_targets |= plane_cells.get(net, set())
         done_cells = set(base_targets)
         done_cells |= net_copper.get(net, set())
         for i, pad in enumerate(pads):
-            src, (L, gx, gy), (px, py) = pad_cells(pad)
+            src, (L, gx, gy), (px, py), horiz = pad_cells(pad)
             if i == 0 and not done_cells:
                 done_cells.add((gx, gy, L))
                 continue
             if any((sx, sy, sl) in done_cells for sl, sx, sy in src):
                 continue
-            path = route_net(g, net, src, done_cells)
+            path = route_net(g, net, src, done_cells, pocket_map,
+                             net_pockets.get(net, 0))
             if path is None:
                 failed += 1
                 fails.append((net, pcbnew.Cast_to_FOOTPRINT(
@@ -434,7 +506,8 @@ def main():
             start = path[0]
             items = add_track_path(
                 net, path,
-                ((start[1] * STEP, start[2] * STEP), (px, py), start[0]))
+                ((start[1] * STEP, start[2] * STEP), (px, py), start[0],
+                 horiz))
             routed += 1
             for it in items:
                 if it[0] == "T":

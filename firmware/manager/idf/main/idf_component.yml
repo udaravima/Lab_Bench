@@ -1,0 +1,6 @@
+# Managed components for the manager shell (fetched by idf.py on the
+# first build; versions pinned loosely, lock file will pin exactly).
+dependencies:
+  idf: ">=5.1"
+  espressif/esp_lcd_ili9341: "^1"
+  espressif/esp_tinyusb: "^1"

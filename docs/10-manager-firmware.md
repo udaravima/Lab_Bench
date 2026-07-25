@@ -40,21 +40,53 @@ calls; outgoing frames accumulate in a fixed ring drained by
 `lb_mgr_tx_pop()`. Same host-test harness as module_core
 (`cd firmware/tests && make test`).
 
+## UI and SCPI cores (v0.2 — host-tested like manager_core)
+
+Two more hardware-independent cores sit beside manager_core, same rules
+(C99, no floats, no allocation), so **every** UI/SCPI decision is
+host-verified before silicon:
+
+- **`ui_core.{h,c}`** (tests/test_ui.c): front-panel state machine +
+  renderer. Consumes encoder/key events, renders a 40×15 **text model**
+  (`text[][]` + per-row attribute NORM/SEL/ALERT/EDIT + `beep` flag);
+  the shell only paints glyphs. Screens: channel LIST (8 rows + budget
+  header), channel DETAIL (setpoints/telemetry/output/fault-clear/charge
+  abort), digit-wise EDIT (rotate = ±digit, push = next digit, hold =
+  commit through the budget arbiter), SYSTEM (budget edit, global
+  off/resume, all-off, backplane INA228 bus meter). Front-panel keys
+  toggle their channel's output from any screen; refusals and new fault
+  bits raise a message line + beep (edge-triggered, once per fault bit).
+- **`scpi_core.{h,c}`** (tests/test_scpi.c): line-in/reply-out SCPI
+  (docs/01 §6): `*IDN?`, `*RST`, `SOURn:VOLT|CURR` (set/query, decimal
+  parsed to µV/µA integer), `MEASn:VOLT?|CURR?|POW?`, `OUTPn
+  ON|OFF|DEM|DROOP|DEMDROOP` + live `OUTPn?`, `SYST:BUDG`,
+  `SYST:SLOTn?` status CSV, `SYST:ERR?` FIFO (depth 4 + overflow mark).
+  Set commands the core refuses (budget #17, lost channel) queue
+  `-221,"Settings conflict"` — remote scripts see exactly the arbiter
+  the UI sees.
+
 ## ESP-IDF shell (firmware/manager/idf/ — requires ESP-IDF ≥5.1 to build)
+
+Managed components (main/idf_component.yml, fetched on first `idf.py
+build`): `espressif/esp_lcd_ili9341`, `espressif/esp_tinyusb`.
 
 | Piece | Binding |
 |---|---|
-| TWAI @ 500 k | IO4 TX / IO5 RX (docs/09 §3), rx task → `lb_mgr_rx`, tx task drains the ring |
+| TWAI @ 500 k | IO4 TX / IO5 RX (docs/09 §3), rx task → `lb_mgr_rx`, 10 ms tick drains the ring |
 | Tick | 10 ms esp_timer → `lb_mgr_tick` |
-| I²C | IO8/IO9: TCA9535 (0x20, PRESENT+keys, INT on IO7) + bus INA228 (0x40, entry meter) |
-| E-stop | IO21 kill FET (assert), IO38 line sense |
-| UI | ILI9341 SPI + EC11 encoder + keys: channel list, setpoint edit, budget display |
-| SCPI | USB-CDC (TinyUSB): `SOURn:VOLT`, `MEASn:CURR?`, `OUTPn`, `SYST:BUDG` (docs/01 §6) |
-| Wi-Fi | later phase; nothing in the core depends on it |
+| I²C | IO8/IO9: TCA9535 (0x20, PRESENT+keys polled at 60 ms; INT on IO7 is a bring-up TODO) + backplane INA228 (0x40: 250 µΩ, ADCRANGE=0, CURRENT_LSB 400 µA, SHUNT_CAL 1311, 1 Hz poll → bus meter row) |
+| E-stop | IO21 kill FET (assert), IO38 line sense (UI alert = bring-up TODO) |
+| Display | `display.c`: esp_lcd + ILI9341 @20 MHz SPI2, paints the ui_core text model with the 8×16 VGA font (`font8x16.h`, machine-extracted from the system PSF font by `tools/gen_font.py` — never hand-typed). Rotation + RGB565 byte order are THE two bring-up knobs. Backlight = LEDC on IO16. Touch parked (T_CS held high) |
+| Encoder | `encoder.c`: PCNT ×4 quadrature + glitch filter, 4 counts/detent; SW: <700 ms = push, 700 ms = hold |
+| SCPI | `scpi_usb.c`: TinyUSB CDC-ACM on the native USB PHY, line buffer → `lb_scpi_line` under the manager mutex |
+| Buzzer | IO41, 60 ms one-shot pulse on ui_core's `beep` |
+| Wi-Fi | later phase; nothing in the cores depends on it |
 
-The shell is committed as a buildable skeleton; it is **not** built in CI
-here (no ESP-IDF on this machine) — the core logic is what's verified, by
-the host suite, exactly like the module firmware before its silicon.
+Locking: one mutex guards the three cores; takers are the CAN rx task,
+the 10 ms tick, the 20 ms UI task and the TinyUSB rx callback. The shell
+compiles-by-inspection only — it is **not** built in CI here (no ESP-IDF
+on this machine) — the core logic is what's verified, by the host suite,
+exactly like the module firmware before its silicon.
 
 ## Bring-up checklist
 
@@ -68,3 +100,10 @@ the host suite, exactly like the module firmware before its silicon.
 5. Charge-sequence a bench battery through CC→CV→cutoff; reboot the
    manager mid-charge: module holds (policy=hold), sequencer resumes
    supervision from telemetry (docs/05 Phase-3 exit criterion).
+6. Display: expect rotation/byte-order wrong on first light-up — flip
+   `swap_xy`/`mirror` and the palette byteswap in display.c, nothing
+   else. Then encoder direction (swap the two PCNT channels if CW/CCW
+   are reversed).
+7. SCPI: `*IDN?` over /dev/ttyACM*, then script a SOUR/OUTP/MEAS
+   round-trip against a live module; verify a budget-refused `SOURn`
+   answers `SYST:ERR?` with -221.

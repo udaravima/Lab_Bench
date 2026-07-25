@@ -81,13 +81,28 @@ the dangling set; U6's 180-degree stubs redrawn; U5's via-on-pad and the R32
 clip resolved; orphan vias and the isolated In2 5V0 fragment cleaned).
 Remaining DRC: 180 lib_footprint_issues (benign bookkeeping, phase-1 carries
 the same class), ~154 silk (cosmetic — silk-cleanup pass), and **238
-unconnected = the signal nets.** `tools/autoroute.py` is WRITTEN (phase-1's
-router with its header fix-list applied: net-independent via hole spacing,
-plane targets from the in1/in2 maps, 0.125mm grid after a quantization
-failure at 0.25 — the U3/C28 escape lane is only 0.185mm wide). First 0.25mm
-run: 262 routed / 70 failed (fine-pitch escapes). The 0.125 run is SLOW
-(~30+ min: the per-net plane-map scans in main() want optimizing — invert
-in1/in2 maps to net->cells ONCE instead of scanning 750k cells per net).
+unconnected = the signal nets.**
+
+**Autoroute state (2026-07-25 evening):** `tools/autoroute.py` runs at a
+0.125mm bytearray grid (the 0.25 grid could not hit the 0.185mm-wide legal
+lanes at fine-pitch escapes; hole spacing is net-independent; plane targets
+come from the in1/in2 maps). Result of the first full 0.125 run:
+**unconnected 238 -> 88**; ~45 'no path' fails still cluster at the U3
+pocket / U10 escapes. The run takes ~30 min. The committed board (c9888d7)
+is the clean pre-autoroute copper state; the autoroute output is NOT
+committed. Known issues for the next session, in order:
+1. **False fails**: some failed pads (e.g. G_HS_A/U3) are already hand-
+   routed by route_board — the router doesn't recognise the existing copper
+   as connected (pad-center cell vs seeded track cells miss at 0.125).
+   Fix: seed net_copper with the PAD cells of every pad that board
+   connectivity already reports as connected, or check
+   `board.GetConnectivity()` per pad before routing.
+2. **Entry-stub clipping** (4 clearance): the grid-to-pad-centre entry stub
+   clips the adjacent pad at 0.5mm-pitch pins (U6.5 stub vs U6.4, U6.7 stub
+   vs U6.8). Fix: constrain the entry stub to the pad's long axis.
+3. Two 0.4-0.9mm dangling slivers at (33.1,30.0)/(79.1,34.2).
+4. Perf: invert the in1/in2 maps to net->cells ONCE (main() currently scans
+   750k cells per net = most of the runtime).
 After autoroute converges: silk cleanup, PS-002 recheck, gerbers + analyzer.
 
 Notable route_board facts a future session needs:

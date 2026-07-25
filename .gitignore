@@ -35,3 +35,8 @@ hardware/**/tools/wip/
 
 # VSCode local-history plugin folders
 .history/
+
+# Transient layout artifacts
+hardware/**/tools/logs/
+*_missing3Dmodels.txt
+*_log_missing3Dmodels.txt

@@ -40,3 +40,5 @@ hardware/**/tools/wip/
 hardware/**/tools/logs/
 *_missing3Dmodels.txt
 *_log_missing3Dmodels.txt
+hardware/**/fab/
+hardware/**/*-fab.zip

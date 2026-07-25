@@ -227,6 +227,11 @@ EXTRA_VIAS = [
 ]
 
 STITCH = (
+    # PS-002: two F.Cu PGND pour islands had no via of their own, so their
+    # pads reached ground the long way round through a pour arm. Both sit
+    # over PGND on In1 (SEAM 67.3) so the tie is domain-safe. Coordinates
+    # from tools/check_planes.py — rerun it after any pour reshape.
+    [("PGND", 70.5, 45.2), ("PGND", 96.3, 43.8)] +
     [("PGND", x, y) for x in range(30, 53, 6) for y in (21.5, 25.5)] +
     [("PGND", x, y) for x in (66, 75, 84, 93) for y in (28.2, 41.6)] +
     [("PGND", x, y) for x in (46, 54, 62, 70, 78, 86, 94) for y in (65.8,)] +

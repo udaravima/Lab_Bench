@@ -8,6 +8,15 @@ import os
 import re
 import sys
 
+# KiCad's global fp-lib-table refers to ${KICAD7_FOOTPRINT_DIR}; that var is
+# only set by the KiCad GUI, so a headless run cannot expand the library
+# URIs and reports every footprint as "not found in library" — 39 phantom
+# lib_footprint_issues on the backplane alone. Set it before importing
+# pcbnew so DRC compares against the real libraries.
+import os as _os
+_os.environ.setdefault("KICAD7_FOOTPRINT_DIR", "/usr/share/kicad/footprints")
+_os.environ.setdefault("KICAD7_SYMBOL_DIR", "/usr/share/kicad/symbols")
+
 import pcbnew
 
 HERE = os.path.dirname(os.path.abspath(__file__))

@@ -42,7 +42,8 @@ manager, CAN 2.0B @500k. Docs 01–07 are the spec; read 05 (build plan) first
 | Design docs 01–07 | complete (07 = module firmware, new) |
 | Phase-1 schematic | **complete, v1**: 7 generated sheets, 137 components, ~90 nets machine-verified; audited (kicad-happy + ngspice 38/40 pass) |
 | Footprints | all vetted; custom lib `labbench.pretty` (LM5145 RGY, LMR36015 RNX, DAC80502 no-EP WSON, PowerFET_SON5x6_GDS) |
-| PCB — Phase 1 | Committed board = clean pass-1 (placement + pours + planes + critical routes, 0 copper DRC); `autoroute.py` is WIP (33 unconnected, notes in its header) |
+| PCB — Phase 1 | Committed board = clean pass-1 (placement + pours + planes + critical routes, 0 copper DRC), **187 unconnected**, 75 silk. The old "33 unconnected" was from an autoroute run that was never committed (its drc-report.txt is gitignored, so the stale number persisted) — verified 2026-07-26 against the committed board |
+| PCB — Phase 3 backplane | **FAB-READY (2026-07-26, d9e1a7b)**: 0 DRC, 0 unconnected, silk 39/39 clean, no plane islands. Gerbers+drills in `fab/` (gitignored) via `python3 ../common/finish_board.py phase3-backplane.kicad_pcb`. Cross-checked: Edge_Cuts exactly 330.00×100.00 mm; drills 2×6.4 (M6 lugs), 16×2.8 (8 slots × 2 XT60 pins), 6×3.2 (M3), 86×1.0, 61×0.4. **Still gated on the XT60 polarity buzz-out before ordering** |
 | PCB — Phase 2 | **83 unconnected, 0 copper DRC, silk clean (2026-07-26, c1a86eb)** — see the resume section; finish by hand in KiCad. Older detail below: |
 | PCB — Phase 2 (history) | **(2026-07-25, 27fb2d1).** `gen_board.py` placement green (173 comps, all pour/courtyard/edge assertions pass, 130×90 4-layer); `route_board.py` pass-1 done (power pours, In2 heat patches, both phases' gate fan-outs, Kelvin pairs, disconnect trunk). DRC: **copper down to ~19 clearance + ~11 dangling/mask/hole in 3 known clusters** (see resume section); 243 unconnected = signal nets, autoroute not yet run. Found & fixed a real LM5143 land-pattern bug in the process (see load-bearing decisions) |
 | PCB — Phase 3 backplane | **COMPLETE pass-1 (2026-07-25)**: `phase3-backplane/tools/gen_board.py` (single-script: placement + 2oz bus pours + stitching + ALL signal routing) — **0 copper DRC, 0 unconnected**; only lib-bookkeeping (39) + 1 silk nick remain. 8 slots @30mm (XT60PW-F rot-90 mates the module pad-for-pad, socket y60..77.8 = module J5 1:1), M6 lugs -> RS1‖RS2 0.5mΩ Kelvin-sensed by INA228, nested PRESENT L-bus, CAN terminated past both end slots, E-stop chain threaded per docs. Netlist from `tools/wip/bp.net` (regenerate via kicad-cli) |
@@ -195,11 +196,21 @@ Notable route_board facts a future session needs:
 ## Immediate next steps (agreed order)
 
 1. **Finish Phase-2 board** — hand-route the remaining 83 connections in
-   KiCad (table + per-item coords in the resume section), then silk
-   rerun, PS-002 stitch pass, `run_drc.py`, `gen_gerbers.py`. Then the
-   phase-3 manager board layout (100×80 2L; the backplane is already
-   done), and the MPN-properties pass → BOM CSVs → order files.
-   **Gates before gerber submission**: XT60 polarity continuity check
+   KiCad (table + per-item coords in the resume section), then
+   `../common/finish_board.py` (silk + planes + fab) and `run_drc.py`.
+2. **Phase-3 manager board layout** — the only board with NO PCB at all
+   (100×80 2L, ~80 comps; schematic + `gen_manager.py` exist). Copy the
+   phase-2 `gen_board.py`/`route_board.py` structure.
+3. **MPN-properties pass → BOM CSVs → order files** — LCSC part numbers
+   and prices are already verified in `hardware/SOURCING.md`; what is
+   missing is the properties in the symbols and the generated CSVs.
+4. **Phase-1 board** — 187 unconnected; port the phase-2 autoroute fixes
+   (connectivity seeding, entry-stub snap, pocket costs, net ordering)
+   before hand-finishing.
+
+**Gates before ordering ANY board — including the fab-ready backplane:**
+
+   XT60 polarity continuity check
    (MECHANICAL.md — verify J1 male vs backplane J-female in the *mated*
    orientation; the footprint descr still says pads 1/2 are ASSUMED +/−),
    re-verify LCSC stock of the order-early parts (LTC7004, CSD19536KTT).
@@ -215,6 +226,34 @@ Notable route_board facts a future session needs:
    the shell, and walk docs/10's bring-up list.
 4. Then the batch PCB pass for phase-1 (its `autoroute.py` still has 33
    unconnected) + silk, gerbers, MPN pass → BOM CSVs → order files.
+
+## Shared layout tooling (hardware/common, 2026-07-26)
+
+Board-agnostic — use these instead of writing per-phase copies:
+
+```bash
+python3 ../common/finish_board.py BOARD.kicad_pcb   # silk + planes + fab
+python3 ../common/finish_board.py BOARD.kicad_pcb --silk     # refdes reflow
+python3 ../common/finish_board.py BOARD.kicad_pcb --planes   # PS-002
+python3 ../common/finish_board.py BOARD.kicad_pcb --fab      # gerbers+drills
+python3 ../common/fix_fpids.py    BOARD.kicad_pcb   # footprint lib nicknames
+```
+
+`--fab` refuses while anything is unconnected (`--force` overrides and
+labels the output NOT fab-ready). The layer set is read from the board,
+so 2- and 4-layer boards both work.
+
+**The `lib_footprint_issues` pile was NOT benign bookkeeping** — it was
+two real defects, both fixed 2026-07-26:
+1. Generated footprints had an **empty FPID library nickname**
+   (`fix_fpids.py` resolves and writes them back).
+2. KiCad's global fp-lib-table expands `${KICAD7_FOOTPRINT_DIR}`, which
+   only the GUI sets — so headless DRC resolved **no** library at all.
+   Every `run_drc.py` now sets it before importing pcbnew.
+Together these hid the fact that KiCad could not diff board footprints
+against their libraries, i.e. silent land-pattern drift would have gone
+unnoticed — and an LM5143 land-pattern bug was already caught here once
+by hand. If a DRC report ever shows this class again, suspect the env.
 
 ## Verification workflow (non-negotiable, it works)
 

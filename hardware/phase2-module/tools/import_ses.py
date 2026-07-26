@@ -43,7 +43,11 @@ def stats(board):
 
 def unconnected(board):
     board.BuildConnectivity()
-    return board.GetConnectivity().GetUnconnectedCount()
+    # The False is required, not optional: KiCad 7's binding is
+    # GetUnconnectedCount(aVisibileOnly) with no default, so the bare call
+    # raised TypeError here and this script died before it imported anything.
+    # False = count every unconnected item, not just the ones on visible nets.
+    return board.GetConnectivity().GetUnconnectedCount(False)
 
 
 def main():

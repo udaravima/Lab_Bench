@@ -90,8 +90,22 @@ PLACEMENT = {
     # 19.3 mm from its own decoupling (EMC DC-002). They belong beside pad 2,
     # which means inside U10's oversized courtyard — that rectangle is the
     # antenna keep-out, not a physical exclusion, and both sit below it.
-    "C65": (58.3, 17.0, 0),       # 100n, nearest the pin
-    "C64": (57.0, 20.5, 0),       # 10u bulk
+    #
+    # ROTATION 180 IS LOAD-BEARING, and so is the x. At rot 0 these parts face
+    # U10 with their *PGND* pad, which put a foreign-net pad 0.97 mm from U10's
+    # pad column — and at 0.3 mm zone clearance each side that leaves 0.37 mm of
+    # nominal channel, too little once the filler rounds the clearance outlines.
+    # The F.Cu 3V3 pour was pinched off there: the copper inside U10's pad ring
+    # became a 244.6 mm2 ISLAND carrying U10 pad 2, tied to nothing (KiCad
+    # reported it as a zone-to-zone unconnected item; check_plane_continuity()
+    # below now fails the build on it). Turning both parts round faces U10 with
+    # the 3V3 pad instead, so that gap is same-net and the pour flows through
+    # it, and it shortens the decoupling path as a bonus: C65 3.73 -> 2.68 mm,
+    # C64 6.70 -> 4.79 mm from pad 2. Measured alternatives: leaving rot 0 and
+    # shifting 1.0 mm left also heals the plane but costs distance (C65 4.73,
+    # C64 7.58); rot 180 alone does NOT (still 2 outlines) — it needs the x too.
+    "C65": (57.8, 17.0, 180),     # 100n, nearest the pin (3V3 pad faces U10)
+    "C64": (56.5, 20.5, 180),     # 10u bulk
 
     # === left edge: backplane header ======================================
     "J1":  (5.0, 14.0, 0),        # 1x20, pins y14..62.3
@@ -292,6 +306,98 @@ def check_keepout(board):
     return fails
 
 
+def _outline_area(poly, i):
+    """Shoelace area (mm2) of one filled outline."""
+    o = poly.Outline(i)
+    pts = [(pcbnew.ToMM(o.CPoint(k).x), pcbnew.ToMM(o.CPoint(k).y))
+           for k in range(o.PointCount())]
+    a = 0.0
+    for k in range(len(pts)):
+        x1, y1 = pts[k]
+        x2, y2 = pts[(k + 1) % len(pts)]
+        a += x1 * y2 - x2 * y1
+    return abs(a) / 2.0
+
+
+def _in_outline(poly, i, x, y):
+    """Point-in-polygon against outline i alone.
+
+    SHAPE_POLY_SET.Contains() tests the whole set, which is exactly the
+    question we are NOT asking: we need to know which individual island a
+    pad landed on.
+    """
+    o = poly.Outline(i)
+    n = o.PointCount()
+    res = False
+    j = n - 1
+    for k in range(n):
+        xk, yk = pcbnew.ToMM(o.CPoint(k).x), pcbnew.ToMM(o.CPoint(k).y)
+        xj, yj = pcbnew.ToMM(o.CPoint(j).x), pcbnew.ToMM(o.CPoint(j).y)
+        if (yk > y) != (yj > y) and x < (xj - xk) * (y - yk) / (yj - yk) + xk:
+            res = not res
+        j = k
+    return res
+
+
+def check_plane_continuity(board):
+    """Fail if a pour fragmented into an island that carries pads but no tie.
+
+    Must run AFTER the final ZONE_FILLER pass — island geometry is a property
+    of the finished copper, not of the zone outlines. A fragment holding no
+    pads is normal (the filler carves copper around pads and clearances); a
+    fragment holding pads with no via/PTH of its own is a genuine break, and
+    on this 2-layer board it is not even fixable with a stitch via, because
+    the opposite layer is the other plane. Moving the offender is the fix.
+
+    This exists because placing U10's decoupling caps pinched the F.Cu 3V3
+    pour into two pieces and nothing in the assertion set noticed — the
+    board still passed DRC at 0 violations, and the break showed up only as
+    one extra unconnected item buried in 174 unrouted signal nets.
+    """
+    pads = [(p.GetNetname(), pcbnew.ToMM(p.GetPosition().x),
+             pcbnew.ToMM(p.GetPosition().y), p)
+            for fp in board.GetFootprints() for p in fp.Pads()]
+    ties = [(t.GetNetname(), pcbnew.ToMM(t.GetPosition().x),
+             pcbnew.ToMM(t.GetPosition().y))
+            for t in board.GetTracks() if isinstance(t, pcbnew.PCB_VIA)]
+    ties += [(n, x, y) for n, x, y, p in pads
+             if p.GetAttribute() != pcbnew.PAD_ATTRIB_SMD]
+
+    fails = 0
+    for z in board.Zones():
+        if z.GetIsRuleArea():
+            continue
+        net = z.GetNetname()
+        for layer in z.GetLayerSet().Seq():
+            poly = z.GetFilledPolysList(layer)
+            if poly.OutlineCount() < 2:
+                continue
+            ranked = sorted(((_outline_area(poly, i), i)
+                             for i in range(poly.OutlineCount())), reverse=True)
+            for a, i in ranked[1:]:
+                held = [f"{p.GetParent().GetReference()}.{p.GetNumber()}"
+                        for n, x, y, p in pads
+                        if n == net and p.IsOnLayer(layer)
+                        and _in_outline(poly, i, x, y)]
+                if not held:
+                    continue
+                tied = sum(1 for n, x, y in ties
+                           if n == net and _in_outline(poly, i, x, y))
+                if tied:
+                    continue
+                o = poly.Outline(i)
+                cx = sum(pcbnew.ToMM(o.CPoint(k).x)
+                         for k in range(o.PointCount())) / o.PointCount()
+                cy = sum(pcbnew.ToMM(o.CPoint(k).y)
+                         for k in range(o.PointCount())) / o.PointCount()
+                print(f"PLANE BREAK [{net}] on {board.GetLayerName(layer)}: "
+                      f"{a:.1f} mm2 island at board-rel "
+                      f"({cx - ORG[0]:.1f},{cy - ORG[1]:.1f}) holds {held} "
+                      f"with no via/PTH tie")
+                fails += 1
+    return fails
+
+
 def load_fp(fpid):
     lib, name = fpid.split(":", 1)
     for d in FPDIRS:
@@ -427,6 +533,14 @@ def main():
 
     board.BuildConnectivity()
     pcbnew.ZONE_FILLER(board).Fill(board.Zones())
+
+    # Only meaningful once the copper is final, so it cannot join the
+    # placement assertions above. Refuse to write a board whose plane is cut.
+    broken = check_plane_continuity(board)
+    if broken:
+        print(f"gen_board: {broken} plane break(s) — board NOT written")
+        sys.exit(1)
+
     board.Save(OUT)
     print(f"gen_board: {len(comps)} footprints, {len(nets)} nets, "
           f"{len(board.Zones())} zones -> {os.path.relpath(OUT, HERE)}")

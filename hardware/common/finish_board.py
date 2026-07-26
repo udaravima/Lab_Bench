@@ -24,18 +24,40 @@ import layout_qa as qa
 
 
 def main():
-    args = [a for a in sys.argv[1:]]
-    flags = {a for a in args if a.startswith("--")}
-    paths = [a for a in args if not a.startswith("--")]
+    args = list(sys.argv[1:])
+
+    # Consume --origin and its value BEFORE picking the board path. This used
+    # to run after, which broke the space-separated form this script's own
+    # usage line documents: "X,Y" is not a flag, so it stayed in the
+    # positional list and became the board path, and a trailing bare
+    # --origin raised IndexError. Only --origin=X,Y ever worked.
+    origin = (0.0, 0.0)
+    rest = []
+    i = 0
+    while i < len(args):
+        a = args[i]
+        if a == "--origin" or a.startswith("--origin="):
+            if "=" in a:
+                v = a.split("=", 1)[1]
+            elif i + 1 < len(args):
+                i += 1
+                v = args[i]
+            else:
+                sys.exit("--origin needs a value, e.g. --origin 20,20")
+            try:
+                x, y = (float(t) for t in v.split(","))
+            except ValueError:
+                sys.exit(f"--origin wants two numbers 'X,Y', got {v!r}")
+            origin = (x, y)
+        else:
+            rest.append(a)
+        i += 1
+
+    flags = {a for a in rest if a.startswith("--")}
+    paths = [a for a in rest if not a.startswith("--")]
     if not paths:
         sys.exit(__doc__)
     board_path = os.path.abspath(paths[0])
-
-    origin = (0.0, 0.0)
-    for a in args:
-        if a.startswith("--origin"):
-            _, v = a.split("=", 1) if "=" in a else (None, args[args.index(a) + 1])
-            origin = tuple(float(t) for t in v.split(","))
 
     do_silk = "--silk" in flags
     do_planes = "--planes" in flags

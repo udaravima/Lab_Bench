@@ -7,6 +7,7 @@ violation or unconnected item.
 import os
 import re
 import sys
+from collections import Counter
 
 # KiCad's global fp-lib-table refers to ${KICAD7_FOOTPRINT_DIR}; that var is
 # only set by the KiCad GUI, so a headless run cannot expand the library
@@ -31,26 +32,43 @@ def main():
     text = open(RPT).read()
     sections = re.split(r"\*\* (.+?) \*\*", text)
     # sections: [head, name1, body1, name2, body2, ...]
+    # Each item is a "[type]: description" line followed by indented detail
+    # lines, one of which carries "Severity: error" or "Severity: warning" —
+    # so grab the whole chunk up to the next item, not just the first line.
+    item_re = re.compile(r"\[(\w+)\]: (.+?)(?=\n\[|\Z)", re.S)
     counts = {}
     for i in range(1, len(sections) - 1, 2):
         name, body = sections[i], sections[i + 1]
-        items = re.findall(r"\[(\w+)\]: (.+)", body)
-        counts[name] = items
-    fails = 0
+        counts[name] = [(m.group(1), m.group(2))
+                        for m in item_re.finditer(body)]
+
+    errors = 0
     for name, items in counts.items():
         print(f"{name}: {len(items)}")
-        from collections import Counter
         for typ, n in Counter(t for t, _ in items).most_common():
             print(f"   {typ}: {n}")
+        for typ, chunk in items:
+            # Unconnected items are always a fail: an unrouted net is not a
+            # matter of taste. Everything else fails only at error severity,
+            # so cosmetic silk warnings do not gate the board.
+            if "unconnected" in name.lower() or "Severity: error" in chunk:
+                errors += 1
+
     # details for placement-relevant problems
     for name, items in counts.items():
-        for typ, desc in items:
+        for typ, chunk in items:
             if typ in ("courtyards_overlap", "malformed_courtyard", "shorting_items",
                        "items_not_allowed", "copper_edge_clearance"):
-                print(f"  !{typ}: {desc[:120]}")
-            fails += 1 if "unconnected" not in name.lower() else 0
-    unconn = len(counts.get("Found 0 unconnected pads", []))
-    sys.exit(0)
+                print(f"  !{typ}: {chunk.splitlines()[0][:120]}")
+
+    if errors:
+        print(f"FAIL: {errors} error-severity/unconnected item(s). "
+              f"Unconnected items are expected until the board is routed — "
+              f"this board is a placement pass, so a nonzero exit here is "
+              f"the honest answer, not a regression.")
+    else:
+        print("PASS: no error-severity violations, no unconnected items.")
+    sys.exit(1 if errors else 0)
 
 
 if __name__ == "__main__":

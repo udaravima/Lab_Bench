@@ -47,7 +47,7 @@ manager, CAN 2.0B @500k. Docs 01–07 are the spec; read 05 (build plan) first
 | PCB — Phase 2 | **83 unconnected, 0 copper DRC, silk clean (2026-07-26, c1a86eb)** — see the resume section; finish by hand in KiCad. Older detail below: |
 | PCB — Phase 2 (history) | **(2026-07-25, 27fb2d1).** `gen_board.py` placement green (173 comps, all pour/courtyard/edge assertions pass, 130×90 4-layer); `route_board.py` pass-1 done (power pours, In2 heat patches, both phases' gate fan-outs, Kelvin pairs, disconnect trunk). DRC: **copper down to ~19 clearance + ~11 dangling/mask/hole in 3 known clusters** (see resume section); 243 unconnected = signal nets, autoroute not yet run. Found & fixed a real LM5143 land-pattern bug in the process (see load-bearing decisions) |
 | PCB — Phase 3 backplane | **COMPLETE pass-1 (2026-07-25)**: `phase3-backplane/tools/gen_board.py` (single-script: placement + 2oz bus pours + stitching + ALL signal routing) — **0 copper DRC, 0 unconnected**; only lib-bookkeeping (39) + 1 silk nick remain. 8 slots @30mm (XT60PW-F rot-90 mates the module pad-for-pad, socket y60..77.8 = module J5 1:1), M6 lugs -> RS1‖RS2 0.5mΩ Kelvin-sensed by INA228, nested PRESENT L-bus, CAN terminated past both end slots, E-stop chain threaded per docs. Netlist from `tools/wip/bp.net` (regenerate via kicad-cli) |
-| PCB — Phase 3 manager | not started (100×80 2L, 80 comps) |
+| PCB — Phase 3 manager | **placement pass complete, 0 DRC (2026-07-26)**: 100×80 2L, 87 footprints (80 comps + 4 M3 + 3 fiducials), 86 nets, F.Cu 3V3 / B.Cu PGND planes, antenna keep-out verified copper-free. **173 unconnected = the signal nets; routing is the next pass.** Reproduce: `cd tools && python3 gen_board.py wip/mgr.net` → `python3 ../../common/fix_fpids.py ../phase3-manager.kicad_pcb` → `python3 ../../common/finish_board.py ../phase3-manager.kicad_pcb --silk --planes` → `python3 run_drc.py` |
 | Module firmware | v0.1 builds clean (6.3 KB): full peripheral binding + CAN dispatch around the host-tested `module_core`. Untested on silicon (no board yet) |
 | Host tests | `cd firmware/tests && make test` — must stay green. **5 suites now**: can, core, manager, scpi, ui |
 | Manager firmware | **v0.2 COMPLETE (2026-07-25, commit 174595e)**: `scpi_core` + `ui_core` join `manager_core` as host-tested cores; ESP-IDF shell fully written (display/encoder/USB-SCPI/app_main). Still **UNBUILT** — no IDF toolchain here. See docs/10 |
@@ -198,9 +198,10 @@ Notable route_board facts a future session needs:
 1. **Finish Phase-2 board** — hand-route the remaining 83 connections in
    KiCad (table + per-item coords in the resume section), then
    `../common/finish_board.py` (silk + planes + fab) and `run_drc.py`.
-2. **Phase-3 manager board layout** — the only board with NO PCB at all
-   (100×80 2L, ~80 comps; schematic + `gen_manager.py` exist). Copy the
-   phase-2 `gen_board.py`/`route_board.py` structure.
+2. **Phase-3 manager board — ROUTE it.** Placement is done and DRC-clean
+   (see the table); what is left is 173 unconnected signal nets on a 2-layer
+   board. Mostly 3-node digital nets, so hand-routing in KiCad is realistic;
+   there is no `route_board.py` for this phase yet.
 3. **MPN-properties pass → BOM CSVs → order files** — LCSC part numbers
    and prices are already verified in `hardware/SOURCING.md`; what is
    missing is the properties in the symbols and the generated CSVs.
@@ -210,22 +211,26 @@ Notable route_board facts a future session needs:
 
 **Gates before ordering ANY board — including the fab-ready backplane:**
 
-   XT60 polarity continuity check
-   (MECHANICAL.md — verify J1 male vs backplane J-female in the *mated*
-   orientation; the footprint descr still says pads 1/2 are ASSUMED +/−),
-   re-verify LCSC stock of the order-early parts (LTC7004, CSD19536KTT).
-   Phase-2 audit notes (2026-07-17): VM-001 on CAN_*/DROOP_EN/PS_FPWM/
-   PS_PGOOD/I_MEAS/V_MEAS all false positives (VIO-variant / verified
-   V_IH / R31-mitigated / divider-bounded); FS-001 "FB divider too low-Z"
-   is the injection scheme working as designed; RS-001 set identical to
-   the audited Phase-1 baseline.
-2. **Phase-3 backplane + ESP32-S3 manager schematics** (bus bars, slot IDs,
-   CAN termination, E-stop; manager board with display/encoder/USB).
-3. ~~**ESP32-S3 manager firmware**~~ — **DONE 2026-07-25/26 (v0.2)**. The
-   only firmware work left needs hardware: install ESP-IDF ≥5.1, build
-   the shell, and walk docs/10's bring-up list.
-4. Then the batch PCB pass for phase-1 (its `autoroute.py` still has 33
-   unconnected) + silk, gerbers, MPN pass → BOM CSVs → order files.
+- **XT60 polarity continuity check** (MECHANICAL.md — verify J1 male vs
+  backplane J-female in the *mated* orientation; the footprint descr still
+  says pads 1/2 are ASSUMED +/−).
+- **Re-verify LCSC stock** of the order-early parts (LTC7004, CSD19536KTT).
+- **Manager board only: confirm the fab quotes 0.2 mm drilling** on a 2-layer
+  stackup — the board rule was relaxed from 0.3 to 0.2 for the stock ESP32
+  footprint's thermal-pad stitching, and that is above some cheapest-process
+  quotes.
+- Phase-2 audit notes (2026-07-17), all triaged, none blocking: VM-001 on
+  CAN_*/DROOP_EN/PS_FPWM/PS_PGOOD/I_MEAS/V_MEAS are false positives
+  (VIO-variant / verified V_IH / R31-mitigated / divider-bounded); FS-001
+  "FB divider too low-Z" is the injection scheme working as designed; RS-001
+  set identical to the audited Phase-1 baseline.
+
+(This section used to carry three orphaned list items — "backplane + manager
+schematics", "manager firmware", "batch PCB pass for phase-1" — left behind
+by an earlier edit of the next-steps list above. All three were either
+complete or superseded, and one repeated the stale "phase-1 has 33
+unconnected" figure. Removed 2026-07-26; the live list is the numbered one
+above.)
 
 ## Shared layout tooling (hardware/common, 2026-07-26)
 
@@ -241,7 +246,23 @@ python3 ../common/fix_fpids.py    BOARD.kicad_pcb   # footprint lib nicknames
 
 `--fab` refuses while anything is unconnected (`--force` overrides and
 labels the output NOT fab-ready). The layer set is read from the board,
-so 2- and 4-layer boards both work.
+so 2- and 4-layer boards both work. `--fab` fills the zones before
+plotting — it did not always, and a board whose stored fill was stale
+plotted B.Cu at 8.5 kB instead of 219 kB, i.e. the whole 2 oz plane
+missing from a run that reported success.
+
+**Re-running a board generator throws away two post-generation passes.**
+`gen_board.py` adds footprints by name only and places refdes naively, so
+straight after a regenerate the board reports ~87 `lib_footprint_issues`
+and a pile of silk errors that were not there before. That is expected, not
+a regression — the fix is to finish the pipeline every time:
+
+```bash
+python3 gen_board.py wip/BOARD.net
+python3 ../../common/fix_fpids.py ../BOARD.kicad_pcb        # nicknames
+python3 ../../common/finish_board.py ../BOARD.kicad_pcb --silk --planes
+python3 run_drc.py                                         # then the numbers
+```
 
 **The `lib_footprint_issues` pile was NOT benign bookkeeping** — it was
 two real defects, both fixed 2026-07-26:
@@ -305,6 +326,20 @@ by hand. If a DRC report ever shows this class again, suspect the env.
   moved out). **Regenerating the footprint lib rewrites every file's tstamps**
   — after `python3 build_fplib.py`, `git checkout` all the other .kicad_mod
   files so only LM5143 changes (that's what commit 27fb2d1 did).
+- **Manager C64/C65 are rotated 180° on purpose (2026-07-26, DO NOT revert):**
+  at rot 0 these caps face U10 with their *PGND* pad, 0.97 mm from U10's pad
+  column — and at 0.3 mm zone clearance per side that channel is too narrow to
+  fill, so the F.Cu 3V3 pour was pinched into a **244.6 mm² island carrying
+  U10's own 3V3 pad with no tie**. Turned round, the gap is same-net and the
+  pour flows; it also shortens the decoupling path (C65 3.73 → 2.68 mm, C64
+  6.70 → 4.79 mm from pad 2), so it is strictly better than the placement it
+  replaced. Note what this defect looked like: the board still passed DRC at
+  **0 violations**, and the break showed up only as one extra unconnected item
+  hidden among 173 unrouted signal nets. `check_plane_continuity()` in the
+  manager's `gen_board.py` now fails the build on any pour fragment that holds
+  pads without a via/PTH tie — it runs after the final fill, because island
+  geometry is a property of the finished copper. On a 2-layer board a stitch
+  via cannot fix this class at all: the other layer is the other plane.
 - **Phase-2 (docs/08) load-bearing findings — do not "optimise" these away:**
   - **6.8 µH, not 4.7 µH**: LM5143 internal slope comp (~100 mV/µs @347 kHz)
     fails Ridley m_c(1−D) > 0.5 with 4.7 µH at D→0.93 (worst 0.44). 6.8 µH
@@ -334,11 +369,23 @@ that the average is servo'd but ripple is skip-mode coarse.
   input). Harmless today, but it breaks the reproducibility contract.
 - **Freerouting does not work on this board** — evidence in the resume
   section; the KiCad plugin hits the same StackOverflowError.
-- Phase-1 `autoroute.py`: 33 unconnected, router-via self-spacing bug,
-  congested U3/U10 escapes — its header has the fix list. Deferred.
-- DRC noise on the committed board: `lib_footprint_issues` (board-vs-library
-  bookkeeping, harmless) and ~75 silk overlaps (cosmetic, clean up in the
-  PCB batch).
+- Phase-1 `autoroute.py`: router-via self-spacing bug, congested U3/U10
+  escapes — its header has the fix list. Deferred. (Its old "33 unconnected"
+  claim was wrong; the committed board is **187** — see the table.)
+- Phase-1/2 DRC noise is now **silk only** (75 and 11, cosmetic). The
+  `lib_footprint_issues` pile is gone and was never "harmless bookkeeping" —
+  see the shared-tooling section for what it was actually hiding.
+- **`run_drc.py` in phase-1, phase-2 and phase-3-backplane still always
+  `sys.exit(0)`**, despite the docstring promising exit 1 on error-severity
+  violations. Only the phase-3-manager copy has been fixed (it now parses
+  per-item severity and fails on errors or unconnected items). Anything that
+  gates on the other three exit codes is gating on nothing — read their
+  printed output instead until they are ported.
+- **The phase-2 tools are not wrappers over `hardware/common/`.**
+  `silk_refs.py`, `check_planes.py` and `gen_gerbers.py` each carry their own
+  copy of logic that now also lives in `common/layout_qa.py`. Retiring the
+  copies changes the silk algorithm the committed phase-2 board was built
+  with, so it needs a board diff attached — deliberately not done yet.
 - LCSC stock was thin on LTC7004 (5) and TLV7011 (42) at 2026-07-16.
 - kicad-happy VM-001 flags CAN_RX/TX/STB as 5V↔3.3V crossings — false
   positives (VIO variant); I_MEAS was the one real hit (fixed via R31).
@@ -354,3 +401,14 @@ that the average is servo'd but ripple is skip-mode coarse.
 - Coilcraft/Mouser/DigiKey product pages block scraping; use the jlcsearch
   API (no auth) for LCSC data, `curl` with browser UA for vendor PDFs, and
   the Farnell datasheet CDN as fallback.
+- **A VSCode local-history "restore" can silently revert a whole board.** On
+  2026-07-26 `phase2-module.kicad_pcb` came back as an old revision — 213
+  tracks instead of 1512, 247 vias instead of 359, **unconnected 83 -> 244**,
+  i.e. the entire autoroute + pass-1 result gone — with the good file dropped
+  into `hardware/phase2-module/_restore_backup_<timestamp>/`. It looks like an
+  ordinary dirty file in `git status`; nothing announces it. If a board file
+  is unexpectedly modified, **diff the copper before committing**: count
+  tracks/vias/unconnected against HEAD rather than eyeballing the diff, which
+  is a 100k-line whole-file rewrite either way. Recovery is just
+  `git checkout -- <board>` as long as the good state was committed — which is
+  the real argument for committing each clean board state promptly.

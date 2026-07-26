@@ -4,8 +4,13 @@ Emits Gerbers + Excellon drills + a drill map into ../fab/, then zips
 them. Settings follow JLCPCB's stated requirements for a 4-layer board:
 Gerber RS-274X, no X2 attributes (their parser is happier without),
 Protel-style extensions off (KiCad's default names are accepted and
-unambiguous), 4.6 metric drill format, PTH/NPTH merged, drill origin =
+unambiguous), 3.3 metric drill format, PTH/NPTH merged, drill origin =
 absolute (the board origin is already the plot origin here).
+
+(That is 3.3, matching `SetFormat(True, DECIMAL_FORMAT, 3, 3)` below. An
+earlier revision of this docstring said 4.6, which was never what the code
+emitted — do not "fix" the code to agree with a comment. 3.3 metric is what
+JLC reads, and micron resolution is more than this board needs.)
 
 Refuses to plot while copper DRC is unclean or nets are unconnected —
 gerbers of a half-routed board are the classic way to fab a paperweight.

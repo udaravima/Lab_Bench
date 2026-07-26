@@ -8,11 +8,22 @@ should be re-implemented per board:
     plot_fab(board, out) Gerbers + Excellon, layer set from the board itself
 
 Written against KiCad 7's pcbnew API. Callers are thin wrappers in each
-phase's tools/ that supply the board path — see
-phase2-module/tools/silk_refs.py for the pattern.
+phase's tools/ that supply the board path — hardware/common/finish_board.py
+is the reference caller.
 
-Nothing here mutates a file: callers save. That keeps "which board did I
-just overwrite" answerable.
+**The phase-2 copies are NOT wrappers yet.** `phase2-module/tools/silk_refs.py`
+(132 lines), `check_planes.py` (148) and `gen_gerbers.py` (97) predate this
+module and each carries its own standalone reimplementation of reflow_refs /
+plane_islands / plot_fab, with their own helper functions. They are not
+imported from here and they do not import from here, so the two sets can
+drift — and the phase-2 board's committed silk state came from silk_refs.py's
+algorithm, not this one, so they are not interchangeable today. Retiring the
+copies is a deliberate change with a board diff attached, not a cleanup.
+
+Nothing here writes a FILE: callers save. Functions do mutate the in-memory
+board where the measurement requires it (both plane_islands and plot_fab run
+the zone filler), so a caller that wants the on-disk fill state preserved
+should reload rather than save after calling.
 """
 import os
 import shutil
@@ -206,7 +217,17 @@ def plot_fab(board, outdir, zip_base=None):
 
     RS-274X, no X2 attributes, no Protel extensions — what JLCPCB's
     parser wants. Returns the list of files written.
+
+    Fills the zones first, deliberately. The plotter emits whatever fill is
+    stored in the board, so plotting without this hands the fab whatever the
+    last save happened to contain: on the backplane, a board whose fill was
+    not current plotted B.Cu at 8.5 kB instead of 219 kB — the entire 2 oz
+    plane missing, from a run that reported success. finish_board's
+    unconnected guard catches a wholly unfilled board (the pads come back
+    unconnected) but NOT a merely stale one, so the fill belongs here.
     """
+    pcbnew.ZONE_FILLER(board).Fill(board.Zones())
+
     ncu = board.GetCopperLayerCount()
     copper = [(pcbnew.F_Cu, "F_Cu")]
     if ncu >= 4:
@@ -256,9 +277,20 @@ def plot_fab(board, outdir, zip_base=None):
 
 
 def board_extent(board):
-    """(width, height) mm of Edge_Cuts — the sanity check on any plot."""
+    """(width, height) mm of the Edge_Cuts centreline — the sanity check on
+    any plot, and the number to compare against a mechanical drawing.
+
+    GetBoardEdgesBoundingBox() inflates by half the stroke on each side, so
+    it reported 330.10 x 100.10 for a backplane whose outline is 330 x 100 —
+    a 0.1 mm lie on every board, in the one function whose whole job is to be
+    checkable against a spec. The fab cuts the centreline, so subtract the
+    widest Edge_Cuts stroke back out.
+    """
     bb = board.GetBoardEdgesBoundingBox()
-    return round(ToMM(bb.GetWidth()), 2), round(ToMM(bb.GetHeight()), 2)
+    strokes = [d.GetWidth() for d in board.GetDrawings()
+               if d.GetLayer() == pcbnew.Edge_Cuts]
+    s = max(strokes) if strokes else 0
+    return round(ToMM(bb.GetWidth() - s), 2), round(ToMM(bb.GetHeight() - s), 2)
 
 
 def unconnected(board):

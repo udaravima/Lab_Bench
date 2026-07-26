@@ -1,7 +1,7 @@
 {
   "version": 1,
   "project": "phase3-manager.kicad_pro",
-  "current": "2026-07-17_2102",
+  "current": "2026-07-26_0906",
   "runs": {
     "2026-07-17_2101": {
       "source_hashes": {
@@ -29,6 +29,81 @@
         "schematic": "analyze_schematic.py phase3-manager.kicad_sch"
       },
       "generated": "2026-07-17T21:02:36+05:30",
+      "pinned": false
+    },
+    "2026-07-26_0849": {
+      "source_hashes": {
+        "phase3-manager.kicad_sch": "sha256:02a78662fe334d48482aa8d37e9c86fbf36ac226e908d2df144c0ac55774b9df",
+        "phase3-manager.kicad_pcb": "sha256:3a4beab8d3795089f6588bec72bd62ab1e002249cb7f11e97df4b12b470b8ebe"
+      },
+      "outputs": {
+        "schematic": "schematic.json",
+        "spice": "spice.json",
+        "pcb": "pcb.json"
+      },
+      "scripts": {
+        "schematic": "analyze_schematic.py phase3-manager.kicad_sch"
+      },
+      "generated": "2026-07-26T08:49:25+05:30",
+      "pinned": false
+    },
+    "2026-07-26_0903": {
+      "source_hashes": {
+        "phase3-manager.kicad_pcb": "sha256:b51d5e4dc09918e2a2895a648fd3dcb86e7e178db988c9c6b8e2f78850f7e967",
+        "schematic.json": "sha256:ae01b861404fd251edeaeb6ca5673304fb5598785741fa47a4b7386c3e71eaf2",
+        "pcb.json": "sha256:26e7f6427ab1b5955c0e0c9d6ca3782aacccba8f30adf26d8a1e84f7778d2e19"
+      },
+      "outputs": {
+        "schematic": "schematic.json",
+        "spice": "spice.json",
+        "pcb": "pcb.json",
+        "cross_analysis": "cross_analysis.json",
+        "emc": "emc.json",
+        "thermal": "thermal.json"
+      },
+      "scripts": {
+        "pcb": "analyze_pcb.py phase3-manager.kicad_pcb"
+      },
+      "generated": "2026-07-26T09:04:47+05:30",
+      "pinned": false
+    },
+    "2026-07-26_0904": {
+      "source_hashes": {
+        "schematic.json": "sha256:ae01b861404fd251edeaeb6ca5673304fb5598785741fa47a4b7386c3e71eaf2",
+        "pcb.json": "sha256:281fc443d57d44b0d82a656f80b325ca34e519dcf81d87abba6b443e17a17176",
+        "phase3-manager.kicad_pcb": "sha256:8edea6a79d52b14ca6e2d7e64fbcfe7505d240f7cf3f7034a6994125cb4b5ad5"
+      },
+      "outputs": {
+        "schematic": "schematic.json",
+        "spice": "spice.json",
+        "pcb": "pcb.json",
+        "cross_analysis": "cross_analysis.json",
+        "emc": "emc.json",
+        "thermal": "thermal.json"
+      },
+      "scripts": {
+        "emc": "analyze_emc.py"
+      },
+      "generated": "2026-07-26T09:06:26+05:30",
+      "pinned": false
+    },
+    "2026-07-26_0906": {
+      "source_hashes": {
+        "schematic.json": "sha256:ae01b861404fd251edeaeb6ca5673304fb5598785741fa47a4b7386c3e71eaf2",
+        "pcb.json": "sha256:a8a6c6d08159ae8ec1b511725fae375e797ec966464505b4c64fd9f1369142b1"
+      },
+      "outputs": {
+        "schematic": "schematic.json",
+        "spice": "spice.json",
+        "pcb": "pcb.json",
+        "cross_analysis": "cross_analysis.json",
+        "emc": "emc.json",
+        "thermal": "thermal.json"
+      },
+      "scripts": {
+        "emc": "analyze_emc.py"
+      },
+      "generated": "2026-07-26T09:06:26+05:30",
       "pinned": false
     }
   }

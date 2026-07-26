@@ -59,7 +59,7 @@ KEEPOUT = (46.0, 0.0, 94.0, 14.3)          # x1, y1, x2, y2
 # (18 x 25.5). Decoupling belongs at the module's pads, which is inside that
 # oversized rectangle but well clear of the antenna — check_keepout() is the
 # constraint that actually matters, and these are asserted against it.
-COURTYARD_EXEMPT = set()      # none needed: C64/C65 clear the courtyard
+COURTYARD_EXEMPT = {("C64", "U10"), ("C65", "U10")}
 
 
 def P(x, y):
@@ -85,8 +85,13 @@ def parse_netlist(path):
 PLACEMENT = {
     # === U10: antenna to the TOP edge, keep-out mostly off-board ==========
     "U10": (70.0, 21.0, 0),       # pads y14.3..32.7; courtyard to y34.5
-    "C64": (60.0, 36.3, 0),       # module bulk 10u, just south of the pads
-    "C65": (65.0, 36.3, 0),       # 100n
+    # U10's 3V3 pin is pad 2 at (61.2, 17.0) — the TOP-left of the module, not
+    # the bottom. An earlier pass parked these at y=36 and left the module
+    # 19.3 mm from its own decoupling (EMC DC-002). They belong beside pad 2,
+    # which means inside U10's oversized courtyard — that rectangle is the
+    # antenna keep-out, not a physical exclusion, and both sit below it.
+    "C65": (58.3, 17.0, 0),       # 100n, nearest the pin
+    "C64": (57.0, 20.5, 0),       # 10u bulk
 
     # === left edge: backplane header ======================================
     "J1":  (5.0, 14.0, 0),        # 1x20, pins y14..62.3
@@ -114,8 +119,12 @@ PLACEMENT.update({
     # === lower-left: VBUS -> buck -> 5V0 -> LDO -> 3V3 ====================
     "F1":  (14.0, 43.0, 0),       # blade fuse, courtyard x11..24.9
     "D5":  (31.0, 43.0, 0),       # SMBJ33A, courtyard 7.3 x 4.5
-    "C50": (39.0, 43.0, 0),       # 4.7u/50V input
-    "C51": (44.5, 43.0, 0),
+    # Buck hot loop: these MUST hug U8's VIN (pads 9/10 at x18.9) and PGND
+    # (pads 1/11). An earlier pass had them 23 mm away at x39/x44 — EMC SW-003
+    # "large hot loop", the classic buck layout error: the di/dt loop area sets
+    # radiated emissions and switch-node ringing.
+    "C50": (23.0, 54.5, 0),       # 4.7u/50V input, hard against U8
+    "C51": (23.0, 50.5, 0),
     "R71": (14.0, 48.5, 0),       # EN divider
     "R52": (19.0, 48.5, 0),
     "U8":  (18.0, 55.0, 0),       # LMR36015 VQFN-HR-12
@@ -171,7 +180,7 @@ PLACEMENT = {k: v for k, v in PLACEMENT.items() if v is not None}
 # Top-right corner belongs to the antenna keep-out, so that hole moves down
 # to y=38 rather than sitting in the RF zone.
 MOUNT_HOLES = [(4.0, 4.0), (4.0, 76.0), (96.0, 76.0), (96.0, 38.0)]
-FIDUCIALS = [(10.0, 36.0), (44.0, 34.0)]
+FIDUCIALS = [(10.0, 36.0), (44.0, 34.0), (90.0, 76.0)]  # >=3 for SMD assembly
 
 # Pours. Nothing may enter KEEPOUT: the polygons below are shaped around it.
 PWR_POURS = {
@@ -395,6 +404,26 @@ def main():
         z.SetThermalReliefSpokeWidth(FromMM(0.5))
         z.SetIsFilled(False)
         board.Add(z)
+
+    # Board-level RULE AREA over the antenna. The ESP32 footprint carries its
+    # own keep-out, but that one does NOT stop the zone filler (verified: with
+    # the planes deliberately flooded full-board, 8 filled-copper vertices
+    # landed inside it). Without this, the antenna is protected only by the
+    # hand-shaped pour polygons above — and one refill in KiCad after someone
+    # edits a pour would flood it with copper and detune the module, silently.
+    ka = pcbnew.ZONE(board)
+    ka.SetIsRuleArea(True)
+    ka.SetDoNotAllowCopperPour(True)
+    ka.SetDoNotAllowTracks(True)
+    ka.SetDoNotAllowVias(True)
+    ka.SetDoNotAllowPads(True)
+    ka.SetLayerSet(pcbnew.LSET(pcbnew.F_Cu).AddLayer(pcbnew.B_Cu))
+    ko = ka.Outline()
+    ko.NewOutline()
+    for x, y in [(KEEPOUT[0], KEEPOUT[1]), (KEEPOUT[2], KEEPOUT[1]),
+                 (KEEPOUT[2], KEEPOUT[3]), (KEEPOUT[0], KEEPOUT[3])]:
+        ko.Append(FromMM(ORG[0] + x), FromMM(ORG[1] + y))
+    board.Add(ka)
 
     board.BuildConnectivity()
     pcbnew.ZONE_FILLER(board).Fill(board.Zones())

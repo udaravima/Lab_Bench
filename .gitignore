@@ -45,3 +45,4 @@ hardware/**/*-fab.zip
 # KiCad freerouting plugin scratch exports
 freerouting.dsn
 temp-freerouting.dsn
+.aider*

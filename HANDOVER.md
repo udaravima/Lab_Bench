@@ -63,6 +63,18 @@ manager, CAN 2.0B @500k. Docs 01–07 are the spec; read 05 (build plan) first
 10 format.** KiCad on this machine is now 10.0.5 (7 is gone); run_drc.py
 works again via kicad-cli (commits ab57e42, 02a9e73, 0f2b361).
 
+### Division of labour (user decision, 2026-08-16 session 3)
+
+The user hand-routes the dense-field/hard parts of each board in KiCad
+(see phase2-module/MANUAL-ROUTES.md — per-item work order with the wall
+map and shove suggestions). Scripting handles: lane surveys, junk DELs,
+open-field/long-haul routes, validation, DRC gates, stitching. Phase-3
+manager routing and the BOM/MPN pass proceed in parallel with the user's
+manual phase-2 pass. LESSON LEARNED: never iterate scripted waypoints
+against sealed fine-pitch mazes — tried at length on the u3 pocket; the
+analysis produced the wall map (valuable) but the routing itself is a
+shove job.
+
 ### The routing method (working, keep using it)
 
 1. `tools/finish_routes.py` — declarative waypoint router with an EXACT

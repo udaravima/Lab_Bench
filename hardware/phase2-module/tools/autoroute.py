@@ -19,6 +19,7 @@ Run:  python3 autoroute.py           (after gen_board.py + route_board.py)
 """
 import heapq
 import os
+import sys
 
 import pcbnew
 from pcbnew import FromMM
@@ -311,11 +312,16 @@ def main():
     board.BuildConnectivity()
     nets = {ni.GetNetname(): ni for ni in board.GetNetsByName().values() if ni.GetNetname()}
 
+    # optional argv net filter: route ONLY these nets (fallback mode for
+    # finish_routes.py's sealed-pin list) instead of every pad-having net
+    only = set(sys.argv[1:]) or None
     todo = {}
     for fp in board.GetFootprints():
         for pad in fp.Pads():
             net = pad.GetNetname()
             if not net or net.startswith("unconnected"):
+                continue
+            if only and net not in only:
                 continue
             todo.setdefault(net, []).append(pad)
 

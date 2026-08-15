@@ -96,7 +96,22 @@ works again via kicad-cli (commits ab57e42, 02a9e73, 0f2b361).
   y38.0; R26.1 is walled on its north by them.
 - Via-in-pad does NOT fit at 0.5mm pitch (0.6 via + 0.25 clr > gap).
 
-### What remains of the 82
+### U10 escape-channel facts (diag_grid-proven, 2026-08-16 session 2)
+
+U10's rows seal between pads exactly like U3's (1.48mm-long pads, 0.5mm
+pitch -> 0.20mm edge gaps, adjacent kp overlap). All four sides have
+pad-shadow strips inside which NO turn is legal: west x77.22-79.10,
+east x68.90-69.85, north y72.95-74.10, south y82.90-83.40 (approx).
+Escapes run STRAIGHT OUT along the pad axis, then turn outside the
+strip; bundle-lane plan needed per side (the y74.0 north and
+y82.5-83.6 south corridors surveyed earlier are still the right
+trunks). The u10 tables in finish_routes.py draft wrong-direction
+routes (west through the body for right-row pads) - REWRITE before
+use; do not iterate them as-is. A* on these nets fails not from
+sealed pads (diag shows free srcs + exits everywhere) but from the
+congested turn corridor; hand lanes + validator converges faster.
+
+### What remains of the 81 (after 5974056)
 
 - ~10 pocket items (sealed pins + PS_RT tail + PS_VCC + PS_COMP cluster
   + VOUT_INT pin5 + FB pin28): junk-surgery or interactive routing.

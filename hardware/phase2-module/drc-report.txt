@@ -1,382 +1,855 @@
-** Drc report for /home/fire310w/Documents/Hobbies/Lab_Bench/hardware/phase2-module/tools/../phase2-module.kicad_pcb **
-** Created on 2026-07-26 07:59:44 **
+** Drc report for phase2-module.kicad_pcb **
+** Created on 2026-08-15T22:42:37 **
+** Report includes: Errors, Warnings **
 
-** Found 11 DRC violations **
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(131.0600 mm, 74.6044 mm): Line on F.Silkscreen
-    @(131.1500 mm, 83.5400 mm): Line on F.Silkscreen
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(113.4000 mm, 101.6300 mm): Reference 'R47'
-    @(113.0000 mm, 102.1700 mm): Reference 'R35'
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(103.3700 mm, 100.7300 mm): Reference 'R64'
-    @(104.3000 mm, 101.1500 mm): Reference 'D3'
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(60.5000 mm, 48.1700 mm): Reference 'R75'
-    @(60.5200 mm, 46.4000 mm): Reference 'R73'
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(101.3200 mm, 93.3000 mm): Reference 'R18'
-    @(100.7000 mm, 93.2300 mm): Reference 'C72'
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(106.4800 mm, 50.5200 mm): Reference 'R2'
-    @(107.3000 mm, 50.9700 mm): Reference 'R24'
+** Found 163 DRC violations **
+[zones_intersect]: Copper zones intersect (intersecting zones must have distinct priorities)
+    Local override; error
+    @(48.0000 mm, 39.6000 mm): Zone [PGND] on F.Cu, priority 2
+    @(62.0000 mm, 41.0000 mm): Zone [PGND] on F.Cu, priority 2
+[zones_intersect]: Copper zones intersect (intersecting zones must have distinct priorities)
+    Local override; error
+    @(84.5000 mm, 36.3000 mm): Zone [PGND] on F.Cu, priority 2
+    @(84.0000 mm, 50.2000 mm): Zone [PGND] on F.Cu, priority 2
+[zones_intersect]: Copper zones intersect (intersecting zones must have distinct priorities)
+    Local override; error
+    @(84.5000 mm, 59.0000 mm): Zone [PGND] on F.Cu, priority 2
+    @(84.0000 mm, 50.2000 mm): Zone [PGND] on F.Cu, priority 2
+[silk_overlap]: Silkscreen clearance
+    Rule: board setup constraints silk; warning
+    @(107.3000 mm, 50.9700 mm): Reference field of R24
+    @(106.4800 mm, 50.5200 mm): Reference field of R2
+[silk_overlap]: Silkscreen clearance
+    Rule: board setup constraints silk; warning
+    @(60.5000 mm, 48.1700 mm): Reference field of R75
+    @(60.5200 mm, 46.4000 mm): Reference field of R73
+[silk_overlap]: Silkscreen clearance
+    Rule: board setup constraints silk; warning
+    @(100.7000 mm, 93.2300 mm): Reference field of C72
+    @(101.3200 mm, 93.3000 mm): Reference field of R18
+[silk_overlap]: Silkscreen clearance
+    Rule: board setup constraints silk; warning
+    @(104.3000 mm, 101.1500 mm): Reference field of D3
+    @(103.3700 mm, 100.7300 mm): Reference field of R64
+[silk_overlap]: Silkscreen clearance
+    Rule: board setup constraints silk; warning
+    @(131.1500 mm, 83.5400 mm): Segment of C36 on F.Silkscreen
+    @(131.0600 mm, 74.6044 mm): Segment of C37 on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: board setup constraints silk; warning
+    @(113.4000 mm, 101.6300 mm): Reference field of R47
+    @(113.0000 mm, 102.1700 mm): Reference field of R35
 [silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; Severity: warning
-    @(109.9300 mm, 93.3000 mm): Reference 'Q6'
+    Local override; warning
+    @(109.9300 mm, 93.3000 mm): Reference field of Q6
+    @(109.7375 mm, 93.3000 mm): Pad 3 [PS_EN] of Q5 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; Severity: warning
-    @(110.0000 mm, 102.9500 mm): Reference 'U7'
+    Local override; warning
+    @(114.0200 mm, 93.3000 mm): Reference field of Q5
+    @(113.9375 mm, 93.3000 mm): Pad 3 [KILL_HW] of Q6 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; Severity: warning
-    @(111.8500 mm, 93.9500 mm): Reference 'D4'
+    Local override; warning
+    @(111.8500 mm, 93.9500 mm): Reference field of D4
+    @(112.0625 mm, 94.2500 mm): Pad 2 [AGND] of Q6 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; Severity: warning
-    @(114.0200 mm, 93.3000 mm): Reference 'Q5'
+    Local override; warning
+    @(110.0000 mm, 102.9500 mm): Reference field of U7
+    @(110.4375 mm, 102.6500 mm): Pad 5 [5V0] of U13 on F.Cu
+[lib_footprint_mismatch]: Footprint 'TO-263-2' does not match copy in library 'Package_TO_SOT_SMD'
+    Local override; warning
+    @(74.8000 mm, 28.5000 mm): Footprint Q14
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(113.5000 mm, 54.5500 mm): Footprint C24
+[lib_footprint_issues]: Footprint 'VSSOP-10_3x3mm_P0.5mm' not found in library 'Package_SO'
+    Local override; warning
+    @(139.0000 mm, 77.6000 mm): Footprint U5
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(105.0000 mm, 89.3000 mm): Footprint R62
+[lib_footprint_mismatch]: Footprint 'C_1210_3225Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(71.0000 mm, 62.0000 mm): Footprint C55
+[lib_footprint_mismatch]: Footprint 'C_1210_3225Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(84.7000 mm, 73.2000 mm): Footprint C13
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(97.1000 mm, 90.6000 mm): Footprint C65
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(105.0000 mm, 99.3000 mm): Footprint R64
+[lib_footprint_mismatch]: Footprint 'R_1206_3216Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(117.6500 mm, 73.4000 mm): Footprint R57
+[lib_footprint_mismatch]: Footprint 'SOT-23' does not match copy in library 'Package_TO_SOT_SMD'
+    Local override; warning
+    @(113.0000 mm, 93.3000 mm): Footprint Q6
+[lib_footprint_mismatch]: Footprint 'SOT-23' does not match copy in library 'Package_TO_SOT_SMD'
+    Local override; warning
+    @(117.2000 mm, 100.2000 mm): Footprint D8
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(80.5000 mm, 98.2000 mm): Footprint C67
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(61.3000 mm, 92.8000 mm): Footprint C1
+[lib_footprint_mismatch]: Footprint 'LQFP-48_7x7mm_P0.5mm' does not match copy in library 'Package_QFP'
+    Local override; warning
+    @(94.0000 mm, 98.0000 mm): Footprint U10
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(98.0000 mm, 46.2000 mm): Footprint R40
+[lib_footprint_mismatch]: Footprint 'PinHeader_1x02_P2.54mm_Vertical' does not match copy in library 'Connector_PinHeader_2.54mm'
+    Local override; warning
+    @(50.0000 mm, 107.6000 mm): Footprint J6
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(104.2000 mm, 54.5500 mm): Footprint C25
+[lib_footprint_mismatch]: Footprint 'C_1210_3225Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(84.7000 mm, 37.2000 mm): Footprint C6
+[lib_footprint_mismatch]: Footprint 'R_2512_6332Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(127.9000 mm, 43.1000 mm): Footprint R30
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(144.0000 mm, 74.6000 mm): Footprint C32
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(110.4000 mm, 56.5000 mm): Footprint R39
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(133.6000 mm, 68.4000 mm): Footprint C42
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(101.1000 mm, 56.5000 mm): Footprint C18
+[lib_footprint_mismatch]: Footprint 'R_1206_3216Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(117.6500 mm, 30.0000 mm): Footprint R36
+[lib_footprint_mismatch]: Footprint 'SOT-323_SC-70' does not match copy in library 'Package_TO_SOT_SMD'
+    Local override; warning
+    @(68.3000 mm, 92.8000 mm): Footprint D1
+[lib_footprint_mismatch]: Footprint 'C_1210_3225Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(124.9000 mm, 38.7000 mm): Footprint C47
+[lib_footprint_mismatch]: Footprint 'C_1210_3225Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(84.7000 mm, 63.0000 mm): Footprint C10
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(80.0000 mm, 75.4000 mm): Footprint R29
+[lib_footprint_mismatch]: Footprint 'C_1210_3225Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(84.7000 mm, 47.4000 mm): Footprint C9
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(104.2000 mm, 52.6000 mm): Footprint R2
+[lib_footprint_mismatch]: Footprint 'SOIC-8_3.9x4.9mm_P1.27mm' does not match copy in library 'Package_SO'
+    Local override; warning
+    @(124.6000 mm, 51.9000 mm): Footprint U4
+[lib_footprint_mismatch]: Footprint 'PinHeader_1x03_P2.54mm_Vertical' does not match copy in library 'Connector_PinHeader_2.54mm'
+    Local override; warning
+    @(72.0000 mm, 107.6000 mm): Footprint J3
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(58.2000 mm, 98.6000 mm): Footprint R6
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(92.5000 mm, 108.6000 mm): Footprint R66
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(120.7000 mm, 90.0000 mm): Footprint R46
+[lib_footprint_mismatch]: Footprint 'C_1210_3225Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(72.9000 mm, 44.0000 mm): Footprint C50
+[lib_footprint_mismatch]: Footprint 'SOT-323_SC-70' does not match copy in library 'Package_TO_SOT_SMD'
+    Local override; warning
+    @(108.3000 mm, 97.0000 mm): Footprint D3
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(96.0000 mm, 49.7000 mm): Footprint C28
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(60.5000 mm, 51.0000 mm): Footprint R75
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(62.4000 mm, 46.4000 mm): Footprint R73
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(97.9000 mm, 60.5500 mm): Footprint C23
+[lib_footprint_mismatch]: Footprint 'SOT-353_SC-70-5' does not match copy in library 'Package_TO_SOT_SMD'
+    Local override; warning
+    @(110.0000 mm, 100.2000 mm): Footprint U7
+[lib_footprint_mismatch]: Footprint 'PinHeader_1x08_P2.54mm_Vertical' does not match copy in library 'Connector_PinHeader_2.54mm'
+    Local override; warning
+    @(22.5000 mm, 80.0000 mm): Footprint J5
+[lib_footprint_mismatch]: Footprint 'LED_0603_1608Metric' does not match copy in library 'LED_SMD'
+    Local override; warning
+    @(89.0000 mm, 108.6000 mm): Footprint D7
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(117.3000 mm, 54.5500 mm): Footprint C20
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(51.0000 mm, 54.5000 mm): Footprint C90
+[lib_footprint_mismatch]: Footprint 'Crystal_SMD_3225-4Pin_3.2x2.5mm' does not match copy in library 'Crystal'
+    Local override; warning
+    @(84.5000 mm, 96.5000 mm): Footprint Y1
+[lib_footprint_mismatch]: Footprint 'C_1210_3225Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(62.0000 mm, 76.0000 mm): Footprint C56
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(59.0000 mm, 54.5000 mm): Footprint R74
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(124.7000 mm, 56.7000 mm): Footprint C31
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(114.5000 mm, 90.0000 mm): Footprint R43
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(32.5000 mm, 93.0000 mm): Footprint C70
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(118.3000 mm, 57.3000 mm): Footprint R45
+[lib_footprint_mismatch]: Footprint 'SOT-23' does not match copy in library 'Package_TO_SOT_SMD'
+    Local override; warning
+    @(121.4000 mm, 93.3000 mm): Footprint Q9
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(80.5000 mm, 94.8000 mm): Footprint C66
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(98.0000 mm, 63.8000 mm): Footprint R41
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(60.3000 mm, 39.3000 mm): Footprint C91
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(117.6000 mm, 90.0000 mm): Footprint R44
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(106.0000 mm, 61.0000 mm): Footprint RT2
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(64.4000 mm, 92.8000 mm): Footprint R4
+[lib_footprint_mismatch]: Footprint 'SOT-23' does not match copy in library 'Package_TO_SOT_SMD'
+    Local override; warning
+    @(117.2000 mm, 93.3000 mm): Footprint Q7
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(93.6000 mm, 47.8000 mm): Footprint C49
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(58.2000 mm, 96.4000 mm): Footprint R3
+[lib_footprint_mismatch]: Footprint 'C_1210_3225Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(71.0000 mm, 76.0000 mm): Footprint C57
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(107.3000 mm, 56.5000 mm): Footprint C21
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(111.4000 mm, 90.0000 mm): Footprint R23
+[lib_footprint_mismatch]: Footprint 'R_1206_3216Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(117.6500 mm, 33.5000 mm): Footprint R42
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(105.0000 mm, 93.3000 mm): Footprint R18
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(73.7000 mm, 58.6000 mm): Footprint R50
+[lib_footprint_mismatch]: Footprint 'R_2512_6332Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(129.3000 mm, 47.0500 mm): Footprint R34
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(105.0000 mm, 91.3000 mm): Footprint R63
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(72.0000 mm, 94.3000 mm): Footprint C5
+[lib_footprint_mismatch]: Footprint 'C_1210_3225Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(63.0000 mm, 62.0000 mm): Footprint C54
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(127.9000 mm, 56.7000 mm): Footprint C33
+[lib_footprint_mismatch]: Footprint 'C_1210_3225Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(118.0500 mm, 63.7000 mm): Footprint C46
+[lib_footprint_mismatch]: Footprint 'SOT-323_SC-70' does not match copy in library 'Package_TO_SOT_SMD'
+    Local override; warning
+    @(68.3000 mm, 101.2000 mm): Footprint D2
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(93.5000 mm, 106.5000 mm): Footprint R67
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(78.0000 mm, 86.5000 mm): Footprint R60
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(110.4000 mm, 54.5500 mm): Footprint C19
+[lib_footprint_mismatch]: Footprint 'R_1206_3216Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(117.6500 mm, 76.8000 mm): Footprint R37
+[lib_footprint_mismatch]: Footprint 'R_2512_6332Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(64.2000 mm, 35.6000 mm): Footprint R70
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(115.3500 mm, 97.0000 mm): Footprint R19
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(119.2000 mm, 103.6000 mm): Footprint C39
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(123.8000 mm, 90.0000 mm): Footprint C44
+[lib_footprint_mismatch]: Footprint 'SOT-323_SC-70' does not match copy in library 'Package_TO_SOT_SMD'
+    Local override; warning
+    @(111.8500 mm, 97.0000 mm): Footprint D4
+[lib_footprint_mismatch]: Footprint 'C_1210_3225Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(84.7000 mm, 44.0000 mm): Footprint C8
+[lib_footprint_mismatch]: Footprint 'C_1210_3225Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(72.9000 mm, 47.4000 mm): Footprint C51
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(32.5000 mm, 89.5000 mm): Footprint C69
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(100.7000 mm, 91.8000 mm): Footprint C72
+[lib_footprint_mismatch]: Footprint 'SOT-23-5' does not match copy in library 'Package_TO_SOT_SMD'
+    Local override; warning
+    @(109.3000 mm, 103.6000 mm): Footprint U13
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(63.6000 mm, 55.0000 mm): Footprint C53
+[lib_footprint_mismatch]: Footprint 'C_1210_3225Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(84.7000 mm, 69.8000 mm): Footprint C12
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(108.3000 mm, 90.0000 mm): Footprint R20
+[lib_footprint_mismatch]: Footprint 'SOIC-8_3.9x4.9mm_P1.27mm' does not match copy in library 'Package_SO'
+    Local override; warning
+    @(38.0000 mm, 91.0000 mm): Footprint U11
+[lib_footprint_mismatch]: Footprint 'CP_Radial_D10.0mm_P5.00mm' does not match copy in library 'Capacitor_THT'
+    Local override; warning
+    @(81.4000 mm, 55.2000 mm): Footprint C14
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(64.4000 mm, 101.2000 mm): Footprint R7
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(105.0000 mm, 95.3000 mm): Footprint R16
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(62.4000 mm, 43.0000 mm): Footprint R72
+[lib_footprint_mismatch]: Footprint 'C_1210_3225Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(118.0500 mm, 50.0000 mm): Footprint C40
+[lib_footprint_mismatch]: Footprint 'C_1210_3225Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(118.0500 mm, 60.4000 mm): Footprint C45
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(145.9000 mm, 77.5000 mm): Footprint R33
+[lib_footprint_mismatch]: Footprint 'C_1210_3225Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(118.0500 mm, 46.6000 mm): Footprint C38
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(87.3000 mm, 91.8000 mm): Footprint C71
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(134.1000 mm, 70.7000 mm): Footprint C41
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(90.9000 mm, 90.6000 mm): Footprint C64
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(101.0000 mm, 63.7700 mm): Footprint C35
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(90.9000 mm, 52.6000 mm): Footprint RT1
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(106.6000 mm, 100.9000 mm): Footprint C43
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(97.0000 mm, 106.5000 mm): Footprint R68
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(101.1000 mm, 52.6000 mm): Footprint R1
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(90.0000 mm, 106.5000 mm): Footprint R65
+[lib_footprint_mismatch]: Footprint 'L_1210_3225Metric' does not match copy in library 'Inductor_SMD'
+    Local override; warning
+    @(67.0000 mm, 56.8000 mm): Footprint L2
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(92.9000 mm, 60.5500 mm): Footprint C22
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(104.2000 mm, 56.5000 mm): Footprint R26
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(148.4000 mm, 73.4000 mm): Footprint R32
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(62.4000 mm, 39.3000 mm): Footprint R71
+[lib_footprint_mismatch]: Footprint 'C_1210_3225Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(118.0500 mm, 67.0000 mm): Footprint C48
+[lib_footprint_mismatch]: Footprint 'MSOP-10-1EP_3x3mm_P0.5mm_EP1.68x1.88mm' does not match copy in library 'Package_SO'
+    Local override; warning
+    @(139.0000 mm, 70.7000 mm): Footprint U6
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(87.3000 mm, 104.2000 mm): Footprint C73
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(49.5000 mm, 95.0000 mm): Footprint C3
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(101.0000 mm, 46.2000 mm): Footprint C27
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(113.4000 mm, 100.2000 mm): Footprint R47
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(90.2000 mm, 54.9000 mm): Footprint C30
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(63.5000 mm, 51.0000 mm): Footprint C52
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(107.3000 mm, 54.5500 mm): Footprint R24
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(121.5000 mm, 56.7000 mm): Footprint R31
+[lib_footprint_mismatch]: Footprint 'C_1210_3225Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(84.7000 mm, 66.4000 mm): Footprint C11
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(73.7000 mm, 65.6000 mm): Footprint R51
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(107.3000 mm, 52.6000 mm): Footprint R5
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(105.0000 mm, 97.3000 mm): Footprint R52
+[lib_footprint_issues]: Footprint 'VSSOP-8_3.0x3.0mm_P0.65mm' not found in library 'Package_SO'
+    Local override; warning
+    @(65.0000 mm, 97.0000 mm): Footprint U2
+[lib_footprint_mismatch]: Footprint 'SOT-23' does not match copy in library 'Package_TO_SOT_SMD'
+    Local override; warning
+    @(56.5000 mm, 104.5000 mm): Footprint Q8
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(95.0000 mm, 62.2000 mm): Footprint C58
+[lib_footprint_mismatch]: Footprint 'C_1210_3225Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(84.7000 mm, 40.6000 mm): Footprint C7
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(113.0000 mm, 103.6000 mm): Footprint R35
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(118.4500 mm, 97.0000 mm): Footprint R22
+[lib_footprint_mismatch]: Footprint 'PinHeader_1x05_P2.54mm_Vertical' does not match copy in library 'Connector_PinHeader_2.54mm'
+    Local override; warning
+    @(108.0000 mm, 107.6000 mm): Footprint J2
+[lib_footprint_issues]: Footprint 'VSSOP-10_3x3mm_P0.5mm' not found in library 'Package_SO'
+    Local override; warning
+    @(55.0000 mm, 51.0000 mm): Footprint U12
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(58.0000 mm, 94.2000 mm): Footprint C4
+[lib_footprint_mismatch]: Footprint 'SOT-23' does not match copy in library 'Package_TO_SOT_SMD'
+    Local override; warning
+    @(108.8000 mm, 93.3000 mm): Footprint Q5
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(86.5000 mm, 106.5000 mm): Footprint C68
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(116.1000 mm, 103.6000 mm): Footprint R38
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(81.0000 mm, 91.0000 mm): Footprint C62
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(110.4000 mm, 52.6000 mm): Footprint R8
+[lib_footprint_mismatch]: Footprint 'R_2512_6332Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(124.0000 mm, 107.5000 mm): Footprint R27
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(61.3000 mm, 101.2000 mm): Footprint C2
+[lib_footprint_mismatch]: Footprint 'R_0603_1608Metric' does not match copy in library 'Resistor_SMD'
+    Local override; warning
+    @(78.0000 mm, 91.0000 mm): Footprint R61
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(100.7000 mm, 104.2000 mm): Footprint C74
+[lib_footprint_mismatch]: Footprint 'C_0603_1608Metric' does not match copy in library 'Capacitor_SMD'
+    Local override; warning
+    @(133.6000 mm, 78.2000 mm): Footprint C34
 [silk_edge_clearance]: Silkscreen clipped by board edge
-    Rule: board setup constraints silk; Severity: warning
-    @(150.0000 mm, 110.0000 mm): Line on Edge.Cuts
-    @(92.5000 mm, 110.0300 mm): Reference 'R66'
+    Rule: board setup constraints silk; warning
+    @(150.0000 mm, 110.0000 mm): Segment on Edge.Cuts
+    @(92.5000 mm, 110.0300 mm): Reference field of R66
 
 ** Found 83 unconnected pads **
 [unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(90.1250 mm, 90.6000 mm): Track [3V3] on F.Cu, length 1.1000 mm
-    @(91.2500 mm, 94.5000 mm): Track [3V3] on F.Cu, length 0.6625 mm
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(98.1625 mm, 95.2500 mm): Pad 36 [3V3] of U10 on F.Cu
-    @(98.8250 mm, 91.8000 mm): Via [3V3] on F.Cu - B.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(70.1500 mm, 70.0000 mm): Track [3V3] on F.Cu, length 18.5000 mm
-    @(85.4250 mm, 91.8000 mm): Via [3V3] on F.Cu - B.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(110.4375 mm, 102.6500 mm): Pad 5 [5V0] of U13 on F.Cu
-    @(110.9500 mm, 99.5500 mm): Pad 5 [5V0] of U7 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(70.1250 mm, 94.3000 mm): Via [5V0] on F.Cu - B.Cu
-    @(67.2000 mm, 96.0250 mm): Pad 8 [5V0] of U2 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(105.8250 mm, 100.9000 mm): Pad 1 [5V0] of C43 on F.Cu
-    @(110.4375 mm, 102.6500 mm): Pad 5 [5V0] of U13 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(112.5750 mm, 100.2000 mm): Pad 1 [5V0] of R47 on F.Cu
-    @(117.6250 mm, 97.0000 mm): Pad 1 [5V0] of R22 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(110.9500 mm, 99.5500 mm): Pad 5 [5V0] of U7 on F.Cu
-    @(107.4750 mm, 90.0000 mm): Pad 1 [5V0] of R20 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(127.1250 mm, 56.7000 mm): Pad 1 [5V0] of C33 on F.Cu
-    @(131.7250 mm, 68.4000 mm): Via [5V0] on F.Cu - B.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(48.0000 mm, 93.3750 mm): Track [5V0] on F.Cu, length 0.6250 mm
-    @(60.5250 mm, 76.0000 mm): Track [5V0] on F.Cu, length 1.1000 mm
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(117.6250 mm, 97.0000 mm): Pad 1 [5V0] of R22 on F.Cu
-    @(131.7250 mm, 68.4000 mm): Via [5V0] on F.Cu - B.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(127.1250 mm, 56.3750 mm): Track [5V0] on F.Cu, length 0.7500 mm
-    @(93.1000 mm, 55.2500 mm): Pad 6 [5V0] of U3 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(141.1500 mm, 70.7000 mm): Pad 3 [AGND] of U6 on F.Cu
-    @(141.1250 mm, 69.7000 mm): Track [AGND] on F.Cu, length 0.0250 mm
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(104.1250 mm, 56.8750 mm): Track [AGND] on F.Cu, length 0.5000 mm
-    @(104.6250 mm, 58.7500 mm): Track [AGND] on B.Cu, length 1.8750 mm
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(106.8750 mm, 57.7500 mm): Track [AGND] on B.Cu, length 5.5000 mm
-    @(108.0750 mm, 56.5000 mm): Pad 2 [AGND] of C21 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(93.1000 mm, 53.7500 mm): Pad 3 [AGND] of U3 on F.Cu
-    @(91.7250 mm, 52.6000 mm): Pad 2 [AGND] of RT1 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(104.9750 mm, 54.5500 mm): Pad 2 [AGND] of C25 on F.Cu
-    @(105.0250 mm, 52.6000 mm): Pad 2 [AGND] of R2 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(105.0250 mm, 56.5000 mm): Pad 2 [AGND] of R26 on F.Cu
-    @(104.9750 mm, 54.5500 mm): Pad 2 [AGND] of C25 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(94.2500 mm, 102.1625 mm): Pad 19 [AGND] of U10 on F.Cu
-    @(96.2500 mm, 102.1625 mm): Pad 23 [AGND] of U10 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(96.2500 mm, 52.1000 mm): Pad 35 [AGND] of U3 on F.Cu
-    @(96.4500 mm, 54.5500 mm): Via [AGND] on F.Cu - B.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(95.5500 mm, 54.5500 mm): Via [AGND] on F.Cu - B.Cu
-    @(93.1000 mm, 53.7500 mm): Pad 3 [AGND] of U3 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(134.3750 mm, 78.2000 mm): Pad 2 [AGND] of C34 on F.Cu
-    @(136.7500 mm, 77.1000 mm): Track [AGND] on F.Cu, length 0.4750 mm
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(98.9750 mm, 90.6000 mm): Via [AGND] on F.Cu - B.Cu
-    @(101.4750 mm, 91.8000 mm): Pad 2 [AGND] of C72 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(141.2000 mm, 78.1000 mm): Pad 7 [AGND] of U5 on F.Cu
-    @(138.5000 mm, 77.3750 mm): Via [AGND] on F.Cu - B.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(34.6250 mm, 90.3650 mm): Track [AGND] on F.Cu, length 0.9000 mm
-    @(33.2500 mm, 93.0000 mm): Track [AGND] on F.Cu, length 0.0250 mm
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(91.7500 mm, 93.8375 mm): Pad 47 [AGND] of U10 on F.Cu
-    @(91.6750 mm, 90.6000 mm): Track [AGND] on F.Cu, length 1.1000 mm
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(96.2500 mm, 102.1625 mm): Pad 23 [AGND] of U10 on F.Cu
-    @(100.0000 mm, 101.5000 mm): Via [AGND] on F.Cu - B.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(122.1250 mm, 53.8050 mm): Track [AGND] on F.Cu, length 1.3050 mm
-    @(125.4750 mm, 57.1250 mm): Track [AGND] on F.Cu, length 0.4250 mm
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(63.5000 mm, 50.2250 mm): Pad 1 [AUX_BOOT] of C52 on F.Cu
-    @(66.1000 mm, 51.6750 mm): Pad 4 [AUX_BOOT] of U8 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(94.2500 mm, 93.8375 mm): Pad 42 [AUX_PG] of U10 on F.Cu
-    @(105.8250 mm, 97.3000 mm): Pad 2 [AUX_PG] of R52 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(67.9000 mm, 51.6750 mm): Pad 8 [AUX_PG] of U8 on F.Cu
-    @(94.2500 mm, 93.8375 mm): Pad 42 [AUX_PG] of U10 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(35.5250 mm, 92.9050 mm): Pad 4 [CAN_RX] of U11 on F.Cu
-    @(98.1625 mm, 96.7500 mm): Pad 33 [CAN_RX] of U10 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(101.6250 mm, 89.8750 mm): Track [CAN_STB] on B.Cu, length 4.6250 mm
-    @(98.1625 mm, 97.2500 mm): Pad 32 [CAN_STB] of U10 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(35.5250 mm, 89.0950 mm): Pad 1 [CAN_TX] of U11 on F.Cu
-    @(98.1625 mm, 96.2500 mm): Pad 34 [CAN_TX] of U10 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(54.9000 mm, 97.0000 mm): Pad 6 [DAC_SCLK] of U1 on F.Cu
-    @(91.2500 mm, 102.1625 mm): Pad 13 [DAC_SCLK] of U10 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(54.9000 mm, 96.0000 mm): Pad 8 [DAC_SDI] of U1 on F.Cu
-    @(92.2500 mm, 102.1625 mm): Pad 15 [DAC_SDI] of U10 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(141.1500 mm, 70.2000 mm): Pad 4 [DISC_INP] of U6 on F.Cu
-    @(121.6250 mm, 91.6250 mm): Track [DISC_INP] on F.Cu, length 6.2500 mm
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(69.3000 mm, 101.2000 mm): Pad 3 [EAI_INJ] of D2 on F.Cu
-    @(109.5750 mm, 52.6000 mm): Pad 1 [EAI_INJ] of R8 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(69.3000 mm, 92.8000 mm): Pad 3 [EAV_INJ] of D1 on F.Cu
-    @(106.4750 mm, 52.6000 mm): Pad 1 [EAV_INJ] of R5 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(98.9000 mm, 53.7500 mm): Pad 28 [FB] of U3 on F.Cu
-    @(101.9250 mm, 52.6250 mm): Track [FB] on F.Cu, length 0.0250 mm
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(67.9000 mm, 51.1750 mm): Pad 9 [HS_PGD] of U8 on F.Cu
-    @(60.5000 mm, 51.0000 mm): Track [HS_PGD] on F.Cu, length 0.8750 mm
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(114.5250 mm, 97.0000 mm): Pad 1 [HW_EN] of R19 on F.Cu
-    @(104.0000 mm, 92.7500 mm): Track [HW_EN] on B.Cu, length 8.0000 mm
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(93.7500 mm, 93.8375 mm): Pad 43 [HW_EN] of U10 on F.Cu
-    @(93.1250 mm, 83.8750 mm): Track [HW_EN] on B.Cu, length 4.3750 mm
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(105.8250 mm, 89.3000 mm): Pad 2 [I2C_SCL] of R62 on F.Cu
-    @(98.1625 mm, 97.7500 mm): Pad 31 [I2C_SCL] of U10 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(105.8250 mm, 91.3000 mm): Pad 2 [I2C_SDA] of R63 on F.Cu
-    @(98.1625 mm, 98.2500 mm): Pad 30 [I2C_SDA] of U10 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(136.8000 mm, 78.1000 mm): Pad 4 [I2C_SDA] of U5 on F.Cu
-    @(105.8250 mm, 91.3000 mm): Pad 2 [I2C_SDA] of R63 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(93.2500 mm, 93.8375 mm): Pad 44 [INA_ALERT] of U10 on F.Cu
-    @(136.8000 mm, 77.6000 mm): Pad 3 [INA_ALERT] of U5 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(112.1750 mm, 103.6000 mm): Pad 1 [I_MEAS] of R35 on F.Cu
-    @(116.3750 mm, 78.1250 mm): Track [I_MEAS] on F.Cu, length 5.8750 mm
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(94.3250 mm, 106.5000 mm): Pad 2 [NTC_FET] of R67 on F.Cu
-    @(92.7500 mm, 102.1625 mm): Pad 16 [NTC_FET] of U10 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(97.8250 mm, 106.5000 mm): Pad 2 [NTC_IND] of R68 on F.Cu
-    @(93.2500 mm, 102.1625 mm): Pad 17 [NTC_IND] of U10 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(84.5000 mm, 59.0000 mm): Zone [PGND] on F.Cu
-    @(96.7500 mm, 57.9000 mm): Pad 17 [PGND] of U3 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(62.0000 mm, 41.0000 mm): Zone [PGND] on F.Cu
-    @(62.0000 mm, 41.0000 mm): Zone [PGND] on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(62.0000 mm, 41.0000 mm): Zone [PGND] on F.Cu
-    @(62.0000 mm, 41.0000 mm): Zone [PGND] on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(84.5000 mm, 59.0000 mm): Zone [PGND] on F.Cu
-    @(84.5000 mm, 59.0000 mm): Zone [PGND] on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(84.0000 mm, 50.2000 mm): Zone [PGND] on F.Cu
-    @(84.0000 mm, 50.2000 mm): Zone [PGND] on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(62.0000 mm, 41.0000 mm): Zone [PGND] on F.Cu
-    @(62.0000 mm, 41.0000 mm): Zone [PGND] on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(84.5000 mm, 59.0000 mm): Zone [PGND] on F.Cu
-    @(84.5000 mm, 59.0000 mm): Zone [PGND] on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(106.4750 mm, 54.5500 mm): Pad 1 [PS_COMP] of R24 on F.Cu
-    @(103.4250 mm, 54.5500 mm): Pad 1 [PS_COMP] of C25 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(98.9000 mm, 53.2500 mm): Pad 29 [PS_COMP] of U3 on F.Cu
-    @(103.4250 mm, 54.5500 mm): Pad 1 [PS_COMP] of C25 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(109.5750 mm, 56.5000 mm): Pad 1 [PS_DITH] of R39 on F.Cu
-    @(116.5250 mm, 54.5500 mm): Pad 1 [PS_DITH] of C20 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(98.2500 mm, 52.1000 mm): Pad 31 [PS_EN] of U3 on F.Cu
-    @(93.7500 mm, 52.1000 mm): Pad 40 [PS_EN] of U3 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(98.2500 mm, 52.1000 mm): Pad 31 [PS_EN] of U3 on F.Cu
-    @(108.2500 mm, 90.0000 mm): Track [PS_EN] on F.Cu, length 0.8750 mm
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(97.2500 mm, 52.1000 mm): Pad 33 [PS_FPWM] of U3 on F.Cu
-    @(104.1750 mm, 95.2500 mm): Track [PS_FPWM] on F.Cu, length 2.0500 mm
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(98.9000 mm, 55.7500 mm): Pad 24 [PS_PGOOD] of U3 on F.Cu
-    @(97.8750 mm, 92.0000 mm): Track [PS_PGOOD] on B.Cu, length 0.5000 mm
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(97.7500 mm, 52.1000 mm): Pad 32 [PS_RES] of U3 on F.Cu
-    @(109.6250 mm, 54.5500 mm): Pad 1 [PS_RES] of C19 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(95.7500 mm, 57.9000 mm): Pad 15 [PS_VCC] of U3 on F.Cu
-    @(92.9000 mm, 59.7750 mm): Pad 1 [PS_VCC] of C22 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(96.7500 mm, 52.1000 mm): Pad 34 [PS_VDDA] of U3 on F.Cu
-    @(95.7500 mm, 52.1000 mm): Pad 36 [PS_VDDA] of U3 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(106.5250 mm, 56.5000 mm): Pad 1 [PS_VDDA] of C21 on F.Cu
-    @(111.2250 mm, 56.5000 mm): Pad 2 [PS_VDDA] of R39 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(96.7500 mm, 52.1000 mm): Pad 34 [PS_VDDA] of U3 on F.Cu
-    @(106.5250 mm, 56.5000 mm): Pad 1 [PS_VDDA] of C21 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(98.9000 mm, 55.2500 mm): Pad 25 [PS_VIN] of U3 on F.Cu
-    @(97.2000 mm, 49.9000 mm): Track [PS_VIN] on F.Cu, length 0.8062 mm
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(22.5000 mm, 87.6200 mm): PTH pad 4 [SLOT_ID0] of J5
-    @(98.1625 mm, 100.7500 mm): Pad 25 [SLOT_ID0] of U10 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(22.5000 mm, 90.1600 mm): PTH pad 5 [SLOT_ID1] of J5
-    @(98.1625 mm, 100.2500 mm): Pad 26 [SLOT_ID1] of U10 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(22.5000 mm, 92.7000 mm): PTH pad 6 [SLOT_ID2] of J5
-    @(98.1625 mm, 99.7500 mm): Pad 27 [SLOT_ID2] of U10 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(95.0000 mm, 27.6000 mm): Zone [SW1] on F.Cu
-    @(95.0000 mm, 27.6000 mm): Zone [SW1] on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(96.2500 mm, 93.8375 mm): Pad 38 [SWCLK] of U10 on F.Cu
-    @(113.0800 mm, 107.6000 mm): PTH pad 3 [SWCLK] of J2
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(67.9000 mm, 50.5250 mm): Pad 10 [VBUS_P] of U8 on F.Cu
-    @(66.1000 mm, 50.5250 mm): Pad 2 [VBUS_P] of U8 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; Severity: error
+    Local override; error
     @(61.8750 mm, 50.1250 mm): Track [VBUS_P] on B.Cu, length 12.6250 mm
     @(66.1000 mm, 50.5250 mm): Pad 2 [VBUS_P] of U8 on F.Cu
 [unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(101.7000 mm, 54.4000 mm): Track [VOUT_INT] on B.Cu, length 21.8000 mm
-    @(100.2750 mm, 52.6000 mm): Pad 1 [VOUT_INT] of R1 on F.Cu
+    Local override; error
+    @(67.9000 mm, 50.5250 mm): Pad 10 [VBUS_P] of U8 on F.Cu
+    @(66.1000 mm, 50.5250 mm): Pad 2 [VBUS_P] of U8 on F.Cu
 [unconnected_items]: Missing connection between items
-    Local override; Severity: error
+    Local override; error
+    @(34.6250 mm, 90.3650 mm): Track [AGND] on F.Cu, length 0.3650 mm
+    @(33.2500 mm, 93.0000 mm): Track [AGND] on F.Cu, length 0.0250 mm
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(91.7500 mm, 93.8375 mm): Pad 47 [AGND] of U10 on F.Cu
+    @(91.6750 mm, 90.6000 mm): Track [AGND] on F.Cu, length 1.1000 mm
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(93.1000 mm, 53.7500 mm): Pad 3 [AGND] of U3 on F.Cu
+    @(91.7250 mm, 52.2500 mm): Track [AGND] on F.Cu, length 0.3500 mm
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(94.2500 mm, 102.1625 mm): Pad 19 [AGND] of U10 on F.Cu
+    @(96.2500 mm, 102.1625 mm): Pad 23 [AGND] of U10 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(95.5500 mm, 54.5500 mm): Via [AGND] on F.Cu - B.Cu
+    @(93.1000 mm, 53.7500 mm): Pad 3 [AGND] of U3 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(96.2500 mm, 52.1000 mm): Pad 35 [AGND] of U3 on F.Cu
+    @(96.4500 mm, 54.5500 mm): Via [AGND] on F.Cu - B.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(96.2500 mm, 102.1625 mm): Pad 23 [AGND] of U10 on F.Cu
+    @(100.0000 mm, 101.5000 mm): Via [AGND] on F.Cu - B.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(98.9750 mm, 90.6000 mm): Via [AGND] on F.Cu - B.Cu
+    @(101.4750 mm, 91.8000 mm): Pad 2 [AGND] of C72 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(104.1250 mm, 56.8750 mm): Track [AGND] on F.Cu, length 0.5000 mm
+    @(104.6250 mm, 58.7500 mm): Track [AGND] on B.Cu, length 1.8750 mm
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(104.9750 mm, 54.5500 mm): Pad 2 [AGND] of C25 on F.Cu
+    @(105.0250 mm, 52.6000 mm): Pad 2 [AGND] of R2 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(105.0250 mm, 56.8750 mm): Track [AGND] on F.Cu, length 0.3750 mm
+    @(104.9750 mm, 54.5500 mm): Pad 2 [AGND] of C25 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(106.8750 mm, 57.7500 mm): Track [AGND] on B.Cu, length 5.5000 mm
+    @(108.0750 mm, 56.5000 mm): Pad 2 [AGND] of C21 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(122.1250 mm, 53.8050 mm): Track [AGND] on F.Cu, length 1.3050 mm
+    @(125.4750 mm, 57.1250 mm): Track [AGND] on F.Cu, length 0.4250 mm
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(134.3750 mm, 78.2000 mm): Pad 2 [AGND] of C34 on F.Cu
+    @(136.7500 mm, 77.1000 mm): Track [AGND] on F.Cu, length 0.4750 mm
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(141.1500 mm, 70.7000 mm): Pad 3 [AGND] of U6 on F.Cu
+    @(141.1500 mm, 69.7000 mm): Pad 5 [AGND] of U6 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(141.2000 mm, 78.1000 mm): Pad 7 [AGND] of U5 on F.Cu
+    @(138.5000 mm, 77.3750 mm): Via [AGND] on F.Cu - B.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(93.2500 mm, 93.8375 mm): Pad 44 [INA_ALERT] of U10 on F.Cu
+    @(136.8000 mm, 77.6000 mm): Pad 3 [INA_ALERT] of U5 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(105.8250 mm, 91.3000 mm): Pad 2 [I2C_SDA] of R63 on F.Cu
+    @(98.1625 mm, 98.2500 mm): Pad 30 [I2C_SDA] of U10 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(136.8000 mm, 78.1000 mm): Pad 4 [I2C_SDA] of U5 on F.Cu
+    @(105.8250 mm, 91.3000 mm): Pad 2 [I2C_SDA] of R63 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(105.8250 mm, 89.3000 mm): Pad 2 [I2C_SCL] of R62 on F.Cu
+    @(98.1625 mm, 97.7500 mm): Pad 31 [I2C_SCL] of U10 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(20.5000 mm, 87.3000 mm): Zone [3V3] on In2.Cu, priority 0
+    @(20.5000 mm, 87.3000 mm): Zone [3V3] on In2.Cu, priority 0
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(90.1250 mm, 90.6000 mm): Track [3V3] on F.Cu, length 1.1000 mm
+    @(91.2500 mm, 93.8375 mm): Pad 48 [3V3] of U10 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(98.1625 mm, 95.2500 mm): Pad 36 [3V3] of U10 on F.Cu
+    @(98.8250 mm, 91.8000 mm): Via [3V3] on F.Cu - B.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
     @(93.1000 mm, 54.7500 mm): Pad 5 [VOUT_INT] of U3 on F.Cu
     @(98.9000 mm, 54.7500 mm): Track [VOUT_INT] on F.Cu, length 2.8500 mm
 [unconnected_items]: Missing connection between items
-    Local override; Severity: error
+    Local override; error
+    @(101.7000 mm, 54.4000 mm): Track [VOUT_INT] on B.Cu, length 21.8000 mm
+    @(100.2750 mm, 52.6000 mm): Pad 1 [VOUT_INT] of R1 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(48.0000 mm, 93.3750 mm): Track [5V0] on F.Cu, length 0.6250 mm
+    @(59.4250 mm, 76.0000 mm): Via [5V0] on F.Cu - B.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(70.1250 mm, 94.3000 mm): Via [5V0] on F.Cu - B.Cu
+    @(67.2000 mm, 96.0250 mm): Pad 8 [5V0] of U2 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(105.8250 mm, 100.9000 mm): Pad 1 [5V0] of C43 on F.Cu
+    @(110.4375 mm, 102.6500 mm): Pad 5 [5V0] of U13 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(110.4375 mm, 102.6500 mm): Pad 5 [5V0] of U13 on F.Cu
+    @(110.9500 mm, 99.5500 mm): Track [5V0] on F.Cu, length 1.1000 mm
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(110.9500 mm, 99.5500 mm): Track [5V0] on F.Cu, length 1.1000 mm
+    @(107.4750 mm, 90.0000 mm): Pad 1 [5V0] of R20 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(112.5750 mm, 100.2000 mm): Pad 1 [5V0] of R47 on F.Cu
+    @(117.6250 mm, 97.0000 mm): Pad 1 [5V0] of R22 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(117.6250 mm, 97.0000 mm): Pad 1 [5V0] of R22 on F.Cu
+    @(131.7250 mm, 68.4000 mm): Via [5V0] on F.Cu - B.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(127.1250 mm, 56.3750 mm): Track [5V0] on F.Cu, length 0.7500 mm
+    @(93.1000 mm, 55.2500 mm): Pad 6 [5V0] of U3 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(127.1250 mm, 56.3750 mm): Track [5V0] on F.Cu, length 0.3250 mm
+    @(131.7250 mm, 68.4000 mm): Via [5V0] on F.Cu - B.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(62.0000 mm, 41.0000 mm): Zone [PGND] on F.Cu, priority 2
+    @(62.0000 mm, 41.0000 mm): Zone [PGND] on F.Cu, priority 2
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(62.0000 mm, 41.0000 mm): Zone [PGND] on F.Cu, priority 2
+    @(62.0000 mm, 41.0000 mm): Zone [PGND] on F.Cu, priority 2
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(62.0000 mm, 41.0000 mm): Zone [PGND] on F.Cu, priority 2
+    @(62.0000 mm, 41.0000 mm): Zone [PGND] on F.Cu, priority 2
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(84.0000 mm, 50.2000 mm): Zone [PGND] on F.Cu, priority 2
+    @(84.0000 mm, 50.2000 mm): Zone [PGND] on F.Cu, priority 2
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(84.5000 mm, 59.0000 mm): Zone [PGND] on F.Cu, priority 2
+    @(84.5000 mm, 59.0000 mm): Zone [PGND] on F.Cu, priority 2
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(84.5000 mm, 59.0000 mm): Zone [PGND] on F.Cu, priority 2
+    @(96.7500 mm, 57.9000 mm): Pad 17 [PGND] of U3 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(20.5000 mm, 20.5000 mm): Zone [PGND] on B.Cu, priority 0
+    @(84.5000 mm, 59.0000 mm): Zone [PGND] on F.Cu, priority 2
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(101.6250 mm, 94.5000 mm): Track [CAN_STB] on B.Cu, length 0.8750 mm
+    @(98.1625 mm, 97.2500 mm): Pad 32 [CAN_STB] of U10 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(93.7500 mm, 93.8375 mm): Pad 43 [HW_EN] of U10 on F.Cu
+    @(93.1250 mm, 83.8750 mm): Track [HW_EN] on B.Cu, length 4.3750 mm
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(114.5250 mm, 97.0000 mm): Pad 1 [HW_EN] of R19 on F.Cu
+    @(104.0000 mm, 92.7500 mm): Track [HW_EN] on B.Cu, length 8.0000 mm
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(95.0000 mm, 27.6000 mm): Zone [SW1] on F.Cu, priority 2
+    @(95.0000 mm, 27.6000 mm): Zone [SW1] on F.Cu, priority 2
+[unconnected_items]: Missing connection between items
+    Local override; error
     @(89.8375 mm, 98.7500 mm): Pad 8 [V_MEAS] of U10 on F.Cu
     @(108.1625 mm, 103.6000 mm): Pad 2 [V_MEAS] of U13 on F.Cu
 [unconnected_items]: Missing connection between items
-    Local override; Severity: error
+    Local override; error
     @(89.8375 mm, 98.7500 mm): Pad 8 [V_MEAS] of U10 on F.Cu
     @(62.8000 mm, 97.3250 mm): Pad 3 [V_MEAS] of U2 on F.Cu
 [unconnected_items]: Missing connection between items
-    Local override; Severity: error
-    @(145.5000 mm, 76.6250 mm): Track [V_MEAS] on F.Cu, length 1.8750 mm
+    Local override; error
+    @(143.6250 mm, 76.6250 mm): Track [V_MEAS] on F.Cu, length 0.7500 mm
     @(108.1625 mm, 103.6000 mm): Pad 2 [V_MEAS] of U13 on F.Cu
 [unconnected_items]: Missing connection between items
-    Local override; Severity: error
+    Local override; error
+    @(112.1750 mm, 103.6000 mm): Pad 1 [I_MEAS] of R35 on F.Cu
+    @(116.3750 mm, 84.0000 mm): Track [I_MEAS] on F.Cu, length 24.0000 mm
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(54.9000 mm, 97.0000 mm): Pad 6 [DAC_SCLK] of U1 on F.Cu
+    @(91.2500 mm, 102.1625 mm): Pad 13 [DAC_SCLK] of U10 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(54.9000 mm, 96.0000 mm): Pad 8 [DAC_SDI] of U1 on F.Cu
+    @(92.2500 mm, 102.1625 mm): Pad 15 [DAC_SDI] of U10 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(94.3250 mm, 106.5000 mm): Pad 2 [NTC_FET] of R67 on F.Cu
+    @(92.7500 mm, 102.1625 mm): Pad 16 [NTC_FET] of U10 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(97.8250 mm, 106.8750 mm): Track [NTC_IND] on F.Cu, length 0.3750 mm
+    @(93.2500 mm, 102.1625 mm): Pad 17 [NTC_IND] of U10 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(22.5000 mm, 87.6200 mm): PTH pad 4 [SLOT_ID0] of J5
+    @(98.1625 mm, 100.7500 mm): Pad 25 [SLOT_ID0] of U10 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(22.5000 mm, 90.1600 mm): PTH pad 5 [SLOT_ID1] of J5
+    @(98.1625 mm, 100.2500 mm): Pad 26 [SLOT_ID1] of U10 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(22.5000 mm, 92.7000 mm): PTH pad 6 [SLOT_ID2] of J5
+    @(98.1625 mm, 99.7500 mm): Pad 27 [SLOT_ID2] of U10 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(97.2500 mm, 52.1000 mm): Pad 33 [PS_FPWM] of U3 on F.Cu
+    @(102.1250 mm, 95.2500 mm): Track [PS_FPWM] on B.Cu, length 3.2500 mm
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(35.5250 mm, 92.9050 mm): Pad 4 [CAN_RX] of U11 on F.Cu
+    @(98.1625 mm, 96.7500 mm): Pad 33 [CAN_RX] of U10 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(35.5250 mm, 89.0950 mm): Pad 1 [CAN_TX] of U11 on F.Cu
+    @(98.1625 mm, 96.2500 mm): Pad 34 [CAN_TX] of U10 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(96.2500 mm, 93.8375 mm): Pad 38 [SWCLK] of U10 on F.Cu
+    @(113.0800 mm, 107.6000 mm): PTH pad 3 [SWCLK] of J2
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(98.9000 mm, 55.7500 mm): Pad 24 [PS_PGOOD] of U3 on F.Cu
+    @(97.8750 mm, 91.5000 mm): Track [PS_PGOOD] on B.Cu, length 3.0000 mm
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(67.9000 mm, 51.6750 mm): Pad 8 [AUX_PG] of U8 on F.Cu
+    @(94.2500 mm, 93.8375 mm): Pad 42 [AUX_PG] of U10 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(94.2500 mm, 93.8375 mm): Pad 42 [AUX_PG] of U10 on F.Cu
+    @(105.8250 mm, 97.3000 mm): Pad 2 [AUX_PG] of R52 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(98.9000 mm, 53.2500 mm): Pad 29 [PS_COMP] of U3 on F.Cu
+    @(103.4250 mm, 54.5500 mm): Pad 1 [PS_COMP] of C25 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(106.4750 mm, 54.5500 mm): Pad 1 [PS_COMP] of R24 on F.Cu
+    @(103.4250 mm, 54.5500 mm): Pad 1 [PS_COMP] of C25 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(109.5750 mm, 56.5000 mm): Pad 1 [PS_DITH] of R39 on F.Cu
+    @(116.5250 mm, 54.1250 mm): Track [PS_DITH] on F.Cu, length 0.4250 mm
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(96.7500 mm, 52.1000 mm): Pad 34 [PS_VDDA] of U3 on F.Cu
+    @(95.7500 mm, 52.1000 mm): Pad 36 [PS_VDDA] of U3 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(96.7500 mm, 52.1000 mm): Pad 34 [PS_VDDA] of U3 on F.Cu
+    @(106.5250 mm, 56.5000 mm): Pad 1 [PS_VDDA] of C21 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(106.5250 mm, 56.5000 mm): Pad 1 [PS_VDDA] of C21 on F.Cu
+    @(111.2250 mm, 56.5000 mm): Pad 2 [PS_VDDA] of R39 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(69.3000 mm, 92.8000 mm): Pad 3 [EAV_INJ] of D1 on F.Cu
+    @(106.4750 mm, 52.6000 mm): Pad 1 [EAV_INJ] of R5 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(98.9000 mm, 55.2500 mm): Pad 25 [PS_VIN] of U3 on F.Cu
+    @(97.2000 mm, 49.9000 mm): Track [PS_VIN] on F.Cu, length 0.8062 mm
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(98.9000 mm, 53.7500 mm): Pad 28 [FB] of U3 on F.Cu
+    @(101.9250 mm, 52.6250 mm): Track [FB] on F.Cu, length 1.4500 mm
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(63.5000 mm, 50.2250 mm): Pad 1 [AUX_BOOT] of C52 on F.Cu
+    @(66.1000 mm, 51.6750 mm): Pad 4 [AUX_BOOT] of U8 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(67.9000 mm, 51.1750 mm): Pad 9 [HS_PGD] of U8 on F.Cu
+    @(60.5000 mm, 51.0000 mm): Track [HS_PGD] on F.Cu, length 0.8750 mm
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(95.7500 mm, 57.9000 mm): Pad 15 [PS_VCC] of U3 on F.Cu
+    @(92.9000 mm, 59.7750 mm): Pad 1 [PS_VCC] of C22 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(98.2500 mm, 52.1000 mm): Pad 31 [PS_EN] of U3 on F.Cu
+    @(93.7500 mm, 52.1000 mm): Pad 40 [PS_EN] of U3 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(98.2500 mm, 52.1000 mm): Pad 31 [PS_EN] of U3 on F.Cu
+    @(108.2500 mm, 90.0000 mm): Track [PS_EN] on F.Cu, length 0.8750 mm
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(97.7500 mm, 52.1000 mm): Pad 32 [PS_RES] of U3 on F.Cu
+    @(109.6250 mm, 54.5500 mm): Pad 1 [PS_RES] of C19 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(141.1500 mm, 70.2000 mm): Pad 4 [DISC_INP] of U6 on F.Cu
+    @(121.6250 mm, 91.6250 mm): Track [DISC_INP] on F.Cu, length 6.2500 mm
+[unconnected_items]: Missing connection between items
+    Local override; error
     @(53.1000 mm, 95.5000 mm): Pad 2 [V_REF] of U1 on F.Cu
     @(57.3750 mm, 96.4000 mm): Pad 1 [V_REF] of R3 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(69.3000 mm, 101.2000 mm): Pad 3 [EAI_INJ] of D2 on F.Cu
+    @(109.5750 mm, 52.6000 mm): Pad 1 [EAI_INJ] of R8 on F.Cu
 
 ** Found 0 Footprint errors **
+
+** Ignored checks **
+    - Footprint has no courtyard defined
+    - Track endpoint not centered on via
+    - Tuning profile track geometries
+    - Footprint doesn't match symbol's footprint filters
+    - PTH inside courtyard
+    - NPTH inside courtyard
+    - Footprint component type doesn't match footprint pads
 
 ** End of Report **

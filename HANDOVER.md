@@ -279,6 +279,18 @@ Notable route_board facts a future session needs:
 - C33.1 <-> U4.6 (5V0) and U3.25 <-> C28.1 (PS_VIN) are pad-to-pad joins
   left for autoroute on purpose.
 
+## Phase-3 manager routing — state 2026-08-16 (commits 5aa913a, 942dda1)
+
+**54 unconnected, ZERO DRC violations.** KiCad-10-native, kicad-cli
+run_drc, autoroute.py ported + parallel (30 forked workers, re-validating
+merge; --jobs=N). Fixes that mattered: keepout zones block the grid
+(z.Outline().Outline(0)), per-pad local clearance honored (fiducials 0.5).
+Remaining: 25 signal (USB DP/DN @ J3, PRESENT3-7 @ J1, U8 aux cluster,
+I2C @ J1, LCD_SCK, KEY0/1/4, ESP_EN/BOOT0/ENC_B/BUZZ_N locals) — hand
+waypoints via the ported tools/finish_routes.py or interactive; 29
+power spokes (PGND/3V3/5V0/VBUS_F) LAST. Division of labour per the
+phase-2 decision applies here too.
+
 ## Immediate next steps (agreed order)
 
 1. **Finish Phase-2 board** — hand-route the remaining 83 connections in

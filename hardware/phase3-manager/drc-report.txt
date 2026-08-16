@@ -1,5 +1,5 @@
 ** Drc report for phase3-manager.kicad_pcb **
-** Created on 2026-08-16T07:57:08 **
+** Created on 2026-08-16T08:19:16 **
 ** Report includes: Errors, Warnings **
 
 ** Found 70 DRC violations **
@@ -214,7 +214,7 @@
     Local override; warning
     @(46.0000 mm, 49.0000 mm): Footprint R84
 
-** Found 55 unconnected pads **
+** Found 54 unconnected pads **
 [unconnected_items]: Missing connection between items
     Local override; error
     @(21.0000 mm, 21.0000 mm): Zone [PGND] on B.Cu, priority 0
@@ -233,8 +233,8 @@
     @(38.9000 mm, 73.8750 mm): Pad 11 [PGND] of U8 on F.Cu
 [unconnected_items]: Missing connection between items
     Local override; error
-    @(44.4750 mm, 74.5000 mm): Pad 2 [PGND] of C50 on F.Cu
-    @(44.4750 mm, 69.2500 mm): Track [PGND] on F.Cu, length 1.2500 mm
+    @(44.4750 mm, 75.7500 mm): Track [PGND] on F.Cu, length 1.2500 mm
+    @(44.4750 mm, 70.5000 mm): Pad 2 [PGND] of C51 on F.Cu
 [unconnected_items]: Missing connection between items
     Local override; error
     @(44.8250 mm, 82.6250 mm): Track [PGND] on F.Cu, length 6.6750 mm
@@ -269,7 +269,7 @@
     @(97.7750 mm, 93.0000 mm): Pad 2 [PGND] of C75 on F.Cu
 [unconnected_items]: Missing connection between items
     Local override; error
-    @(101.1250 mm, 77.9000 mm): Track [PGND] on F.Cu, length 0.7250 mm
+    @(101.8500 mm, 77.9000 mm): Pad 2 [PGND] of SW2 on F.Cu
     @(108.1500 mm, 77.9000 mm): Pad 2 [PGND] of SW2 on F.Cu
 [unconnected_items]: Missing connection between items
     Local override; error
@@ -333,10 +333,6 @@
     @(21.0000 mm, 21.0000 mm): Zone [3V3] on F.Cu, priority 0
 [unconnected_items]: Missing connection between items
     Local override; error
-    @(85.2400 mm, 60.0000 mm): PTH pad 7 [LCD_SCK] of J6
-    @(91.7500 mm, 58.5000 mm): Track [LCD_SCK] on F.Cu, length 2.3750 mm
-[unconnected_items]: Missing connection between items
-    Local override; error
     @(34.8250 mm, 52.0000 mm): Pad 2 [PRESENT5] of R85 on F.Cu
     @(25.0000 mm, 77.1800 mm): PTH pad 18 [PRESENT5] of J1
 [unconnected_items]: Missing connection between items
@@ -349,7 +345,7 @@
     @(50.5000 mm, 61.5000 mm): Track [KEY1] on F.Cu, length 5.2500 mm
 [unconnected_items]: Missing connection between items
     Local override; error
-    @(72.0000 mm, 91.0000 mm): Track [USB_DP] on F.Cu, length 1.5000 mm
+    @(73.5000 mm, 91.0000 mm): Track [USB_DP] on F.Cu, length 2.5000 mm
     @(81.7500 mm, 92.3200 mm): Pad A6 [USB_DP] of J3 on F.Cu
 [unconnected_items]: Missing connection between items
     Local override; error
@@ -374,10 +370,10 @@
 [unconnected_items]: Missing connection between items
     Local override; error
     @(37.1000 mm, 74.5250 mm): Pad 2 [VBUS_F] of U8 on F.Cu
-    @(41.5250 mm, 74.5000 mm): Track [VBUS_F] on F.Cu, length 2.6500 mm
+    @(38.8750 mm, 75.1750 mm): Track [VBUS_F] on F.Cu, length 0.6750 mm
 [unconnected_items]: Missing connection between items
     Local override; error
-    @(41.5250 mm, 74.5000 mm): Pad 1 [VBUS_F] of C50 on F.Cu
+    @(41.5250 mm, 74.5000 mm): Track [VBUS_F] on F.Cu, length 2.6500 mm
     @(41.5250 mm, 70.5000 mm): Pad 1 [VBUS_F] of C51 on F.Cu
 [unconnected_items]: Missing connection between items
     Local override; error
@@ -393,7 +389,7 @@
     @(38.5000 mm, 76.4000 mm): Pad 7 [AUX_FB] of U8 on F.Cu
 [unconnected_items]: Missing connection between items
     Local override; error
-    @(39.8250 mm, 68.1250 mm): Track [AUX_PG] on F.Cu, length 0.3750 mm
+    @(39.8250 mm, 68.5000 mm): Pad 2 [AUX_PG] of R52 on F.Cu
     @(38.9000 mm, 75.6750 mm): Pad 8 [AUX_PG] of U8 on F.Cu
 [unconnected_items]: Missing connection between items
     Local override; error
@@ -413,7 +409,7 @@
     @(97.9375 mm, 83.0000 mm): Pad 3 [BUZZ_N] of Q9 on F.Cu
 [unconnected_items]: Missing connection between items
     Local override; error
-    @(46.8250 mm, 51.6250 mm): Track [KEY0] on F.Cu, length 11.4250 mm
+    @(58.2500 mm, 51.6250 mm): Track [KEY0] on F.Cu, length 17.0000 mm
     @(70.0000 mm, 66.0000 mm): PTH pad 1 [KEY0] of J5
 [unconnected_items]: Missing connection between items
     Local override; error

@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  host-tests:
+    name: Host tests (can, core, manager, scpi, ui)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and run test suites
+        run: make -C firmware/tests test
+
+  module-firmware:
+    name: Module firmware (STM32G431)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install arm-none-eabi toolchain
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gcc-arm-none-eabi libnewlib-arm-none-eabi
+          arm-none-eabi-gcc --version | head -1
+      - name: Build
+        run: make -C firmware/module
+      - uses: actions/upload-artifact@v4
+        with:
+          name: module-firmware
+          path: |
+            firmware/module/build/labbench-module.elf
+            firmware/module/build/labbench-module.bin
+            firmware/module/build/labbench-module.map
+
+  manager-firmware:
+    name: Manager firmware (ESP32-S3, IDF v5.3.2)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        uses: espressif/esp-idf-ci-action@v1
+        with:
+          esp_idf_version: v5.3.2
+          target: esp32s3
+          path: firmware/manager/idf
+      - uses: actions/upload-artifact@v4
+        with:
+          name: manager-firmware
+          path: |
+            firmware/manager/idf/build/labbench-manager.bin
+            firmware/manager/idf/build/labbench-manager.elf
+            firmware/manager/idf/build/bootloader/bootloader.bin
+            firmware/manager/idf/build/partition_table/partition-table.bin
+            firmware/manager/idf/build/flasher_args.json
+            firmware/manager/idf/dependencies.lock

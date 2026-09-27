@@ -97,8 +97,9 @@ PLACEMENT = {
     "RT2": (86.0, 41.0, 0),
     # comp cluster east of the NE B.Cu corridor (x80..83.6), 3.02 mm columns,
     # so the FB (y33.75) and COMP (y33.25) lanes leave pins 28/29 straight
-    # east on F.Cu; R1/R5/R8 turned so their FB pads face the FB lane
-    "C25": (84.54, 32.6, 0), "R24": (87.56, 32.6, 0), "C24": (90.58, 32.6, 0),
+    # east on F.Cu; R1/R5/R8 turned so their FB pads face the FB lane, C25
+    # turned so COMP meets R24 directly and its AGND pad gets a pocket via
+    "C25": (84.54, 32.6, 180), "R24": (87.56, 32.6, 0), "C24": (90.58, 32.6, 0),
     "R1":  (93.6, 32.6, 180),
     "R2":  (84.54, 34.55, 0), "R5": (87.56, 34.55, 180), "R8": (90.58, 34.55, 180),
     "C20": (93.6, 34.55, 0),

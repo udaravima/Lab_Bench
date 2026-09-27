@@ -54,6 +54,10 @@ PARTS = [
     ({MGR: ["U12"]}, "C150526", "TPD2E001DRLR", "TI", 0.16, ""),
     ({P1: ["U3"]}, "C485912", "LM5145RGYR", "TI", 1.55, ""),
     ({P1: ["Q1", "Q2"]}, "C77239", "CSD18563Q5A", "TI", 0.85, ""),
+    ({P1: ["Q3", "Q4"]}, "C77239", "CSD18563Q5A", "TI", 0.85,
+     "output disconnect: same 60 V part and Q5A land as Q1/Q2, 5.7 mOhm "
+     "(about 0.6 W each at 10 A); phase-2's CSD18540Q5B is lower loss but "
+     "its Q5B land is not checked against this footprint"),
 
     # ---- B. Magnetics & power passives ------------------------------------
     ({P2: ["L1", "L3"]}, "C6238332", "MWSA1707S-6R8MT", "Sunlord", 1.72,
@@ -100,14 +104,16 @@ PARTS = [
 # Parts with no LCSC number yet that are worth saying why in the BOM.
 NOTES = [
     ({P1: ["J1", "J4"]},
-     "SOURCING lists 2EDG 5.08 plugs C3697 for P1 bench IO, but this "
-     "footprint is a 5.0 mm Phoenix PT - pick the matching header"),
-    ({P1: ["F1"]}, "mini blade holder; likely C3207114 as on the manager, "
-     "not confirmed for 10 A"),
+     "through-hole, hand-solder; SOURCING lists 2EDG 5.08 plugs C3697 for "
+     "P1 bench IO, but this footprint is a 5.0 mm Phoenix PT - pick the "
+     "matching header"),
+    ({P1: ["F1"]}, "through-hole, hand-solder; mini blade holder, likely "
+     "C3207114 as on the manager, not confirmed for 10 A"),
     ({BP: ["C2"]}, "SOURCING's 470 uF part C106666 is THT D10; this board "
      "uses a 16x17.5 SMD footprint - choose an SMD part"),
     ({P1: ["C21", "C22", "C78"]}, "not in SOURCING - choose at order time"),
-    ({P1: ["Q3", "Q4"]}, "60 V NFET not chosen in SOURCING"),
+    ({P1: ["J2", "J3", "J5", "J6"]}, "through-hole pin header: hand-solder "
+     "(or pay for JLCPCB THT assembly)"),
     ({MGR: ["J6"]}, "ILI9341+XPT2046 2.8in module plugs here - AliExpress, "
      "confirm 3V3-VCC jumper"),
 ]

@@ -27,17 +27,17 @@ Item,Qty,References,Value,Footprint,LCSC,MPN,Manufacturer,Unit USD,Ext USD,Note
 26,1,D5,SMBJ33A,Diode_SMD:D_SMB,,,,,,
 27,1,D6,1N4148W,Diode_SMD:D_SOD-323,,,,,,
 28,1,D7,STATUS,LED_SMD:LED_0603_1608Metric,,,,,,
-29,1,F1,10A blade,Fuse:Fuse_Blade_Mini_directSolder,,,,,,"mini blade holder; likely C3207114 as on the manager, not confirmed for 10 A"
-30,1,J1,VBUS IN,"TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-2-5.0-H_1x02_P5.00mm_Horizontal",,,,,,"SOURCING lists 2EDG 5.08 plugs C3697 for P1 bench IO, but this footprint is a 5.0 mm Phoenix PT - pick the matching header"
-31,1,J2,SWD,Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical,,,,,,
-32,1,J3,UART,Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical,,,,,,
-33,1,J4,OUTPUT,"TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-2-5.0-H_1x02_P5.00mm_Horizontal",,,,,,"SOURCING lists 2EDG 5.08 plugs C3697 for P1 bench IO, but this footprint is a 5.0 mm Phoenix PT - pick the matching header"
-34,1,J5,BACKPLANE,Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical,,,,,,
-35,1,J6,FAN,Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical,,,,,,
+29,1,F1,10A blade,Fuse:Fuse_Blade_Mini_directSolder,,,,,,"through-hole, hand-solder; mini blade holder, likely C3207114 as on the manager, not confirmed for 10 A"
+30,1,J1,VBUS IN,"TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-2-5.0-H_1x02_P5.00mm_Horizontal",,,,,,"through-hole, hand-solder; SOURCING lists 2EDG 5.08 plugs C3697 for P1 bench IO, but this footprint is a 5.0 mm Phoenix PT - pick the matching header"
+31,1,J2,SWD,Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical,,,,,,through-hole pin header: hand-solder (or pay for JLCPCB THT assembly)
+32,1,J3,UART,Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical,,,,,,through-hole pin header: hand-solder (or pay for JLCPCB THT assembly)
+33,1,J4,OUTPUT,"TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-2-5.0-H_1x02_P5.00mm_Horizontal",,,,,,"through-hole, hand-solder; SOURCING lists 2EDG 5.08 plugs C3697 for P1 bench IO, but this footprint is a 5.0 mm Phoenix PT - pick the matching header"
+34,1,J5,BACKPLANE,Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical,,,,,,through-hole pin header: hand-solder (or pay for JLCPCB THT assembly)
+35,1,J6,FAN,Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical,,,,,,through-hole pin header: hand-solder (or pay for JLCPCB THT assembly)
 36,1,L1,10u MWSA1707S-100/XAL1350,labbench:L_1707_XAL1510,C5240401,MWSA1707S-100MT,Sunlord,1.68,1.68,16.5 A Isat / 10.5 A Irms; placeholder footprint until the land pass
 37,1,L2,33u/1.2A,Inductor_SMD:L_1210_3225Metric,,,,,,
 38,2,Q1 Q2,CSD18563Q5A,labbench:PowerFET_SON5x6_GDS,C77239,CSD18563Q5A,TI,0.85,1.7,
-39,2,Q3 Q4,60V NFET,labbench:PowerFET_SON5x6_GDS,,,,,,60 V NFET not chosen in SOURCING
+39,2,Q3 Q4,60V NFET,labbench:PowerFET_SON5x6_GDS,C77239,CSD18563Q5A,TI,0.85,1.7,"output disconnect: same 60 V part and Q5A land as Q1/Q2, 5.7 mOhm (about 0.6 W each at 10 A); phase-2's CSD18540Q5B is lower loss but its Q5B land is not checked against this footprint"
 40,5,Q5 Q6 Q7 Q8 Q9,2N7002,Package_TO_SOT_SMD:SOT-23,,,,,,
 41,1,R1,25.5K 0.1%,Resistor_SMD:R_0603_1608Metric,,,,,,
 42,1,R2,1.0K 0.1%,Resistor_SMD:R_0603_1608Metric,,,,,,
@@ -81,4 +81,4 @@ Item,Qty,References,Value,Footprint,LCSC,MPN,Manufacturer,Unit USD,Ext USD,Note
 80,1,U10,STM32G431CBT6,Package_QFP:LQFP-48_7x7mm_P0.5mm,C529355,STM32G431CBT6,ST,2.85,2.85,
 81,1,U11,TCAN1042HGV,Package_SO:SOIC-8_3.9x4.9mm_P1.27mm,C485806,TCAN1042VDRQ1,TI,0.57,0.57,"symbol value says TCAN1042HGV; SOURCING picked the V (VIO) variant, same SOIC-8 pinout"
 82,1,Y1,8MHz,Crystal:Crystal_SMD_3225-4Pin_3.2x2.5mm,C400090,,,0.105,0.105,"8 MHz 3225, CL = 12 pF (load caps 18 p)"
-,136,,,,,,,,27.71,"16/136 placements have an LCSC number; total covers those only (qty-1, SOURCING.md 2026-07-18)"
+,136,,,,,,,,29.41,"18/136 placements have an LCSC number; total covers those only (qty-1, SOURCING.md 2026-07-18)"

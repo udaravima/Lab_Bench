@@ -73,10 +73,10 @@ Decisions taken this pass (user-approved 2026-07-18):
 | XT60PW-F (Amass) | C428722 | 0.56 | 8.4k | backplane, ×8 slots |
 | 2.54 header/socket strips | — | ~0.05 | ≫100k | slot signal rows, UART/SWD |
 | TYPE-C-31-M-12 | C165948 | 0.16 | 336k | manager USB |
-| EC11 encoder (generic) | C2831776 | 0.036 | 4.6k | vs Alps $1.99 — generic fine |
-| MLT-8530 SMD buzzer | C94599 | 0.18 | 46k | replaces CUI CST-931RP (footprint change at PCB pass; verify 5 V drive on ds) |
+| EC11E encoder with switch (Alps EC11E18244A5) | C255515 | 2.40 | 766 | 2026-09-27: the old "generic EC11" C2831776 was really a 100 µF/50 V electrolytic; no generic EC11 with switch is listed |
+| YX-SMD8530P SMD buzzer (Yuexin) | C781886 | 0.39 | 368 | 2026-09-27: replaces MLT-8530 C94599, which is rated 2.5–4.5 V but runs from 5V0; same vendor land, pad 1 (+) in the same corner |
 | ATO fuse holder | C3207132 | 0.42 | 997 | module 35 A |
-| Mini blade holder | C3207114 | 0.64 | 450 | manager 2 A |
+| 2 A MINI blade fuse (Littelfuse 0297002.WXNV) | C151091 | 0.11 | 5.9k | manager F1, soldered directly into the Fuse_Blade_Mini_directSolder land. 2026-09-27: replaces C3207114, which is a 6.35 mm cylindrical clip, not a mini-blade holder |
 | 2EDG 5.08 plugs (P1 bench IO) | C3697 | 0.04 | 103k | |
 | ILI9341+XPT2046 2.8" module | — | ~5 | — | AliExpress/Taobao (not LCSC); confirm 3V3-VCC jumper before soldering |
 | E-stop NC mushroom, M6 lugs, standoffs | — | ~3 | — | AliExpress/hardware store |
@@ -110,7 +110,8 @@ US$300–380** including boards, spares and the Coilcraft A/B pair.
    EC11/2N7002/diodes accepted.
 5. Ratings still to verify from datasheets **at order time** (flagged
    above): BVS power rating, Lelon SVZ ESR,
-   alloy-shunt TCR, MLT-8530 drive voltage, TS5A3166 pin map.
+   alloy-shunt TCR, TS5A3166 pin map. (MLT-8530 drive voltage: resolved
+   2026-09-27 by the 5 V-rated YX-SMD8530P.)
 
 ## F. Engineering changes from this pass — APPLIED 2026-07-18
 

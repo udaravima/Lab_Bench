@@ -45,3 +45,7 @@ hardware/**/*-fab.zip
 # KiCad freerouting plugin scratch exports
 freerouting.dsn
 temp-freerouting.dsn
+# ESP-IDF generated config (sdkconfig.defaults is the tracked source)
+firmware/manager/idf/sdkconfig
+firmware/manager/idf/sdkconfig.old
+firmware/manager/idf/managed_components/

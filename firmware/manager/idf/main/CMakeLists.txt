@@ -3,5 +3,5 @@ idf_component_register(
          "../../core/manager_core.c" "../../core/ui_core.c"
          "../../core/scpi_core.c"
     INCLUDE_DIRS "." "../../core" "../../../common"
-    REQUIRES driver esp_timer esp_lcd
+    REQUIRES driver esp_timer esp_lcd esp_lcd_ili9341 esp_tinyusb
 )

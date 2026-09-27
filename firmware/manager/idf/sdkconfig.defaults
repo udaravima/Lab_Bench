@@ -3,3 +3,6 @@ CONFIG_ESPTOOLPY_FLASHSIZE_8MB=y
 CONFIG_SPIRAM=y
 CONFIG_SPIRAM_MODE_QUAD=y
 CONFIG_FREERTOS_HZ=1000
+# USB-SCPI transport (scpi_usb.c) needs esp_tinyusb's CDC-ACM class,
+# which is off by default.
+CONFIG_TINYUSB_CDC_ENABLED=y

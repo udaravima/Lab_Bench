@@ -51,6 +51,7 @@ BOARD = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "..", "phase2-m
 STEP = 0.05
 TRACK_W = 0.2
 NECK_W = 0.15        # board minimum; signal nets only, when 0.2 cannot pass
+EDGE_KEEP = 0.85      # grid margin to the board edge: 0.5 mm edge rule + widest NET_W/2 + slack
 POWER_NETS = {"PGND", "AGND", "3V3", "5V0", "VBUS", "VBUS_FUSED", "VBUS_P", "VOUT", "VOUT_INT",
               "VOUT_SW", "SW1", "SW2", "PS_VCC", "PS_VIN", "AUX_VCC"}
 # Width per net where 0.2 mm is not enough. PS_VCC is the LM5143 gate-drive
@@ -199,8 +200,8 @@ def route(cu, net, src, dst, board_bb, rip=False, protect=(), w=None):
     dg = unary_union([items[i][2] for i in dst])
     near = nearest_points(sg, dg)[1]
     minx, miny, maxx, maxy = unary_union([sg, near]).bounds
-    x1, y1 = max(minx - WINDOW, board_bb[0] + 0.6), max(miny - WINDOW, board_bb[1] + 0.6)
-    x2, y2 = min(maxx + WINDOW, board_bb[2] - 0.6), min(maxy + WINDOW, board_bb[3] - 0.6)
+    x1, y1 = max(minx - WINDOW, board_bb[0] + EDGE_KEEP), max(miny - WINDOW, board_bb[1] + EDGE_KEEP)
+    x2, y2 = min(maxx + WINDOW, board_bb[2] - EDGE_KEEP), min(maxy + WINDOW, board_bb[3] - EDGE_KEEP)
     nx, ny = int((x2 - x1) / STEP) + 1, int((y2 - y1) / STEP) + 1
     xs = x1 + np.arange(nx) * STEP
     ys = y1 + np.arange(ny) * STEP

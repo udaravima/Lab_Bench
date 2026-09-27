@@ -76,6 +76,7 @@ python3 ../../common/fix_fpids.py ../phase1-module.kicad_pcb
 python3 ../../common/finish_board.py ../phase1-module.kicad_pcb --silk --planes
 python3 run_drc.py                                 # 0 unconnected, 0 errors
 python3 ../../common/finish_board.py ../phase1-module.kicad_pcb --fab
+(cd ../.. && python3 common/cpl.py phase1-module/phase1-module.kicad_pcb)  # JLCPCB CPL
 ```
 
 Freerouting is not deterministic, so a rerun gives a different (equally

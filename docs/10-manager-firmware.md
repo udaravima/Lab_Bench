@@ -70,6 +70,16 @@ host-verified before silicon:
 Managed components (main/idf_component.yml, fetched on first `idf.py
 build`): `espressif/esp_lcd_ili9341`, `espressif/esp_tinyusb`.
 
+**First compile (2026-09-27): builds clean, zero warnings in `main`,**
+IDF v5.3.2, 355 KB app image (IRAM full at 16383/16384 B, from IDF +
+TinyUSB, not our code). Built with esp_lcd_ili9341 1.2.0, esp_tinyusb
+1.7.6~1, tinyusb 0.18.0~6. Two fixes were needed: `CONFIG_TINYUSB_CDC_ENABLED=y`
+in sdkconfig.defaults (esp_tinyusb ships CDC off, so `tusb_cdc_acm.h`
+hard-errors), and `esp_lcd_ili9341`/`esp_tinyusb` named in main's
+`REQUIRES` so the includes resolve whether components come from the
+registry or from local copies (`IDF_COMPONENT_MANAGER=0` +
+`EXTRA_COMPONENT_DIRS`). Still untested on silicon.
+
 | Piece | Binding |
 |---|---|
 | TWAI @ 500 k | IO4 TX / IO5 RX (docs/09 §3), rx task → `lb_mgr_rx`, 10 ms tick drains the ring |

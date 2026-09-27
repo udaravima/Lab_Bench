@@ -27,7 +27,7 @@ Item,Qty,References,Value,Footprint,LCSC,MPN,Manufacturer,Unit USD,Ext USD,Note
 26,1,D5,SMBJ33A,Diode_SMD:D_SMB,C224019,SMBJ33A,Littelfuse,0.122,0.122,
 27,1,D6,1N4148W,Diode_SMD:D_SOD-323,C2128,1N4148WS,"Jiangsu Changjing Electronics Technology Co., Ltd.",0.0158,0.016,1N4148WS is the SOD-323 version (1N4148W is SOD-123)
 28,1,D7,STATUS,LED_SMD:LED_0603_1608Metric,C2286,KT-0603R,Hubei KENTO Elec,0.0075,0.007,red 0603 LED (Basic)
-29,1,F1,10A blade,Fuse:Fuse_Blade_Mini_directSolder,,,,,,"through-hole, hand-solder; the land is a direct-solder MINI blade fuse, not a holder - fit a 10 A 0297-series fuse (C3207114 is a cylindrical clip and does not fit)"
+29,1,F1,10A blade,Fuse:Fuse_Blade_Mini_directSolder,,,,,,"through-hole, hand-solder; the land is KiCad's direct-solder mini blade pattern, so a 10 A mini blade (ATM) fuse solders straight in with no holder (C3207114 does not fit it)"
 30,1,J1,VBUS IN,"TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-2-5.0-H_1x02_P5.00mm_Horizontal",,,,,,"through-hole, hand-solder; SOURCING lists 2EDG 5.08 plugs C3697 for P1 bench IO, but this footprint is a 5.0 mm Phoenix PT - pick the matching header"
 31,1,J2,SWD,Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical,,,,,,through-hole pin header: hand-solder (or pay for JLCPCB THT assembly)
 32,1,J3,UART,Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical,,,,,,through-hole pin header: hand-solder (or pay for JLCPCB THT assembly)

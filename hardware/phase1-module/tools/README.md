@@ -36,7 +36,7 @@ eyeball; it has caught >15 real hardware bugs before any board was ordered.
 | `check_footprints.py` | Every component has a resolvable footprint; every netted pin has a matching pad |
 | `merge_vendor.py` | Merges only datasheet-VETTED vendor symbols into `lib/labbench.kicad_sym` |
 | `build_fplib.py` | Same for footprints -> `lib/labbench.pretty/`; also generates `PowerFET_SON5x6_GDS` from the TI Q5A land pattern (pads renumbered 1=G/2=D/3=S for the generic symbol) |
-| `gen_board.py` | Netlist -> placed 120x80 4-layer board: PLACEMENT table, split In1 ground plane (PGND/AGND star at NT1 + AGND pocket under the LTC7004), In2 5V0/3V3 zones, 10 F.Cu power pours, pour/courtyard/edge checks |
+| `gen_board.py` | Netlist -> placed 100x80 4-layer board: PLACEMENT table, split In1 ground plane (PGND/AGND star at NT1; the LTC7004 now sits on the AGND side, so no pocket), In2 5V0/3V3 zones, 10 F.Cu power pours, pour/courtyard (real polygons)/edge checks. The 120x80 layout is on branch `phase1-120x80` |
 | `route_board.py` | Deterministic copper: In2 heat patches, thermal/stitching/pad vias (seam-aware), critical routes (Kelvin pair, LM5145 gate fan-out, BST/ILIM/VIN, NT1 tie) |
 | `autoroute.py` | Superseded grid A* signal router (kept for reference) |
 | `fanout.py` | Routing pass 1b: placement nudges (NUDGES, empty now), solid-joined pads (SOLID_PADS), hand escapes for U3's boxed-in pins, then a via drop for every plane-net pad (PGND/AGND to In1, 3V3/5V0 to In2) and an escape for signal pads inside a foreign F.Cu pour |
@@ -71,7 +71,8 @@ python3 export_dsn.py wip/p1.dsn
 xvfb-run -a java -Xss64m -jar freerouting-1.9.0.jar \
     -de wip/p1.dsn -do wip/p1.ses -mp 20 -mt 1     # 2.x CLI never finishes
 python3 import_ses.py wip/p1.ses                   # 145 -> ~18 unconnected
-python3 finish_routes.py --base=/tmp/base.kicad_pcb    # -> 0
+python3 finish_routes.py ../phase1-module.kicad_pcb --base=/tmp/base.kicad_pcb  # -> 0 (board path first)
+python3 fb_reroute.py                              # FB run >= 5.5 mm from SW copper
 python3 ../../common/fix_fpids.py ../phase1-module.kicad_pcb
 python3 ../../common/finish_board.py ../phase1-module.kicad_pcb --silk --planes
 python3 run_drc.py                                 # 0 unconnected, 0 errors

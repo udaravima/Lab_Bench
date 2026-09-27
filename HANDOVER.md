@@ -42,7 +42,7 @@ manager, CAN 2.0B @500k. Docs 01–07 are the spec; read 05 (build plan) first
 | Design docs 01–07 | complete (07 = module firmware, new) |
 | Phase-1 schematic | **complete, v1**: 7 generated sheets, 137 components, ~90 nets machine-verified; audited (kicad-happy + ngspice 38/40 pass) |
 | Footprints | all vetted; custom lib `labbench.pretty` (LM5145 RGY, LMR36015 RNX, DAC80502 no-EP WSON, PowerFET_SON5x6_GDS) |
-| PCB — Phase 1 | **Routed, 0 unconnected, 0 DRC errors** (PR #3, 2026-09-27; review fixes in a follow-up PR from `claude/project-thread-nojoms`): pass-1 + `fanout.py` + Freerouting 1.9 + `finish_routes.py`, then `eco_move.py` for the review moves; 1166 tracks / 357 vias. DRC = 9 silk *warnings* (6 are J1/J4 terminal-block silk over the edge, by design). Fab zip generated. `gen_board.py` PLACEMENT matches the board again (every footprint checked) |
+| PCB — Phase 1 | **100 × 80 mm, routed, 0 unconnected, 0 DRC errors** (2026-09-27, draft PR from `claude/phase1-100x80`; the 120 × 80 layout it replaces is kept on branch `phase1-120x80`). Re-placed from the netlist, so L1 now has the 17 mm MWSA1707S/XAL1510 superset land and U7 the SC-70-5 land the BOM orders (the 120 × 80 board still carried XAL1350 and SOT-23-5 lands: do not order it). Output bank tightened round the bigger L1; R30 Kelvin shunt, U4/U5 and their sense traces moved as one block with the same geometry; Q3/Q4, J4 and the LTC7004 stack down the right edge. Pipeline: pass-1 + `fanout.py` + Freerouting 1.9 + `finish_routes.py`; 1303 tracks / 353 vias. DRC = 11 silk *warnings*. Fab zip + CPL regenerated |
 | PCB — Phase 3 backplane | **FAB-READY (2026-07-26, d9e1a7b)**: 0 DRC, 0 unconnected, silk 39/39 clean, no plane islands. Gerbers+drills in `fab/` (gitignored) via `python3 ../common/finish_board.py phase3-backplane.kicad_pcb`. Cross-checked: Edge_Cuts exactly 330.00×100.00 mm; drills 2×6.4 (M6 lugs), 16×2.8 (8 slots × 2 XT60 pins), 6×3.2 (M3), 86×1.0, 61×0.4. **Still gated on the XT60 polarity buzz-out before ordering** |
 | PCB — Phase 2 | **83 unconnected, 0 copper DRC, silk clean (2026-07-26, c1a86eb)** — see the resume section; finish by hand in KiCad. Older detail below: |
 | PCB — Phase 2 (history) | **(2026-07-25, 27fb2d1).** `gen_board.py` placement green (173 comps, all pour/courtyard/edge assertions pass, 130×90 4-layer); `route_board.py` pass-1 done (power pours, In2 heat patches, both phases' gate fan-outs, Kelvin pairs, disconnect trunk). DRC: **copper down to ~19 clearance + ~11 dangling/mask/hole in 3 known clusters** (see resume section); 243 unconnected = signal nets, autoroute not yet run. Found & fixed a real LM5143 land-pattern bug in the process (see load-bearing decisions) |
@@ -209,12 +209,14 @@ Notable route_board facts a future session needs:
    is `common/lcsc_parts.py`; `--check` fails if anything is stale. Still
    open: generic R/C/jellybean/header numbers, and the `CHECK:` rows in the
    BOMs (footprint/variant mismatches vs SOURCING.md).
-4. **Phase-1 board** — routed (0 unconnected, 0 DRC errors) and its
-   review items fixed (2026-09-27): C28 sits on U3.20, the VBUS divider
+4. **Phase-1 board** — shrunk to 100 × 80 mm and re-routed (0
+   unconnected, 0 DRC errors, 2026-09-27) with the BOM's L1 and U7 lands;
+   the 120 × 80 version (wrong L1/U7 lands) is on branch `phase1-120x80`.
+   Earlier review items still hold: C28 sits on U3.20, the VBUS divider
    (R60/R61/C62) sits by U10.14, and every part offset is in `gen_board.py`
-   PLACEMENT. VOUT_INT's 39.5 mm FB sense run was left as routed: it keeps
-   5.5 mm or more from SW copper on every layer and its long end is the
-   low-impedance output side. Next: owner picks the BOM `CHECK:` parts,
+   PLACEMENT. The VOUT_INT FB sense run (52 mm, tapped at L1.2) keeps
+   5.5 mm or more from SW copper on every layer, enforced by
+   `tools/fb_reroute.py` after routing. Next: owner picks the BOM `CHECK:` parts,
    then order.
 
 **Gates before ordering ANY board — including the fab-ready backplane:**
@@ -316,9 +318,9 @@ by hand. If a DRC report ever shows this class again, suspect the env.
 - **INA228 ALERT has no external pull-up** in schematic v1 — firmware enables
   PB7's internal one; add a discrete pull-up in the next schematic rev.
 - **Grounding**: PGND/AGND split planes joined ONLY at NT1 (net-tie beside the
-  sense amps); In1 has an AGND pocket under the LTC7004 cluster. Never add a
-  via that shorts the domains — the seam geometry lives in gen_board.py
-  (`SEAM`, `AUXW`, `POCKET`).
+  sense amps). Phase-1 (100 × 80) has no AGND pocket: the LTC7004 cluster
+  sits below the seam. Never add a via that shorts the domains — the seam
+  geometry lives in gen_board.py (`SEAM`, `AUXW`).
 - **Kelvin shunt**: pours grab only the outer halves of R30's pads; sense
   traces leave the inner edges. Preserve this in any re-layout.
 - Package truths (all datasheet-verified): LM5145 pin 15 = isolated "EP"

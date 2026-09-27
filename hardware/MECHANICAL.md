@@ -25,7 +25,7 @@ component + airflow:
 | Board | Size | Layers/copper | Notes |
 |---|---|---|---|
 | phase2-module | **130 × 90 mm** | 4-layer (stackup below) | grows from P1's 120×80 for hot-swap + 4 FETs; XT60PW-M + signal row on the bottom edge (power connector proud by ~2 mm for power-first mating) |
-| phase1-module | 120 × 80 mm | 4-layer | unchanged; gets the same bottom-edge connector pair so it can plug the backplane too |
+| phase1-module | **100 × 80 mm** (was 120 × 80; that layout is kept on branch `phase1-120x80`) | 4-layer | shrunk to fit JLCPCB's ≤100 × 100 mm tier; gets the same bottom-edge connector pair so it can plug the backplane too |
 | phase3-backplane | **~330 × 100 mm** | 2-layer 2 oz | 8 × 30 mm slots + end margins + manager header zone; M6 lug bolts at entry; bus rails solder-reinforced |
 | phase3-manager | **100 × 80 mm** | 2-layer 1 oz | display module on standoffs above (or panel-mounted via ribbon); encoder/keys wired to panel |
 

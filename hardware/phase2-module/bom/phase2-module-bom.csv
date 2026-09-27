@@ -76,7 +76,7 @@ Item,Qty,References,Value,Footprint,LCSC,MPN,Manufacturer,Unit USD,Ext USD,Note
 75,1,U2,OPA2333,Package_SO:VSSOP-8_3.0x3.0mm_P0.65mm,C19608,OPA2333AIDGKR,TI,1.14,1.14,
 76,1,U3,LM5143RHAR,labbench:LM5143_RHA0040P,C5219258,LM5143QRHARQ1,TI,2.93,2.93,CHECK: symbol value says LM5143RHAR; SOURCING picked the cheaper Q1 variant (same VQFN-40) - confirm RHA0040P land vs the Q1 addendum
 77,1,U4,INA240A3,Package_SO:SOIC-8_3.9x4.9mm_P1.27mm,C2060584,INA240A3DR,TI,1.87,1.87,
-78,1,U5,INA228,Package_SO:VSSOP-10_3x3mm_P0.5mm,C2887910,INA228AIDGSR,TI,3.83,3.83,
+78,1,U5,INA228,Package_SO:VSSOP-10_3x3mm_P0.5mm,C2887910,INA228AIDGSR,TI,3.83,3.83,out of stock at LCSC/JLCPCB on 2026-09-27
 79,1,U6,LTC7004,Package_SO:MSOP-10-1EP_3x3mm_P0.5mm_EP1.68x1.88mm,C690105,LTC7004EMSE#PBF,ADI,5.77,5.77,thinnest stock in the BOM - order early (IMSE fallback)
 80,1,U7,TLV7011DCK,Package_TO_SOT_SMD:SOT-353_SC-70-5,C193688,TLV7011DCKR,TI,0.27,0.27,SC-70-5 (DCK)
 81,1,U8,LMR36015AQRNXRQ1,labbench:LMR36015_RNX_VQFN-HR-12,C1850345,LMR36015ARNXR,TI,1.91,1.91,"symbol value says LMR36015AQRNXRQ1 (automotive); SOURCING picked the commercial ARNXR, same RNX package"
@@ -85,5 +85,5 @@ Item,Qty,References,Value,Footprint,LCSC,MPN,Manufacturer,Unit USD,Ext USD,Note
 84,1,U11,TCAN1042HGV,Package_SO:SOIC-8_3.9x4.9mm_P1.27mm,C485806,TCAN1042VDRQ1,TI,0.57,0.57,"symbol value says TCAN1042HGV; SOURCING picked the V (VIO) variant, same SOIC-8 pinout"
 85,1,U12,LM5069MM-2,Package_SO:VSSOP-10_3x3mm_P0.5mm,C111822,LM5069MM-2/NOPB,TI,1.17,1.17,
 86,1,U13,TS5A3166,Package_TO_SOT_SMD:SOT-23-5,C353035,TS5A3166DBVR,TI,0.28,0.28,
-87,1,Y1,8MHz,Crystal:Crystal_SMD_3225-4Pin_3.2x2.5mm,C400090,,,0.105,0.105,"8 MHz 3225, CL = 12 pF (load caps 18 p)"
-,172,,,,,,,,51.97,"55/172 placements have an LCSC number; total covers those only (qty-1, SOURCING.md 2026-07-18)"
+87,1,Y1,8MHz,Crystal:Crystal_SMD_3225-4Pin_3.2x2.5mm,C403948,TAXM8M4RFDCET2T,Yajingxin,0.147,0.147,"8 MHz 3225, CL = 12 pF (load caps 18 p); replaces C400090, which is the CL = 10 pF version"
+,172,,,,,,,,52.01,"55/172 placements have an LCSC number; total covers those only (qty-1, SOURCING.md 2026-07-18)"

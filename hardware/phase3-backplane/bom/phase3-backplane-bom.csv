@@ -26,5 +26,5 @@ Item,Qty,References,Value,Footprint,LCSC,MPN,Manufacturer,Unit USD,Ext USD,Note
 25,1,R2,120R slot0-end,Resistor_SMD:R_0603_1608Metric,,,,,,
 26,1,R3,120R slot7-end,Resistor_SMD:R_0603_1608Metric,,,,,,
 27,2,RS1 RS2,0m5 3920,labbench:R3920_BVS,C466580,BVS-M-R0005,Isabellenhuette,0.6,1.2,2 in parallel = 0.25 mOhm; verify power rating on datasheet
-28,1,U1,INA228,Package_SO:VSSOP-10_3x3mm_P0.5mm,C2887910,INA228AIDGSR,TI,3.83,3.83,
+28,1,U1,INA228,Package_SO:VSSOP-10_3x3mm_P0.5mm,C2887910,INA228AIDGSR,TI,3.83,3.83,out of stock at LCSC/JLCPCB on 2026-09-27
 ,30,,,,,,,,9.51,"11/30 placements have an LCSC number; total covers those only (qty-1, SOURCING.md 2026-07-18)"

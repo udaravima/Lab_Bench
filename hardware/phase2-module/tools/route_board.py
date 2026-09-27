@@ -134,7 +134,8 @@ TRACKS = [
     ("SW2", F, 0.3, [(73.1, 37.375), (72.6, 38.05), (71.8, 38.65),
                      (71.8, 43.6), (72.3, 44.6)]),
     ("G_LS_B", F, 0.3, [(74.25, 37.9), (74.5, 38.4), (74.75, 37.9)]),
-    ("G_LS_B", F, 0.3, [(74.5, 38.4), (75.9, 40.55), (76.3, 41.05)]),
+    ("G_LS_B", F, 0.3, [(74.5, 38.4), (74.55, 38.5), (74.55, 40.2), (75.9, 40.55),
+                        (76.3, 41.05)]),                               # west of the PGND 14/17 link
     ("G_LS_B", B, 0.4, [(76.3, 41.05), (76.3, 41.3), (69.6, 47.4),
                         (69.0, 50.9), (69.0, 51.4)]),
     ("G_LS_B", F, 0.4, [(69.0, 51.4), (68.92, 50.1)]),
@@ -159,7 +160,7 @@ TRACKS = [
     ("PS_COMP", F, 0.15, [(79.7, 33.25), (79.825, 33.375), (85.315, 33.375),
                           (85.315, 32.6)]),
     ("PS_COMP", F, 0.2, [(85.315, 32.6), (86.785, 32.6)]),             # C25.1 -> R24.1
-    ("AGND", F, 0.2, [(83.765, 32.6), (84.35, 31.85)]),                # C25.2 pocket via
+    ("AGND", F, 0.2, [(83.765, 32.6), (84.2, 31.97)]),                 # C25.2 pocket via
     ("COMP_Z", F, 0.2, [(88.335, 32.6), (89.805, 32.6)]),
     ("PS_DITH", F, 0.2, [(92.825, 34.55), (92.825, 36.5)]),
     ("PS_SS", F, 0.15, [(78.9, 32.75), (79.2, 32.75), (79.45, 32.5),
@@ -181,11 +182,12 @@ TRACKS = [
                         (72.5, 31.3)]),                                # pin 1
     ("AGND", F, 0.2, [(76.25, 32.1), (76.25, 33.35)]),                 # pin 35 -> EP
     ("AGND", F, 0.2, [(73.1, 33.75), (74.4, 33.75)]),                  # pin 3 -> EP
-    # U3 bottom row: PGND 14<->17 under the body, 17 drops into the pour;
-    # PS_VCC 15/16 via to C22 (B west) and C23 (B, north of the G_LS_A via)
-    ("PGND", F, 0.2, [(75.25, 37.9), (75.25, 37.125), (76.75, 37.125),
-                      (76.75, 37.9)]),
+    # U3 bottom row: PGND 14<->17 linked outside the pads (around the PS_VCC
+    # via), 17 drops into the pour; PS_VCC 15/16 via to C22 (B west) and C23
+    # (B, north of the G_LS_A via)
     ("PGND", F, 0.25, [(76.75, 37.9), (76.75, 39.5)]),
+    ("PGND", F, 0.25, [(75.25, 37.9), (75.25, 39.65), (76.75, 39.65),
+                       (76.75, 39.5)]),
     ("PS_VCC", F, 0.25, [(75.75, 37.9), (76.25, 37.9)]),
     ("PS_VCC", F, 0.3, [(76.0, 37.9), (76.0, 39.0)]),
     ("PS_VCC", B, 0.3, [(76.0, 39.0), (73.1, 39.0), (72.9, 38.775)]),
@@ -193,9 +195,15 @@ TRACKS = [
     ("PS_VCC", F, 0.3, [(77.9, 39.775), (78.9, 39.3)]),                # C23.1
     ("PS_VCC", B, 0.3, [(78.9, 39.3), (78.4, 38.8), (78.4, 37.4), (76.0, 37.4),
                         (76.0, 39.0)]),
-    # U3 pin 5 (VOUT2) escape west to In2
-    ("VOUT_INT", F, 0.15, [(73.1, 34.75), (72.8, 34.75), (72.7, 34.85),
-                           (71.85, 34.85), (71.55, 34.55)]),
+    # U3 VOUT2 (pin 5) to VOUT1 (pin 26) under the body: left, bottom and
+    # right channels between the pad ring and the exposed pad (0.4 mm each side)
+    ("VOUT_INT", F, 0.15, [(73.1, 34.75), (73.875, 34.75), (73.875, 37.125),
+                           (78.125, 37.125), (78.125, 34.75), (78.9, 34.75)]),
+    # COMP2 (pin 2) dives in the left channel (0.5 mm via, SMALL_VIAS)
+    ("PS_COMP", F, 0.15, [(73.1, 33.25), (73.875, 33.2)]),
+    # RT1: AGND pad to the pocket, NTC_FET pad out past the G_LS_A B.Cu run
+    ("AGND", F, 0.2, [(71.725, 32.6), (71.6, 33.75)]),
+    ("NTC_FET", F, 0.2, [(70.075, 32.6), (69.45, 31.6)]),
     # U4 (INA240) analog ground: no pocket under it, so gather U4.2-4/7,
     # C31.2 and C33.2 on F.Cu and drop one via
     ("AGND", F, 0.25, [(102.125, 31.265), (107.075, 31.265)]),
@@ -271,8 +279,9 @@ EXTRA_VIAS = [
     ("PS_EN", 78.9, 30.2), ("PS_EN", 73.3, 30.5), ("PS_RES", 77.9, 30.6),
     ("PS_FPWM", 77.25, 29.3), ("PS_VDDA", 76.25, 31.0), ("PS_RT", 75.25, 30.1),
     ("PS_DITH", 74.4, 30.95),
-    ("AGND", 84.35, 31.85), ("PS_VCC", 76.0, 39.0), ("PS_VCC", 72.9, 38.775),
-    ("PS_VCC", 78.9, 39.3), ("VOUT_INT", 71.55, 34.55), ("AGND", 101.2, 35.3),
+    ("AGND", 84.2, 31.97), ("PS_VCC", 76.0, 39.0), ("PS_VCC", 72.9, 38.775),
+    ("PS_VCC", 78.9, 39.3), ("AGND", 101.2, 35.3),
+    ("AGND", 71.6, 33.75), ("NTC_FET", 69.45, 31.6),
     *[("PGND", x, 15.25) for x in (104.6, 105.6, 106.6)],
     *[("PGND", x, 18.95) for x in (103.9, 104.9, 105.9)],
     *[("PGND", 104.2, y) for y in (47.5, 48.9, 50.3)],
@@ -289,6 +298,9 @@ EXTRA_VIAS = [
     ("VOUT_INT", 100.6, 86.8), ("VOUT_INT", 100.6, 66.9),
     ("PGND", 107.4, 86.7), ("PGND", 107.4, 67.0),
     ("3V3", 50.15, 68.5),
+]
+SMALL_VIAS = [
+    ("PS_COMP", 73.875, 33.2, 0.5),   # inside U3's pad-ring channel
 ]
 
 # PS-002 island stitching does NOT belong here. tools/check_planes.py
@@ -345,11 +357,11 @@ def main():
             if ni.GetNetname()}
     layer_id = {"F.Cu": pcbnew.F_Cu, "B.Cu": pcbnew.B_Cu}
 
-    def add_via(net, x, y):
+    def add_via(net, x, y, d=None):
         v = pcbnew.PCB_VIA(board)
         v.SetPosition(P(x, y))
         v.SetDrill(FromMM(VIA_DRILL))
-        v.SetWidth(FromMM(VIA_D))
+        v.SetWidth(FromMM(d or VIA_D))
         v.SetViaType(pcbnew.VIATYPE_THROUGH)
         v.SetLayerPair(pcbnew.F_Cu, pcbnew.B_Cu)
         v.SetNetCode(nets[net].GetNetCode())
@@ -380,6 +392,8 @@ def main():
 
     for net, x, y in VIAS + EXTRA_VIAS:
         add_via(net, x, y)
+    for net, x, y, d in SMALL_VIAS:
+        add_via(net, x, y, d)
     for net, layer, width, pts in TRACKS:
         add_track(net, layer, width, pts)
 

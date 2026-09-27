@@ -214,9 +214,8 @@ Notable route_board facts a future session needs:
    the 120 × 80 version (wrong L1/U7 lands) is on branch `phase1-120x80`.
    Earlier review items still hold: C28 sits on U3.20, the VBUS divider
    (R60/R61/C62) sits by U10.14, and every part offset is in `gen_board.py`
-   PLACEMENT. VOUT_INT's 39.5 mm FB sense run was left as routed: it keeps
-   5.5 mm or more from SW copper on every layer and its long end is the
-   low-impedance output side. Next: owner picks the BOM `CHECK:` parts,
+   PLACEMENT. The VOUT_INT FB sense run was re-routed by Freerouting in the
+   resize and has not been re-reviewed for SW spacing. Next: owner picks the BOM `CHECK:` parts,
    then order.
 
 **Gates before ordering ANY board — including the fab-ready backplane:**

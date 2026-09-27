@@ -23,7 +23,7 @@ OUT = os.path.join(HERE, "..", "phase1-module.kicad_pcb")
 FPDIRS = [os.path.join(HERE, "..", "lib"), "/usr/share/kicad/footprints"]
 
 ORG = (20.0, 20.0)          # page position of board origin
-W, H = 120.0, 80.0          # board size
+W, H = 100.0, 80.0          # board size
 SEAM = 31.0                 # y of PGND/AGND plane split (x > AUXW)
 AUXW = 30.0                 # aux-rail column width (PGND region below seam)
 
@@ -66,7 +66,7 @@ PLACEMENT = {
     # ---- half bridge: Q1 tab in VBUS_F band, Q2 (rot180) tab right = SW
     "Q1":  (47.5, 10.0, 0),       # tab 44.05..49.65 VBUS_F; sources x50.58 SW
     "Q2":  (47.5, 23.0, 180),     # tab 45.35..50.3 SW; leads x44.42 PGND
-    "L1":  (61.0, 15.0, 0),       # pad1 SW (56.7), pad2 VOUT_INT (65.3)
+    "L1":  (60.57, 15.0, 0),     # 17 mm superset land: pad1 SW (54.17), pad2 VOUT_INT (66.98)
     "RT1": (44.0, 33.0, 0),       # FET NTC below Q2, on AGND side of seam
     "RT2": (61.0, 28.7, 0),       # inductor NTC below L1
     # SW island taps (pad into pour at y<=26.5, other pad below)
@@ -75,41 +75,41 @@ PLACEMENT = {
     "R17": (52.0, 27.2, 270),     # snub: pad1 up=SW, pad2 dn=SNUB
     "C17": (50.9, 30.4, 270),     # pad1 up=SNUB, pad2 dn=PGND (in bar)
     # ---- output bank straddle
-    "C22": (86.2, 6.9, 90),      # top-strip straddle like C78     # 220u poly
-    "C78": (75.5, 6.9, 90),     # pad1 dn in VOUT_INT, pad2 up in PGND_TOP strip
-    "C23": (69.6, 16.9, 270),     # 22u/25V bank
-    "C79": (73.3, 16.9, 270),
-    "C80": (77.0, 16.9, 270),
-    "C81": (80.7, 16.9, 270),
-    "R27": (84.7, 17.2, 270),     # 2512 preload straddle
+    "C22": (83.16, 6.9, 90),     # top-strip straddle like C78     # 220u poly
+    "C78": (74.34, 6.9, 90),    # pad1 dn in VOUT_INT, pad2 up in PGND_TOP strip
+    "C23": (71.56, 16.9, 270),     # 22u/25V bank
+    "C79": (74.78, 16.9, 270),
+    "C80": (78.0, 16.9, 270),
+    "C81": (81.22, 16.9, 270),
+    "R27": (89.52, 4.4, 90),      # 2512 preload: pad1 dn VOUT_INT, pad2 up PGND_TOP
     # ---- Kelvin shunt + sense amps below it
-    "R30": (94.5, 10.0, 0),       # pad1 VOUT_INT (91.54), pad2 VOUT_SW (97.46)
-    "U4":  (94.5, 24.0, 90),      # INA240: pin8 (92.59,21.53) faces shunt
-    "R31": (98.5, 29.0, 0),       # INA240_OUT -> I_MEAS
-    "C31": (102.2, 29.0, 0),      # I_MEAS filter (AGND pocket)
-    "C33": (99.6, 19.5, 0),       # U4 5V0
-    "U5":  (94.5, 36.0, 90),      # INA228
-    "C34": (90.5, 36.0, 270),     # U5 3V3
-    "NT1": (97.5, 31.2, 0),       # star tie on the seam
+    "R30": (86.7, 14.8, 0),       # pad1 VOUT_INT (83.74), pad2 VOUT_SW (89.66)
+    "U4":  (86.7, 28.8, 90),      # INA240: pin8 (84.79,26.33) faces shunt
+    "R31": (79.6, 33.5, 270),     # INA240_OUT -> I_MEAS
+    "C31": (79.6, 36.7, 270),     # I_MEAS filter (AGND)
+    "C33": (86.8, 21.0, 90),      # U4 5V0, inside the Kelvin pair
+    "U5":  (86.7, 40.8, 90),      # INA228
+    "C34": (83.6, 40.0, 270),     # U5 3V3
+    "NT1": (91.2, 31.0, 0),       # star tie on the seam
     # ---- disconnect pair + LTC7004 + VOUT
-    "Q3":  (102.9, 10.0, 0),      # tab VOUT_SW; sources 105.98 DISC_SRC
-    "Q4":  (111.7, 10.0, 180),    # tab VOUT 109.55..115.16; sources 108.62
-    "U6":  (107.0, 22.0, 0),      # LTC7004 under the pair (AGND pocket)
-    "C41": (107.7, 16.6, 90),     # BST: pad1 dn=LTC_BST, pad2 up in DISC pour
-    "C42": (102.0, 25.5, 270),    # 5V0 1u   (pad2 dn AGND pocket)
-    "C43": (92.8, 45.5, 270),    # moved to U7 (audit DC-001)    # 5V0 100n
-    "J4":  (116.5, 27.0, 90),    # pad1 VOUT (116.5,22), pad2 PGND (116.5,27)
+    "Q3":  (95.5, 14.0, 270),     # tab VOUT_SW (up); sources y17.08 DISC_SRC; gate (97.41,17.08)
+    "Q4":  (95.5, 22.5, 90),      # sources y19.42 DISC_SRC; tab VOUT (down); gate (93.59,19.42)
+    "U6":  (95.8, 39.6, 180),     # LTC7004 under J4 (AGND side); gate/source/BST pins face left
+    "C41": (91.5, 40.1, 90),      # BST: pad1 dn LTC_BST (U6.9), pad2 up DISC_SRC (U6.8)
+    "C42": (97.6, 42.6, 0),       # 5V0 1u below U6.1/2
+    "C43": (77.0, 44.0, 270),     # U7 5V0 100n
+    "J4":  (96.65, 34.3, 90),     # pad1 VOUT (96.65,34.3), pad2 PGND (96.65,29.3)
     # ---- OVP + disconnect logic (y 33..50)
-    "R45": (84.0, 33.0, 270),     # VOUT_INT (B.Cu tap) -> OVP_DIV
-    "R46": (84.0, 38.0, 270),
-    "C44": (87.0, 38.0, 270),
-    "U7":  (94.0, 42.0, 0),       # TLV7011 (5V0 pocket at x92..103)
-    "R47": (104.5, 42.5, 270),    # 3V3 -> REF_2V5
-    "R48": (104.5, 48.5, 270),
-    "Q9":  (89.0, 47.0, 0),       # OVP_TRIP pulls DISC_INP
-    "Q7":  (108.0, 45.5, 0),      # EN_KILL pulls DISC_INP
-    "R43": (102.0, 46.0, 270),    # OUT_REQ -> DISC_INP
-    "R44": (111.5, 45.5, 270),    # DISC_INP -> AGND
+    "R45": (81.6, 33.5, 270),     # VOUT_INT -> OVP_DIV
+    "R46": (81.6, 36.7, 270),
+    "C44": (81.6, 39.9, 270),
+    "U7":  (79.5, 44.0, 0),       # TLV7011 SC-70-5 (5V0 In2 island)
+    "R47": (82.8, 44.5, 270),     # 3V3 -> REF_2V5
+    "R48": (82.8, 47.7, 270),
+    "Q9":  (79.5, 48.0, 0),       # OVP_TRIP pulls DISC_INP
+    "Q7":  (75.5, 48.0, 0),       # EN_KILL pulls DISC_INP
+    "R43": (72.0, 48.0, 270),     # OUT_REQ -> DISC_INP
+    "R44": (94.5, 42.6, 0),       # DISC_INP -> AGND, below U6.4
     # ---- controller + comp/FB + EN cluster
     "U3":  (47.0, 36.0, 0),       # LM5145: right col = LO/VCC/EP/BST/HO/SW
     "R29": (46.2, 16.6, 270),     # VBUS_F (pad1 in band) -> PS_VIN corridor
@@ -193,43 +193,57 @@ PLACEMENT = {
     "J3":  (26.0, 76.8, 90),      # UART, runs +x to 31.1
     "J2":  (40.0, 76.8, 90),      # SWD, runs +x to 50.2
     # ---- CAN + backplane + VBUS telemetry divider
-    "U11": (98.0, 60.0, 0),       # TCAN1042
-    "C69": (93.0, 56.5, 0),       # 5V0 (pocket)
-    "C70": (93.0, 63.5, 0),       # 3V3
-    "J5":  (116.5, 50.0, 0),      # 1x08 runs +y to 67.8
+    "U11": (89.0, 60.0, 0),       # TCAN1042
+    "C69": (89.0, 56.3, 0),       # 5V0
+    "C70": (89.0, 63.7, 0),       # 3V3
+    "J5":  (96.5, 52.7, 0),       # 1x08 runs +y to 70.5
     "R60": (63.5, 73.0, 0),       # VBUS_F -> VBUS_SNS, divider by U10.14 (ADC)
     "R61": (65.0, 74.75, 0),
     "C62": (66.5, 73.0, 0),
-    # V_MEAS divider (0.1%) senses VOUT at the output connector corner
-    "R32": (110.5, 34.0, 270),
-    "R33": (110.5, 40.0, 270),
-    "C32": (107.5, 40.0, 270),
+    # V_MEAS divider (0.1%) senses VOUT by the output connector
+    "R32": (86.0, 46.0, 270),
+    "R33": (86.0, 49.2, 270),
+    "C32": (87.8, 49.2, 270),
 }
 
-MOUNT_HOLES = [(4.0, 4.0), (W - 4.0, 36.0), (4.0, H - 4.0), (W - 4.0, H - 4.0)]
-FIDUCIALS = [(10.0, 2.2), (110.0, 77.8), (2.5, 45.0)]   # audit FD-001
+MOUNT_HOLES = [(4.0, 4.0), (W - 4.0, 47.0), (4.0, H - 4.0), (W - 4.0, H - 4.0)]
+FIDUCIALS = [(10.0, 2.2), (88.0, 77.8), (2.5, 45.0)]   # audit FD-001
 
 
 # ------------------------------------------------------------------ zones --
 # (net, layer, priority, [(x,y)...], pad_connection)
-# The AGND "pocket" carves an island out of the PGND regions (higher priority
-# wins) so the LTC7004 cluster -- AGND-referenced but living in the power
-# strip -- gets correct plane reference without through-via shorts.
-POCKET = [(100.0, 16.5), (112.5, 16.5), (112.5, SEAM + 0.2), (100.0, SEAM + 0.2)]
+# The LTC7004 cluster sits below the seam on the AGND side, so the plain
+# PGND/AGND split serves every part (the 120 x 80 layout needed an AGND
+# pocket carved into the power strip; see branch phase1-120x80).
 PWR_POURS = {  # name -> F.Cu polygon (also used by pour-connection checks)
     "VBUS_F":   [(12.0, 5.0), (49.6, 5.0), (49.6, 16.0), (12.0, 16.0)],
     "PGND_IN":  [(10.0, 17.3), (44.9, 17.3), (44.9, 30.0), (10.0, 30.0)],
-    "PGND_TOP": [(66.0, 0.8), (91.0, 0.8), (91.0, 3.9), (66.0, 3.9)],
+    "PGND_TOP": [(66.0, 0.8), (91.4, 0.8), (91.4, 3.9), (66.0, 3.9)],
     "PGND_BAR": [(38.0, 30.0), (54.4, 30.0), (54.4, 31.7), (38.0, 31.7)],
     "SW":       [(50.5, 8.6), (56.9, 8.6), (56.9, 19.0), (58.4, 19.0),
                  (58.4, 26.5), (47.0, 26.5), (47.0, 19.0), (50.5, 19.0)],
-    "VOUT_INT": [(64.3, 5.0), (91.7, 5.0), (91.7, 16.0), (64.3, 16.0)],
-    "PGND_OUT": [(66.0, 17.3), (91.0, 17.3), (91.0, 30.0), (66.0, 30.0)],
-    "VOUT_SW":  [(97.4, 5.0), (104.7, 5.0), (104.7, 16.0), (97.4, 16.0)],
-    "DISC_SRC": [(105.5, 5.0), (109.9, 5.0), (109.9, 16.0), (105.5, 16.0)],
-    "VOUT":     [(110.5, 5.0), (119.5, 5.0), (119.5, 29.0), (108.0, 29.0),
-                 (108.0, 21.0), (110.5, 21.0)],
+    # stepped: full width under the top-strip caps and R27, then stops at
+    # R30 pad1 so the Kelvin VOUT_INT lead leaves from the bare pad edge
+    "VOUT_INT": [(64.3, 5.0), (91.4, 5.0), (91.4, 9.3), (83.8, 9.3),
+                 (83.8, 16.0), (64.3, 16.0)],
+    "PGND_OUT": [(70.0, 17.3), (83.0, 17.3), (83.0, 30.0), (70.0, 30.0)],
+    # right column, top to bottom: R30 pad2 + Q3 tab, the source-to-source
+    # band (notched at the two gate pads: Q3 top right, Q4 bottom left),
+    # then Q4's tab wrapping J4.2 (PGND) down to J4.1, clear of NT1.
+    "VOUT_SW":  [(89.6, 10.0), (99.5, 10.0), (99.5, 16.4), (89.6, 16.4)],
+    "DISC_SRC": [(92.9, 16.65), (96.75, 16.65), (96.75, 18.25), (98.1, 18.25),
+                 (98.1, 20.0), (94.25, 20.0), (94.25, 18.25), (92.9, 18.25)],
+    "VOUT":     [(91.2, 20.2), (99.5, 20.2), (99.5, 37.0), (93.0, 37.0),
+                 (93.0, 27.0), (91.2, 27.0)],
 }
+# In2 5V0 islands outside the aux column (priority 1 over the 3V3 plane):
+# U4/C33 inside the Kelvin pair, U6/C42, U7/C43, U11/C69.
+IN2_5V0 = [
+    [(85.0, 17.2), (88.6, 17.2), (88.6, 30.6), (85.0, 30.6)],
+    [(90.4, 37.6), (99.5, 37.6), (99.5, 44.2), (90.4, 44.2)],
+    [(75.6, 42.4), (81.2, 42.4), (81.2, 45.6), (75.6, 45.6)],
+    [(84.5, 53.5), (93.5, 53.5), (93.5, 68.0), (84.5, 68.0)],
+]
 
 
 def zone_polys():
@@ -242,17 +256,15 @@ def zone_polys():
         # inner ground planes (split at SEAM/AUXW, joined only through NT1)
         ("PGND", IN1, 0, pgnd_l, "thermal"),
         ("AGND", IN1, 0, agnd_r, "thermal"),
-        ("AGND", IN1, 1, POCKET, "thermal"),
         # In2: logic power distribution
         ("5V0", IN2, 0, [(0.5, 0.5), (AUXW, 0.5), (AUXW, H - 0.5), (0.5, H - 0.5)], "thermal"),
         ("5V0", IN2, 0, [(AUXW, 56.0), (56.0, 56.0), (56.0, H - 0.5), (AUXW, H - 0.5)], "thermal"),
-        ("5V0", IN2, 1, [(92.0, 18.0), (103.0, 18.0), (103.0, 68.0), (92.0, 68.0)], "thermal"),
+        *[("5V0", IN2, 1, poly, "thermal") for poly in IN2_5V0],
         ("3V3", IN2, 0, [(AUXW, SEAM), (W - 0.5, SEAM), (W - 0.5, H - 0.5),
                          (56.0, H - 0.5), (56.0, 56.0), (AUXW, 56.0)], "thermal"),
         # B.Cu ground fills (mirror the In1 split, tracks push through)
         ("PGND", B, 0, pgnd_l, "thermal"),
         ("AGND", B, 0, agnd_r, "thermal"),
-        ("AGND", B, 1, POCKET, "thermal"),
     ]
     for name, poly in PWR_POURS.items():
         net = {"PGND_IN": "PGND", "PGND_BAR": "PGND", "PGND_OUT": "PGND", "PGND_TOP": "PGND"}.get(name, name)
@@ -281,11 +293,10 @@ EXPECT_IN_POUR = [
     ("C79", "1", "VOUT_INT"), ("C79", "2", "PGND_OUT"),
     ("C80", "1", "VOUT_INT"), ("C80", "2", "PGND_OUT"),
     ("C81", "1", "VOUT_INT"), ("C81", "2", "PGND_OUT"),
-    ("R27", "1", "VOUT_INT"), ("R27", "2", "PGND_OUT"),
+    ("R27", "1", "VOUT_INT"), ("R27", "2", "PGND_TOP"),
     ("R30", "1", "VOUT_INT"), ("R30", "2", "VOUT_SW"),
     ("Q3", "2", "VOUT_SW"), ("Q3", "3", "DISC_SRC"),
     ("Q4", "3", "DISC_SRC"), ("Q4", "2", "VOUT"),
-    ("C41", "2", "DISC_SRC"),
     ("J4", "1", "VOUT"),
 ]
 
@@ -303,35 +314,36 @@ def point_in_poly(x, y, poly):
 
 
 def check_courtyards(board):
-    """Fast bbox overlap report on F.CrtYd; placement iteration aid."""
-    boxes = []
+    """Courtyard overlap / board-edge report on the real F.CrtYd polygons
+    (bounding boxes flag false overlaps: L1's box, round mounting holes)."""
+    from shapely.geometry import Polygon, box
+    crt = []
     for fp in board.GetFootprints():
-        bb = None
-        for g in fp.GraphicalItems():
-            if g.GetLayer() == pcbnew.F_CrtYd:
-                b = g.GetBoundingBox()
-                if bb is None:
-                    bb = [b.GetLeft(), b.GetTop(), b.GetRight(), b.GetBottom()]
-                else:
-                    bb = [min(bb[0], b.GetLeft()), min(bb[1], b.GetTop()),
-                          max(bb[2], b.GetRight()), max(bb[3], b.GetBottom())]
-        if bb:
-            boxes.append((fp.GetReference(), bb))
+        fp.BuildCourtyardCaches()
+        ps = fp.GetCourtyard(pcbnew.F_CrtYd)
+        polys = []
+        for k in range(ps.OutlineCount()):
+            ol = ps.Outline(k)
+            pts = [(pcbnew.ToMM(ol.CPoint(i).x), pcbnew.ToMM(ol.CPoint(i).y))
+                   for i in range(ol.PointCount())]
+            if len(pts) >= 3:
+                polys.append(Polygon(pts).buffer(0))
+        if polys:
+            crt.append((fp.GetReference(), polys))
     fails = 0
-    for i in range(len(boxes)):
-        for j in range(i + 1, len(boxes)):
-            (r1, a), (r2, b) = boxes[i], boxes[j]
-            ox = min(a[2], b[2]) - max(a[0], b[0])
-            oy = min(a[3], b[3]) - max(a[1], b[1])
-            if ox > 0 and oy > 0:
-                print(f"CRTYD {r1}<->{r2} overlap {pcbnew.ToMM(ox):.2f}x{pcbnew.ToMM(oy):.2f}mm")
+    for i in range(len(crt)):
+        for j in range(i + 1, len(crt)):
+            (r1, a), (r2, b) = crt[i], crt[j]
+            area = sum(p.intersection(q).area for p in a for q in b)
+            if area > 1e-4:
+                print(f"CRTYD {r1}<->{r2} overlap {area:.3f} mm^2")
                 fails += 1
     # board edge check (terminal blocks J1/J4 legitimately overhang for wire entry)
-    for ref, bb in boxes:
+    edge = box(ORG[0], ORG[1], ORG[0] + W, ORG[1] + H)
+    for ref, polys in crt:
         if ref in ("J1", "J4"):
             continue
-        if (pcbnew.ToMM(bb[0]) < ORG[0] or pcbnew.ToMM(bb[1]) < ORG[1]
-                or pcbnew.ToMM(bb[2]) > ORG[0] + W or pcbnew.ToMM(bb[3]) > ORG[1] + H):
+        if any(not edge.contains(p) for p in polys):
             print(f"CRTYD {ref} extends past board edge")
             fails += 1
     return fails

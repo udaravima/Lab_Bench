@@ -1,5 +1,7 @@
 # Lab_Bench — Multi-Channel Modular Power Supply
 
+[![CI](https://github.com/udaravima/Lab_Bench/actions/workflows/ci.yml/badge.svg)](https://github.com/udaravima/Lab_Bench/actions/workflows/ci.yml)
+
 A modular, rack-style DC power supply: up to **8 hot-pluggable 600 W buck
 modules** on a shared DC input bus, coordinated by a central manager over CAN.
 Each channel is a self-contained analog CV/CC supply with bench-grade

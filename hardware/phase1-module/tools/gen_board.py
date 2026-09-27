@@ -113,7 +113,7 @@ PLACEMENT = {
     # ---- controller + comp/FB + EN cluster
     "U3":  (47.0, 36.0, 0),       # LM5145: right col = LO/VCC/EP/BST/HO/SW
     "R29": (46.2, 16.6, 270),     # VBUS_F (pad1 in band) -> PS_VIN corridor
-    "C28": (52.9, 32.4, 90),      # PS_VIN 100n; pad2 up into PGND bar
+    "C28": (47.75, 32.2, 90),     # PS_VIN 100n right on U3.20; pad2 up into PGND bar
     "C29": (52.0, 41.5, 0),       # PS_VCC 2.2u; pad2 PGND
     "C19": (48.2, 41.0, 0),      # ILIM 15p; pad1 taps the ILIM track
     "R1":  (40.2, 34.0, 0),       # FB divider + injection at the FB pin
@@ -122,8 +122,8 @@ PLACEMENT = {
     "R2":  (40.2, 40.0, 0),
     "R24": (40.2, 42.0, 0),
     "C24": (40.2, 44.0, 0),
-    "C25": (43.4, 36.0, 0),
-    "C26": (43.4, 38.0, 0),
+    "C25": (43.2, 36.0, 0),       # 0.62 mm F.Cu channel for U3.5 FB
+    "C26": (43.4, 38.5, 0),       # room for U3.8 FPWM escape via
     "R25": (43.4, 40.0, 0),
     "C18": (43.4, 42.0, 0),       # SS
     "R26": (43.4, 44.0, 0),       # RT
@@ -157,8 +157,8 @@ PLACEMENT = {
     "U1":  (34.0, 62.0, 0),       # DAC80502
     "C3":  (30.0, 61.0, 0),
     "C4":  (37.5, 59.5, 0),       # REFIO
-    "R3":  (37.5, 61.5, 0),       # V_REF -> EAV_INV
-    "R6":  (37.5, 63.5, 0),       # I_REF -> EAI_INV
+    "R3":  (38.5, 61.5, 0),       # V_REF -> EAV_INV; 1 mm off U1 for its escapes
+    "R6":  (38.5, 63.5, 0),       # I_REF -> EAI_INV
     "U2":  (44.0, 62.0, 0),       # OPA2333
     "C5":  (49.3, 61.0, 0),       # 5V0
     "C1":  (41.0, 58.5, 0),       # EAV integrator
@@ -197,9 +197,9 @@ PLACEMENT = {
     "C69": (93.0, 56.5, 0),       # 5V0 (pocket)
     "C70": (93.0, 63.5, 0),       # 3V3
     "J5":  (116.5, 50.0, 0),      # 1x08 runs +y to 67.8
-    "R60": (101.5, 51.5, 270),    # VBUS_F -> VBUS_SNS
-    "R61": (104.0, 56.0, 270),
-    "C62": (107.0, 56.0, 270),
+    "R60": (63.5, 73.0, 0),       # VBUS_F -> VBUS_SNS, divider by U10.14 (ADC)
+    "R61": (65.0, 74.75, 0),
+    "C62": (66.5, 73.0, 0),
     # V_MEAS divider (0.1%) senses VOUT at the output connector corner
     "R32": (110.5, 34.0, 270),
     "R33": (110.5, 40.0, 270),

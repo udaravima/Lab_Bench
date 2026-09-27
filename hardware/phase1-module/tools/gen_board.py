@@ -94,9 +94,9 @@ PLACEMENT = {
     # ---- disconnect pair + LTC7004 + VOUT
     "Q3":  (95.5, 14.0, 270),     # tab VOUT_SW (up); sources y17.08 DISC_SRC; gate (97.41,17.08)
     "Q4":  (95.5, 22.5, 90),      # sources y19.42 DISC_SRC; tab VOUT (down); gate (93.59,19.42)
-    "U6":  (95.8, 39.6, 0),       # LTC7004 under J4 (AGND side of the seam)
-    "C41": (95.8, 42.6, 0),       # BST: LTC_BST <-> DISC_SRC, beside U6.8/9
-    "C42": (91.5, 39.6, 90),      # 5V0 1u by U6.1/2
+    "U6":  (95.8, 39.6, 180),     # LTC7004 under J4 (AGND side); gate/source/BST pins face left
+    "C41": (91.5, 40.1, 90),      # BST: pad1 dn LTC_BST (U6.9), pad2 up DISC_SRC (U6.8)
+    "C42": (97.6, 42.6, 0),       # 5V0 1u below U6.1/2
     "C43": (77.0, 44.0, 270),     # U7 5V0 100n
     "J4":  (96.65, 34.3, 90),     # pad1 VOUT (96.65,34.3), pad2 PGND (96.65,29.3)
     # ---- OVP + disconnect logic (y 33..50)
@@ -109,7 +109,7 @@ PLACEMENT = {
     "Q9":  (79.5, 48.0, 0),       # OVP_TRIP pulls DISC_INP
     "Q7":  (75.5, 48.0, 0),       # EN_KILL pulls DISC_INP
     "R43": (72.0, 48.0, 270),     # OUT_REQ -> DISC_INP
-    "R44": (91.5, 43.0, 270),     # DISC_INP -> AGND, by U6
+    "R44": (94.5, 42.6, 0),       # DISC_INP -> AGND, below U6.4
     # ---- controller + comp/FB + EN cluster
     "U3":  (47.0, 36.0, 0),       # LM5145: right col = LO/VCC/EP/BST/HO/SW
     "R29": (46.2, 16.6, 270),     # VBUS_F (pad1 in band) -> PS_VIN corridor

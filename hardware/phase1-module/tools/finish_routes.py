@@ -545,6 +545,17 @@ def main():
                     break
             if res or net in POWER_NETS:
                 break
+        if not res:
+            # the largest island may be boxed in (a fine-pitch pin's escape
+            # via); join two of the others first and come back for it
+            pairs = sorted(((a, b) for i, a in enumerate(others) for b in others[i + 1:]),
+                           key=lambda p: unary_union([cu.items[i][2] for i in p[0]]).distance(
+                               unary_union([cu.items[i][2] for i in p[1]])))
+            for a, b in pairs:
+                res, _ = route(cu, net, a, b, board_bb, w=TRACK_W)
+                if res:
+                    w = TRACK_W
+                    break
         if not res and base_keys:
             # rip-up: let the path run through Freerouting copper of nets
             # that have not already been ripped too often, then requeue them

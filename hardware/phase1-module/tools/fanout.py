@@ -45,21 +45,12 @@ PLANE_MARGIN = 0.45   # via centre inside its plane fill by at least this
 EDGE = 0.8
 LANE = 1.0            # escape lane kept clear past each fine-pitch pin's tip
 
-# Placement nudges (mm), applied before fan-out. The committed board's
-# placement no longer regenerates from gen_board.py (its courtyard check
-# now fails on L1/C23), so these small moves live here, with the reason:
+# Placement nudges (mm), applied before fan-out, for moves not yet in
+# gen_board.py PLACEMENT:
 NUDGES = {
-    # opens a 0.62 mm F.Cu channel between C25.2 (PS_COMP) and U3's left
-    # pin column so U3.5 FB can drop to C26.2; C25's courtyard still
-    # clears R5's by 0.04 mm
-    "C25": (-0.2, 0.0),
-    # R3/R6 sat 0.6 mm off U1's right pin tips, walling in I_REF, DAC_SDI
-    # and DAC_NSYNC; 1 mm more room fits the escapes and their vias
-    "R3": (1.0, 0.0),
-    "R6": (1.0, 0.0),
-    # gives U3.8's escape via 0.27 mm to C26.2 (see ESCAPES); C26's
-    # courtyard still clears R25's by 0.04 mm
-    "C26": (0.0, 0.5),
+    # empty: the first routing pass's nudges (C25 -0.2 x, C26 +0.5 y,
+    # R3/R6 +1 x) are folded into gen_board.py PLACEMENT (2026-09-27).
+    # Add "REF": (dx, dy) here only for a board that predates a PLACEMENT edit.
 }
 
 # PTH pads joined to their B.Cu pour solid instead of by thermal spokes.

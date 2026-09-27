@@ -221,8 +221,9 @@ NOTES = [
      "through-hole, hand-solder; SOURCING lists 2EDG 5.08 plugs C3697 for "
      "P1 bench IO, but this footprint is a 5.0 mm Phoenix PT - pick the "
      "matching header"),
-    ({P1: ["F1"]}, "through-hole, hand-solder; mini blade holder, likely "
-     "C3207114 as on the manager, not confirmed for 10 A"),
+    ({P1: ["F1"]}, "through-hole, hand-solder; the land is KiCad's "
+     "direct-solder mini blade pattern, so a 10 A mini blade (ATM) fuse "
+     "solders straight in with no holder (C3207114 does not fit it)"),
     ({BP: ["C2"]}, "SOURCING's 470 uF part C106666 is THT D10; this board "
      "uses a 16x17.5 SMD footprint - choose an SMD part"),
     ({P1: ["J2", "J3", "J5", "J6"]}, "through-hole pin header: hand-solder "

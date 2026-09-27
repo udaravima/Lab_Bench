@@ -58,8 +58,9 @@ NUDGES = {
 # SWDIO running under it on B.Cu and NRST beside it, so the AGND pour
 # gets one spoke in and DRC flags a starved thermal. The pin is also on
 # the In1 AGND plane; a solid B.Cu join on a 1 mm header pin still
-# hand-solders fine.
-SOLID_PADS = {("J2", "5")}
+# hand-solders fine. J4.2 (output terminal PGND) carries the full load
+# return straight into In1/B.Cu PGND, so spokes would only add resistance.
+SOLID_PADS = {("J2", "5"), ("J4", "2")}
 
 # Hand-placed signal escapes: (ref, pad, via x, y board-relative mm), a
 # straight F.Cu stub from the pad centre to a through via. U3's left pins

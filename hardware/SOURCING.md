@@ -6,6 +6,10 @@ LCSC/JLCPCB in one consolidated shipment to Sri Lanka** (LCSC parts +
 JLCPCB boards combine into one DHL parcel; modules/AliExpress items noted
 separately). Prices move — re-check stock the week of ordering.
 
+The LCSC numbers below are applied to the schematic symbols and the per-board
+BOMs by `common/bom.py` (table: `common/lcsc_parts.py`) — change a part there,
+then rerun it.
+
 Decisions taken this pass (user-approved 2026-07-18):
 - **Inductors:** Sunlord MWSA1707S-6R8MT ($1.72) with the phase shunts
   moved to 3.75 mΩ (2×7.5 mΩ 1206) so the worst-corner current-limit peak

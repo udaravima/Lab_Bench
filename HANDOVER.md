@@ -202,9 +202,13 @@ Notable route_board facts a future session needs:
    (see the table); what is left is 173 unconnected signal nets on a 2-layer
    board. Mostly 3-node digital nets, so hand-routing in KiCad is realistic;
    there is no `route_board.py` for this phase yet.
-3. **MPN-properties pass → BOM CSVs → order files** — LCSC part numbers
-   and prices are already verified in `hardware/SOURCING.md`; what is
-   missing is the properties in the symbols and the generated CSVs.
+3. **Order files** — the MPN/LCSC pass is done for every part SOURCING.md
+   verified: `python3 common/bom.py` (from `hardware/`) writes hidden
+   LCSC/MPN/Manufacturer properties into the schematics (surgical, additive
+   only) and emits `<board>/bom/*-bom.csv` + `*-jlcpcb.csv`. The part table
+   is `common/lcsc_parts.py`; `--check` fails if anything is stale. Still
+   open: generic R/C/jellybean/header numbers, and the `CHECK:` rows in the
+   BOMs (footprint/variant mismatches vs SOURCING.md).
 4. **Phase-1 board** — 187 unconnected; port the phase-2 autoroute fixes
    (connectivity seeding, entry-stub snap, pocket costs, net ordering)
    before hand-finishing.

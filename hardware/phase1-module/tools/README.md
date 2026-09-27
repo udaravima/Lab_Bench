@@ -72,6 +72,7 @@ xvfb-run -a java -Xss64m -jar freerouting-1.9.0.jar \
     -de wip/p1.dsn -do wip/p1.ses -mp 20 -mt 1     # 2.x CLI never finishes
 python3 import_ses.py wip/p1.ses                   # 145 -> ~18 unconnected
 python3 finish_routes.py ../phase1-module.kicad_pcb --base=/tmp/base.kicad_pcb  # -> 0 (board path first)
+python3 fb_reroute.py                              # FB run >= 5.5 mm from SW copper
 python3 ../../common/fix_fpids.py ../phase1-module.kicad_pcb
 python3 ../../common/finish_board.py ../phase1-module.kicad_pcb --silk --planes
 python3 run_drc.py                                 # 0 unconnected, 0 errors

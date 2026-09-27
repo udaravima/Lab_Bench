@@ -42,7 +42,7 @@ manager, CAN 2.0B @500k. Docs 01–07 are the spec; read 05 (build plan) first
 | Design docs 01–07 | complete (07 = module firmware, new) |
 | Phase-1 schematic | **complete, v1**: 7 generated sheets, 137 components, ~90 nets machine-verified; audited (kicad-happy + ngspice 38/40 pass) |
 | Footprints | all vetted; custom lib `labbench.pretty` (LM5145 RGY, LMR36015 RNX, DAC80502 no-EP WSON, PowerFET_SON5x6_GDS) |
-| PCB — Phase 1 | Committed board = clean pass-1 (placement + pours + planes + critical routes, 0 copper DRC), **187 unconnected**, 75 silk. The old "33 unconnected" was from an autoroute run that was never committed (its drc-report.txt is gitignored, so the stale number persisted) — verified 2026-07-26 against the committed board |
+| PCB — Phase 1 | **Routed, 0 unconnected, 0 DRC errors** (2026-09-27, draft PR from `claude/project-thread-nojoms`): pass-1 + `fanout.py` + Freerouting 1.9 + `finish_routes.py`; 1173 tracks / 358 vias. DRC = 9 silk *warnings* (6 are J1/J4 terminal-block silk over the edge, by design). Fab zip generated. Placement nudges (C25, C26, R3, R6) live in `fanout.py`, so `gen_board.py` no longer reproduces the board — see tools/README |
 | PCB — Phase 3 backplane | **FAB-READY (2026-07-26, d9e1a7b)**: 0 DRC, 0 unconnected, silk 39/39 clean, no plane islands. Gerbers+drills in `fab/` (gitignored) via `python3 ../common/finish_board.py phase3-backplane.kicad_pcb`. Cross-checked: Edge_Cuts exactly 330.00×100.00 mm; drills 2×6.4 (M6 lugs), 16×2.8 (8 slots × 2 XT60 pins), 6×3.2 (M3), 86×1.0, 61×0.4. **Still gated on the XT60 polarity buzz-out before ordering** |
 | PCB — Phase 2 | **83 unconnected, 0 copper DRC, silk clean (2026-07-26, c1a86eb)** — see the resume section; finish by hand in KiCad. Older detail below: |
 | PCB — Phase 2 (history) | **(2026-07-25, 27fb2d1).** `gen_board.py` placement green (173 comps, all pour/courtyard/edge assertions pass, 130×90 4-layer); `route_board.py` pass-1 done (power pours, In2 heat patches, both phases' gate fan-outs, Kelvin pairs, disconnect trunk). DRC: **copper down to ~19 clearance + ~11 dangling/mask/hole in 3 known clusters** (see resume section); 243 unconnected = signal nets, autoroute not yet run. Found & fixed a real LM5143 land-pattern bug in the process (see load-bearing decisions) |
@@ -205,9 +205,11 @@ Notable route_board facts a future session needs:
 3. **MPN-properties pass → BOM CSVs → order files** — LCSC part numbers
    and prices are already verified in `hardware/SOURCING.md`; what is
    missing is the properties in the symbols and the generated CSVs.
-4. **Phase-1 board** — 187 unconnected; port the phase-2 autoroute fixes
-   (connectivity seeding, entry-stub snap, pocket costs, net ordering)
-   before hand-finishing.
+4. **Phase-1 board** — routed (0 unconnected, 0 DRC errors). Review before
+   ordering: the long thin sense runs (VBUS_F to R60.1 is 79 mm with 4 vias,
+   VOUT_INT to L1.2 39.5 mm), C28's PS_VIN decoupling (7.1 mm, 1 via) and
+   the placement nudges. Then fold the nudges back into `gen_board.py`
+   PLACEMENT.
 
 **Gates before ordering ANY board — including the fab-ready backplane:**
 
@@ -367,12 +369,15 @@ that the average is servo'd but ripple is skip-mode coarse.
 - **Phase-2: 83 connections to finish by hand** — see the resume section.
 - **`route_board.py` is not deterministic** (67/68/66 pad-vias on identical
   input). Harmless today, but it breaks the reproducibility contract.
-- **Freerouting does not work on this board** — evidence in the resume
-  section; the KiCad plugin hits the same StackOverflowError.
-- Phase-1 `autoroute.py`: router-via self-spacing bug, congested U3/U10
-  escapes — its header has the fix list. Deferred. (Its old "33 unconnected"
-  claim was wrong; the committed board is **187** — see the table.)
-- Phase-1/2 DRC noise is now **silk only** (75 and 11, cosmetic). The
+- **Freerouting does not work on the phase-2 board** — evidence in the resume
+  section; the KiCad plugin hits the same StackOverflowError. On phase-1 it
+  works headless as **1.9.0** under `xvfb-run` with `-Xss64m` (2.x's CLI
+  never finished); see phase1-module/tools/README.md. phase-2's
+  `import_ses.py` is broken (KiCad 7 `ImportSpecctraSES` takes no board);
+  phase-1's has a working SES parser to port.
+- Phase-1 `autoroute.py` is superseded by fanout.py + Freerouting +
+  finish_routes.py (the board is routed); kept for reference.
+- Phase-1/2 DRC noise is now **silk only** (9 and 11 warnings, cosmetic). The
   `lib_footprint_issues` pile is gone and was never "harmless bookkeeping" —
   see the shared-tooling section for what it was actually hiding.
 - **`run_drc.py` in phase-1, phase-2 and phase-3-backplane still always

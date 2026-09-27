@@ -62,10 +62,8 @@ def main():
                 print(f"  !{typ}: {chunk.splitlines()[0][:120]}")
 
     if errors:
-        print(f"FAIL: {errors} error-severity/unconnected item(s). "
-              f"Unconnected items are expected until the board is routed — "
-              f"this board is a placement pass, so a nonzero exit here is "
-              f"the honest answer, not a regression.")
+        print(f"FAIL: {errors} error-severity/unconnected item(s). The board "
+              f"is routed (2026-09-27), so any of these is a regression.")
     else:
         print("PASS: no error-severity violations, no unconnected items.")
     sys.exit(1 if errors else 0)

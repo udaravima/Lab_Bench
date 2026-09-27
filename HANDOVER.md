@@ -47,7 +47,7 @@ manager, CAN 2.0B @500k. Docs 01–07 are the spec; read 05 (build plan) first
 | PCB — Phase 2 | **83 unconnected, 0 copper DRC, silk clean (2026-07-26, c1a86eb)** — see the resume section; finish by hand in KiCad. Older detail below: |
 | PCB — Phase 2 (history) | **(2026-07-25, 27fb2d1).** `gen_board.py` placement green (173 comps, all pour/courtyard/edge assertions pass, 130×90 4-layer); `route_board.py` pass-1 done (power pours, In2 heat patches, both phases' gate fan-outs, Kelvin pairs, disconnect trunk). DRC: **copper down to ~19 clearance + ~11 dangling/mask/hole in 3 known clusters** (see resume section); 243 unconnected = signal nets, autoroute not yet run. Found & fixed a real LM5143 land-pattern bug in the process (see load-bearing decisions) |
 | PCB — Phase 3 backplane | **COMPLETE pass-1 (2026-07-25)**: `phase3-backplane/tools/gen_board.py` (single-script: placement + 2oz bus pours + stitching + ALL signal routing) — **0 copper DRC, 0 unconnected**; only lib-bookkeeping (39) + 1 silk nick remain. 8 slots @30mm (XT60PW-F rot-90 mates the module pad-for-pad, socket y60..77.8 = module J5 1:1), M6 lugs -> RS1‖RS2 0.5mΩ Kelvin-sensed by INA228, nested PRESENT L-bus, CAN terminated past both end slots, E-stop chain threaded per docs. Netlist from `tools/wip/bp.net` (regenerate via kicad-cli) |
-| PCB — Phase 3 manager | **placement pass complete, 0 DRC (2026-07-26)**: 100×80 2L, 87 footprints (80 comps + 4 M3 + 3 fiducials), 86 nets, F.Cu 3V3 / B.Cu PGND planes, antenna keep-out verified copper-free. **173 unconnected = the signal nets; routing is the next pass.** Reproduce: `cd tools && python3 gen_board.py wip/mgr.net` → `python3 ../../common/fix_fpids.py ../phase3-manager.kicad_pcb` → `python3 ../../common/finish_board.py ../phase3-manager.kicad_pcb --silk --planes` → `python3 run_drc.py` |
+| PCB — Phase 3 manager | **Routed, 0 unconnected, 0 DRC errors (2026-09-27, draft PR into `development` from `claude/route-manager-shxsg1`)**: placement reworked (15+ passives had been placed by stale refdes, far from their pins; U8 buck re-laid tight round its pinout; U11 turned so CAN faces J1; U12 in the USB path), PGND now poured on both layers (was F.Cu 3V3 / B.Cu PGND), USB + CAN pairs and buck power copper hand-drawn and locked (`route_critical.py`), rest Freerouting 1.9 + `finish_routes.py`, 283 PGND stitch vias. DRC = 5 warnings (4 silk, 1 U8 courtyard-override lib mismatch). Antenna keep-out copper-free. Pipeline: `phase3-manager/tools/README.md` |
 | Module firmware | v0.1 builds clean (6.3 KB): full peripheral binding + CAN dispatch around the host-tested `module_core`. Untested on silicon (no board yet) |
 | Host tests | `cd firmware/tests && make test` — must stay green. **5 suites now**: can, core, manager, scpi, ui |
 | Manager firmware | **v0.2 COMPLETE (2026-07-25, commit 174595e)**: `scpi_core` + `ui_core` join `manager_core` as host-tested cores; ESP-IDF shell fully written (display/encoder/USB-SCPI/app_main). **First compile 2026-09-27: builds clean on IDF v5.3.2** (355 KB image, two build fixes). Untested on silicon. See docs/10 |
@@ -198,10 +198,10 @@ Notable route_board facts a future session needs:
 1. **Finish Phase-2 board** — hand-route the remaining 83 connections in
    KiCad (table + per-item coords in the resume section), then
    `../common/finish_board.py` (silk + planes + fab) and `run_drc.py`.
-2. **Phase-3 manager board — ROUTE it.** Placement is done and DRC-clean
-   (see the table); what is left is 173 unconnected signal nets on a 2-layer
-   board. Mostly 3-node digital nets, so hand-routing in KiCad is realistic;
-   there is no `route_board.py` for this phase yet.
+2. **Phase-3 manager board — routed (2026-09-27).** Review before ordering:
+   the J3 breakout is tied to the USB4105 land pattern while the USB-C part
+   is still an open pick; 13 nets cross under the USB pair on B.Cu (fine at
+   full speed); the 0.2 mm drilling gate below still applies.
 3. **Order files** — the MPN/LCSC pass is done for every part SOURCING.md
    verified: `python3 common/bom.py` (from `hardware/`) writes hidden
    LCSC/MPN/Manufacturer properties into the schematics (surgical, additive

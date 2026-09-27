@@ -102,13 +102,20 @@ PARTS = [
     ({MGR: ["J3"]}, "C165948", "TYPE-C-31-M-12", "Korean Hroparts", 0.16,
      "CHECK: footprint is GCT USB4105 - swap to the TYPE-C-31-M-12 land "
      "before ordering, or order a USB4105"),
-    ({MGR: ["ENC1"]}, "C2831776", "", "", 0.036, "generic EC11"),
-    ({MGR: ["BZ1"]}, "C94599", "MLT-8530", "", 0.18,
-     "verify 5 V drive on datasheet"),
+    # C2831776 (the old "generic EC11") is a 100 uF/50 V electrolytic, and
+    # the MLT-8530 is rated 2.5-4.5 V but hangs off 5V0 - replaced 2026-09-27.
+    ({MGR: ["ENC1"]}, "C255515", "EC11E18244A5", "Alps Alpine", 2.40,
+     "EC11E with push switch; EasyEDA land A/B/C + D/E switch + 2 lugs "
+     "matches the EC11E-Switch footprint"),
+    ({MGR: ["BZ1"]}, "C781886", "YX-SMD8530P", "Yuexin", 0.39,
+     "5 V-rated (2-5 V) drop-in for the 3.6 V MLT-8530; vendor land "
+     "is identical, pad 1 (+) in the same corner"),
     ({P2: ["F1"]}, "C3207132", "", "", 0.42,
      "ATO fuse HOLDER; the 35 A fuse itself is bought separately"),
-    ({MGR: ["F1"]}, "C3207114", "", "", 0.64,
-     "mini blade fuse HOLDER; the 2 A fuse itself is bought separately"),
+    # F1's land is Fuse_Blade_Mini_directSolder: the fuse's own blades
+    # solder in. C3207114 was a 6.35 mm cylindrical clip, not a holder.
+    ({MGR: ["F1"]}, "C151091", "0297002.WXNV", "Littelfuse", 0.11,
+     "2 A MINI blade fuse, soldered directly into the land (no holder)"),
 
     # ---- D. Phase-1 passives & small parts (JLCPCB catalogue, 2026-09-27) --
     ({P1: ["C1"]}, "C57112", "0603B103K500NT", "FH", 0.0108,
@@ -221,8 +228,9 @@ NOTES = [
      "through-hole, hand-solder; SOURCING lists 2EDG 5.08 plugs C3697 for "
      "P1 bench IO, but this footprint is a 5.0 mm Phoenix PT - pick the "
      "matching header"),
-    ({P1: ["F1"]}, "through-hole, hand-solder; mini blade holder, likely "
-     "C3207114 as on the manager, not confirmed for 10 A"),
+    ({P1: ["F1"]}, "through-hole, hand-solder; the land is a direct-solder "
+     "MINI blade fuse, not a holder - fit a 10 A 0297-series fuse "
+     "(C3207114 is a cylindrical clip and does not fit)"),
     ({BP: ["C2"]}, "SOURCING's 470 uF part C106666 is THT D10; this board "
      "uses a 16x17.5 SMD footprint - choose an SMD part"),
     ({P1: ["J2", "J3", "J5", "J6"]}, "through-hole pin header: hand-solder "

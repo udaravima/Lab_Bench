@@ -46,6 +46,7 @@ if the schematic changes, board.h must follow):
 | PA5/7 | DAC SCLK/SDI | SPI1 AF5 | PB5 | AUX_PG | in |
 | PA6 | VBUS_SNS | ADC2_IN3 | PB6 | HW_EN | in, high=enabled |
 | PA8/9 | I2C SDA/SCL | I2C2 AF4 | PB7 | INA_ALERT | in, **internal pull-up** |
+| | | | PB4 | OVP_TRIP | in, pull-down, EXTI4 rising |
 | PA10 | CAN_STB | out, low=run | PB10 | FAN_PWM | TIM2_CH3 AF1 |
 | PA11/12 | CAN RX/TX | FDCAN1 AF9 | PB11-13 | SLOT_ID | in, pull-up, inverted |
 | PA15 | PS_PGOOD | in | PB14 | OUT_REQ | out, high=close |
@@ -78,9 +79,12 @@ FAULT frame on any state/fault-bit change.
 Per 1 ms tick:
 1. ADC scan; hottest NTC -> `lb_core_set_temp` (derate #11 / OTP #12).
 2. `lb_core_tick` (ramp, envelope, comms timeout).
-3. Backup latches: V_MEAS > 112 % of v_max -> OVP fault #4 (reporting only —
-   the comparator already tripped the disconnect); INA_ALERT low in ACTIVE ->
-   OCP backup #2.
+3. Latches: OVP_TRIP (PB4) high, or its EXTI4 edge seen -> OVP fault #4
+   (the EXTI handler already set PS_OFF and cleared OUT_REQ within µs);
+   V_MEAS > 112 % of v_max -> OVP #4 as a terminal-side backup;
+   `lb_core_ocp_sample`: INA240 current > 110 % of i_max, or INA_ALERT low
+   (INA228 SOVL programmed to the same limit at boot), for > 5 ms while the
+   output is closed -> OCP backup #2.
 4. DAC references written with calibration applied.
 5. Outputs: `PS_OFF = !(state ok && mode!=OFF && hw_enable)`;
    `OUT_REQ = output_closed && PS_PGOOD`; `PS_FPWM = !DEM`.

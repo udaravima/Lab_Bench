@@ -72,7 +72,7 @@ Decisions taken this pass (user-approved 2026-07-18):
 | XT60PW-M (Amass) | C98732 | 0.54 | 29k | module power edge + P2 output |
 | XT60PW-F (Amass) | C428722 | 0.56 | 8.4k | backplane, ×8 slots |
 | 2.54 header/socket strips | — | ~0.05 | ≫100k | slot signal rows, UART/SWD |
-| TYPE-C-31-M-12 | C165948 | 0.16 | 336k | manager USB |
+| GCT USB4105-GF-A | C3020560 | 1.30 | 1.1k at JLCPCB | manager USB (J3). 2026-09-28: matches the routed land. LCSC retail shows 0, JLCPCB assembly stock holds it; backup USB4105-GF-A-120 C5184243 (4.7k). The cheaper TYPE-C-31-M-12 C165948 has longer pads and would need the J3 breakout re-routed |
 | EC11E encoder with switch (Alps EC11E18244A5) | C255515 | 2.40 | 766 | 2026-09-27: the old "generic EC11" C2831776 was really a 100 µF/50 V electrolytic; no generic EC11 with switch is listed |
 | YX-SMD8530P SMD buzzer (Yuexin) | C781886 | 0.39 | 368 | 2026-09-27: replaces MLT-8530 C94599, which is rated 2.5–4.5 V but runs from 5V0; same vendor land, pad 1 (+) in the same corner |
 | ATO fuse holder | C3207132 | 0.42 | 997 | module 35 A |

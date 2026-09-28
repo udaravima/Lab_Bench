@@ -22,8 +22,8 @@ length-matched tracks on F.Cu over the B.Cu ground.
   B7-A7 with a U under it. 0.25 mm / 0.2 mm gap. Controlled 90-ohm
   impedance is not achievable on 1.6 mm two-layer stock and is not needed
   at full speed; the pair is kept coupled and matched instead. The J3 end
-  is tied to the USB4105 land pattern, and the USB-C part is still an open
-  choice: redraw it if the footprint changes.
+  is tied to the USB4105 land pattern (J3 = GCT USB4105-GF-A): redraw it
+  if the footprint changes.
 
   CAN (500 kbit/s): J1 pins 7/8 -> U11 pins 7/6, up the clear x~9 channel.
   U11 is turned 180 in gen_board.py so its bus pins face J1. The two nets

@@ -316,9 +316,11 @@ P1_DISCONNECT = {
     "ovp_top": "158K 1%",
     "ovp_bot": "20K 1%",
     "ref_tl431": False,
+    "ovp_to_mcu": True,
     "note": "OUTPUT DISCONNECT: back-to-back NFETs (blocks battery back-feed when off),\\n"
             "LTC7004 charge-pump gate driver. INP = OUT_REQ AND NOT(EN_KILL) AND NOT(OVP).\\n"
-            "OVP: VOUT_INT/8.9 vs 2.5V ref -> trips at 22.25V, independent of firmware.",
+            "OVP: VOUT_INT/8.9 vs 2.5V ref -> trips at 22.25V, independent of firmware.\\n"
+            "OVP_TRIP also goes to MCU PB4: firmware kills EN and latches the fault.",
 }
 P1_AUX_RAILS = {
     "vin_net": "VBUS_F",
@@ -329,7 +331,7 @@ P1_AUX_RAILS = {
 }
 P1_MCU_CAN = {
     "vbus_net": "VBUS_F",
-    "pb4": "nc",
+    "pb4": "OVP_TRIP",
     "note": "MCU: STM32G431CBT6. SPI1->DAC, I2C1->INA228, FDCAN1->TCAN1042 (VCC 5V bus\\n"
             "drive, VIO 3V3 logic). 8MHz crystal for CAN clock accuracy. OUT_REQ on PB14\\n"
             "(PB4 NJTRST reset pull-up would close the disconnect at boot). Slot straps\\n"
@@ -448,7 +450,7 @@ EXPECTED_NETS = {
     "OUT_REQ":   {"R43.1", "U10.28"},
     "OVP_DIV":   {"R45.2", "R46.1", "C44.1", "U7.3"},
     "REF_2V5":   {"R47.2", "R48.1", "U7.4"},
-    "OVP_TRIP":  {"U7.1", "Q9.1"},
+    "OVP_TRIP":  {"U7.1", "Q9.1", "U10.41"},   # PB4: firmware OVP latch
     # -- aux rails
     "SW_AUX":    {"U8.12", "L2.1", "C52.2"},
     "AUX_BOOT":  {"U8.4", "C52.1"},

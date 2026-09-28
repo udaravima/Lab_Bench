@@ -99,9 +99,12 @@ PARTS = [
     ({P2: ["J1", "J4"]}, "C98732", "XT60PW-M", "Amass", 0.54, ""),
     ({BP: ["J10", "J11", "J12", "J13", "J14", "J15", "J16", "J17"]},
      "C428722", "XT60PW-F", "Amass", 0.56, ""),
-    ({MGR: ["J3"]}, "C165948", "TYPE-C-31-M-12", "Korean Hroparts", 0.16,
-     "CHECK: footprint is GCT USB4105 - swap to the TYPE-C-31-M-12 land "
-     "before ordering, or order a USB4105"),
+    # 2026-09-28: the board is routed to the USB4105 land, so order that part.
+    # LCSC shows 0 stock but JLCPCB assembly holds 1.1k; -120 (C5184243, 4.7k,
+    # longer shell stakes) is the backup. TYPE-C-31-M-12 needs a re-route.
+    ({MGR: ["J3"]}, "C3020560", "USB4105-GF-A", "Global Connector Technology",
+     1.30, "stocked at JLCPCB assembly, not LCSC retail; backup "
+     "USB4105-GF-A-120 C5184243"),
     # C2831776 (the old "generic EC11") is a 100 uF/50 V electrolytic, and
     # the MLT-8530 is rated 2.5-4.5 V but hangs off 5V0 - replaced 2026-09-27.
     ({MGR: ["ENC1"]}, "C255515", "EC11E18244A5", "Alps Alpine", 2.40,

@@ -199,8 +199,8 @@ Notable route_board facts a future session needs:
    KiCad (table + per-item coords in the resume section), then
    `../common/finish_board.py` (silk + planes + fab) and `run_drc.py`.
 2. **Phase-3 manager board — routed (2026-09-27).** Review before ordering:
-   the J3 breakout is tied to the USB4105 land pattern while the USB-C part
-   is still an open pick; 13 nets cross under the USB pair on B.Cu (fine at
+   J3 is the GCT USB4105-GF-A (C3020560, picked 2026-09-28 to match the
+   routed land; JLCPCB assembly stock, backup -120 C5184243); 13 nets cross under the USB pair on B.Cu (fine at
    full speed); the 0.2 mm drilling gate below still applies.
 3. **Order files** — the MPN/LCSC pass is done for every part SOURCING.md
    verified: `python3 common/bom.py` (from `hardware/`) writes hidden

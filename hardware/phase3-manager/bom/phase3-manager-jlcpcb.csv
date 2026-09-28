@@ -1,5 +1,5 @@
 Comment,Designator,Footprint,LCSC Part #
-MLT-8530,BZ1,MLT-8530,C94599
+MLT-8530,BZ1,MLT-8530,C781886
 4.7u/50V,"C50,C51",C_1210_3225Metric,
 100n,"C52,C65,C66,C69,C70,C73,C74,C75,C76",C_0603_1608Metric,
 1u,"C53,C68",C_0603_1608Metric,
@@ -11,10 +11,10 @@ SMBJ33A,D5,D_SMB,
 LED_STAT,D7,LED_0603_1608Metric,
 LED_CAN,D8,LED_0603_1608Metric,
 1N4148W,D9,D_SOD-323,
-EC11,ENC1,RotaryEncoder_Alps_EC11E-Switch_Vertical_H20mm,C2831776
-2A mini blade,F1,Fuse_Blade_Mini_directSolder,C3207114
+EC11,ENC1,RotaryEncoder_Alps_EC11E-Switch_Vertical_H20mm,C255515
+2A mini blade,F1,Fuse_Blade_Mini_directSolder,C151091
 BACKPLANE,J1,PinHeader_1x20_P2.54mm_Vertical,
-USB-C,J3,USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal,C165948
+USB-C,J3,USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal,C3020560
 UART,J4,PinHeader_1x03_P2.54mm_Vertical,
 PANEL KEYS,J5,PinHeader_1x09_P2.54mm_Vertical,
 ILI9341 LCD MODULE,J6,PinHeader_1x14_P2.54mm_Vertical,

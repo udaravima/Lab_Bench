@@ -114,6 +114,25 @@ void lb_core_fault(lb_core *c, uint8_t fault_bit)
     c->vref_uv = 0;
 }
 
+int32_t lb_core_ocp_limit_ua(const lb_core_cfg *cfg)
+{
+    return cfg->i_max_ua + cfg->i_max_ua / 10;
+}
+
+void lb_core_ocp_sample(lb_core *c, int32_t i_ua, bool ina_alert, uint32_t dt_ms)
+{
+    bool over = i_ua > lb_core_ocp_limit_ua(&c->cfg) || ina_alert;
+    if (!over || !lb_core_output_closed(c)) {
+        c->ocp_over_ms = 0;
+        return;
+    }
+    c->ocp_over_ms += dt_ms;
+    if (c->ocp_over_ms > LB_OCP_BACKUP_MS) {
+        c->ocp_over_ms = 0;
+        lb_core_fault(c, LB_FAULT_OCP_BACKUP);
+    }
+}
+
 void lb_core_tick(lb_core *c, uint32_t dt_ms)
 {
     if (c->ms_since_mgr <= c->cfg.comms_timeout_ms) c->ms_since_mgr += dt_ms;

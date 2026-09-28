@@ -2,7 +2,8 @@
  * main.c — Phase-1 module firmware: binds the host-tested module_core to the
  * STM32G431 peripherals. Architecture per docs/02 s.8: the analog CV/CC loops
  * regulate; this firmware only moves setpoints, opens/closes the output and
- * reports. Nothing here is in the fast safety path (OVP/OCP are hardware).
+ * reports. The fast OVP action is hardware (TLV7011 opens the disconnect);
+ * firmware adds the converter kill and the latch (EXTI4), and the OCP backup.
  *
  * Loop layout: main loop polls CAN + kicks the watchdog continuously;
  * a 1 ms tick samples ADCs, runs lb_core_tick, drives DAC/GPIO;
@@ -16,6 +17,7 @@ static uint8_t slot;
 static adc_raw raw;
 static int32_t ina_v_uv, ina_i_ua;        /* precise telemetry (INA228) */
 static bool ina_ok;
+static volatile bool ovp_tripped;          /* set by EXTI4, latched below */
 
 /* ---- GPIO ------------------------------------------------------------- */
 static void gpio_init(void)
@@ -44,17 +46,51 @@ static void gpio_init(void)
     GPIOA->AFR[1] = (4u << 0) | (4u << 4) | (9u << 12) | (9u << 16);
     /* keep SWD: PA13/14 AF0 is default in AFR, MODER=AF already set above */
 
-    /* PB: 0,1 analog; 2,3,14,15 out; 5,6,7 in; 10 AF1; 11,12,13 in pull-up */
+    /* PB: 0,1 analog; 2,3,14,15 out; 4,5,6,7 in; 10 AF1; 11,12,13 in pull-up
+     * (PB4 leaves reset as NJTRST AF with a pull-up; this makes it a plain
+     * input with a pull-down, so an unfitted U7 reads "no trip"). */
     GPIOB->MODER =
-        (3u << 0) | (3u << 2) | (1u << 4) | (1u << 6) |
+        (3u << 0) | (3u << 2) | (1u << 4) | (1u << 6) | (0u << 8) |
         (0u << 10) | (0u << 12) | (0u << 14) |
         (2u << 20) |
         (0u << 22) | (0u << 24) | (0u << 26) |
         (1u << 28) | (1u << 30);
     /* SLOT_ID pull-ups + PB7: INA228 ALERT is open-drain and the board has
      * no external pull-up on that net — the internal one is required. */
-    GPIOB->PUPDR = (1u << 14) | (1u << 22) | (1u << 24) | (1u << 26);
+    GPIOB->PUPDR = (2u << 8) | (1u << 14) | (1u << 22) | (1u << 24) | (1u << 26);
     GPIOB->AFR[1] = (1u << 8);                             /* PB10 TIM2_CH3 */
+}
+
+/* ---- hardware OVP trip (matrix #4) -------------------------------------- */
+/* The TLV7011 opens the disconnect by itself (Q9 on DISC_INP) but cannot
+ * stop the converter or hold anything off: it is a plain comparator. Its
+ * output also reaches PB4, so the rising edge kills LM5145 EN (PS_OFF ->
+ * EN_KILL, which also holds DISC_INP low through Q7) within microseconds, and
+ * the 1 ms tick latches OVP_HW until RESET(0x5A) with VOUT_INT back below
+ * the threshold. */
+static void ovp_trip_init(void)
+{
+    RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+    SYSCFG->EXTICR[1] = (SYSCFG->EXTICR[1] & ~SYSCFG_EXTICR2_EXTI4)
+                      | SYSCFG_EXTICR2_EXTI4_PB;
+    EXTI->RTSR1 |= EXTI_RTSR1_RT4;
+    EXTI->PR1 = EXTI_PR1_PIF4;
+    EXTI->IMR1 |= EXTI_IMR1_IM4;
+    NVIC_SetPriority(EXTI4_IRQn, 0);
+    NVIC_EnableIRQ(EXTI4_IRQn);
+}
+
+void EXTI4_IRQHandler(void)
+{
+    EXTI->PR1 = EXTI_PR1_PIF4;
+    /* a real trip holds the comparator high for as long as VOUT_INT is over
+     * the threshold; an edge already gone at ISR entry (~0.2 us) is coupled
+     * noise on the 40 mm OVP_TRIP run, not an overvoltage */
+    if (!OVP_TRIP_IN())
+        return;
+    PS_OFF_SET(1);
+    OUT_REQ_SET(0);
+    ovp_tripped = true;
 }
 
 /* ---- fan PWM: TIM2_CH3, 25 kHz ---------------------------------------- */
@@ -174,14 +210,23 @@ static void tick_1ms(void)
     lb_core_set_hw_enable(&core, HW_EN_IN());
     lb_core_tick(&core, 1);
 
-    /* backup OVP check (matrix #4 reports; hardware comparator acts) */
+    /* OVP (matrix #4): the comparator output latches here. The level check
+     * also re-asserts the fault after RESET while VOUT_INT is still high. */
+    if (ovp_tripped || OVP_TRIP_IN()) {
+        ovp_tripped = false;
+        lb_core_fault(&core, LB_FAULT_OVP_HW);
+    }
+    /* backup OVP check on the terminals (V_MEAS is after the disconnect) */
     int32_t v_uv = lb_cal_apply(&cal.cal[LB_CAL_VMEAS],
                                 (int32_t)raw.v_meas * V_MEAS_UV_PER_COUNT);
     if (v_uv > core.cfg.v_max_uv + core.cfg.v_max_uv / 8)
         lb_core_fault(&core, LB_FAULT_OVP_HW);
-    /* INA228 alert pin: OCP backup latch (matrix #2) */
-    if (!INA_ALERT_IN() && core.state == LB_STATE_ACTIVE)
-        lb_core_fault(&core, LB_FAULT_OCP_BACKUP);
+    /* OCP backup (matrix #2): INA240 via the ADC, and the INA228 ALERT
+     * (SOVL programmed to the same 110 % limit), >5 ms -> latch */
+    lb_core_ocp_sample(&core,
+                       lb_cal_apply(&cal.cal[LB_CAL_IMEAS],
+                                    (int32_t)raw.i_meas * I_MEAS_UA_PER_COUNT),
+                       !INA_ALERT_IN(), 1);
 
     /* references out (calibration at the DAC boundary) */
     dac_write_v(dac_counts_v(
@@ -192,8 +237,13 @@ static void tick_1ms(void)
     /* output controls: converter EN, disconnect, DEM/FPWM */
     bool run = core.state != LB_STATE_FAULT_LATCHED && core.hw_enable
              && core.out_mode != LB_OUT_OFF;
-    PS_OFF_SET(!run);
-    OUT_REQ_SET(lb_core_output_closed(&core) && PS_PGOOD_IN());
+    /* an OVP edge landing after the latch check above must not be undone
+     * here: with IRQs masked it either shows in the flag or runs after */
+    __disable_irq();
+    bool trip = ovp_tripped;
+    PS_OFF_SET(!run || trip);
+    OUT_REQ_SET(!trip && lb_core_output_closed(&core) && PS_PGOOD_IN());
+    __enable_irq();
     FPWM_SET(!lb_core_dem(&core));
 
     /* fan: proportional 40..100 % between 45 and 75 degC */
@@ -282,7 +332,9 @@ int main(void)
     adc_init();
     dac_init();
     fan_init();
-    ina_ok = ina228_init();
+    ovp_trip_init();
+    ina_ok = ina228_init() &&
+             ina228_set_ocp_limit(lb_core_ocp_limit_ua(&core.cfg));
     if (!ina_ok) {
         uart_puts("INA228 missing\n");
         lb_core_fault(&core, LB_FAULT_SENSE);      /* matrix #18 */

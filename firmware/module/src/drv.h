@@ -26,6 +26,7 @@ void dac_write_i(uint16_t counts);   /* DAC-B = I_REF */
 
 /* ina228.c — I2C2, addr 0x40 (A1=A0=GND) */
 bool ina228_init(void);              /* false: not responding (fault #18) */
+bool ina228_set_ocp_limit(int32_t i_ua);   /* SOVL -> ALERT (matrix #2) */
 bool ina228_read(int32_t *vbus_uv, int32_t *cur_ua);
 bool ina228_read_energy(int64_t *charge_nAh, int64_t *energy_nWh);
 

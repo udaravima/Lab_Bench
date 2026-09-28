@@ -42,6 +42,7 @@ typedef struct {
     int32_t     iset_ua;
     int32_t     vref_uv;         /* live, ramped V reference          */
     uint32_t    ms_since_mgr;
+    uint32_t    ocp_over_ms;     /* consecutive ms above the backup limit */
 } lb_core;
 
 void lb_core_init(lb_core *c, const lb_core_cfg *cfg);
@@ -58,6 +59,14 @@ void lb_core_mgr_seen(lb_core *c);                   /* any manager frame */
 void lb_core_set_hw_enable(lb_core *c, bool enabled);
 void lb_core_set_temp(lb_core *c, int16_t dC);
 void lb_core_fault(lb_core *c, uint8_t fault_bit);   /* latching, matrix rows */
+
+/* Matrix #2, OCP backup for a failed CC loop: latches OCP_BACKUP once the
+ * output current has been above 110 % of i_max, or the INA228 alert (same
+ * limit, programmed by the HAL) has been asserted, for more than
+ * LB_OCP_BACKUP_MS consecutive ms while the output is closed. */
+#define LB_OCP_BACKUP_MS 5u
+int32_t lb_core_ocp_limit_ua(const lb_core_cfg *cfg);
+void lb_core_ocp_sample(lb_core *c, int32_t i_ua, bool ina_alert, uint32_t dt_ms);
 
 /* -- periodic -------------------------------------------------------------- */
 void lb_core_tick(lb_core *c, uint32_t dt_ms);

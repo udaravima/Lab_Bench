@@ -31,7 +31,7 @@ Decisions taken this pass (user-approved 2026-07-18):
 | CSD19536KTT | C2687963 | 4.94 | **12** | hot-swap pass FET — SOA-critical, no clone. **Order early** |
 | STM32G431CBT6 | C529355 | 2.85 | 67k | |
 | DAC80502DRXR | C1880990 | 4.19 | 189 | |
-| INA228AIDGSR | C2887910 | 3.83 | 236 | ×1/module + 1 backplane |
+| INA228AQDGSRQ1 | C5214669 | 17.16 | 142 | ×1/module + 1 backplane. The AIDGSR (C2887910, $3.83) was out of stock on 2026-09-28; the Q1 grade is pin- and register-identical. Swap back if it returns |
 | INA240A3DR | C2060584 | 1.87 | 1.7k | |
 | OPA2333AIDGKR | C19608 | 1.14 | 1.3k | |
 | TCAN1042VDRQ1 | C485806 | 0.57 | 2.6k | V = VIO variant ✓ (Phase-1 finding) |
@@ -60,7 +60,7 @@ Decisions taken this pass (user-approved 2026-07-18):
 | 1.5 mΩ 2512 3 W 1 % | C49837991 | 0.044 | 4k | LM5069 R_SNS |
 | 2 mΩ 2512 3 W 1 % (P1) | C2994640 | 0.060 | 167k | same TCR caveat |
 | Bus shunt 0.5 mΩ 3920 ×2 ∥ | C466580 | 0.60 | 2.9k | BVS-M-R0005: 2 in parallel = 0.25 mΩ (0.5 W each @62 A); verify power rating on ds. Alt: ARCS8518 100 µΩ bar $3.64/49 |
-| 220 µF 35 V polymer ×4 | C2923769 | 0.28 | 3.1k | Lelon SVZ SMD D8×11.5 — verify ESR ≤ 25 mΩ on ds; Panasonic EEHZK1V221UP hybrid $0.64/1.8k as upgrade |
+| 220 µF 35 V hybrid ×4 | C454349 | 1.42 | **1** | Panasonic EEHZA1V221P D10×10.2, 20 mΩ / 2.5 A — fits the CP_Elec_10x10.5 land. Stocked alternative on the same land: SUNCON 35HVH220M+P (C179812, D10×12.5, 8 in stock 2026-09-28). The earlier D8 SVZ pick (C2923769) did not fit the land and is out of stock |
 | 470 µF 50 V bulk | C106666 | 0.10 | 73k | **THT radial D10×20** — cheaper + stronger than SMD; footprint changes at PCB pass |
 | 10 µF 50 V X7S 1210 ×8+6 | C126612 | 0.144 | 43k | GCM32EC71H106KA03L; also replaces the 22 µF/50 V output MLCCs (that value barely exists) |
 | 8 MHz 3225 crystal | C400090 | 0.105 | 200k | cheap parts are CL=12 pF → C66/C67 = 18 p (APPLIED, both phases) |
@@ -72,11 +72,11 @@ Decisions taken this pass (user-approved 2026-07-18):
 | XT60PW-M (Amass) | C98732 | 0.54 | 29k | module power edge + P2 output |
 | XT60PW-F (Amass) | C428722 | 0.56 | 8.4k | backplane, ×8 slots |
 | 2.54 header/socket strips | — | ~0.05 | ≫100k | slot signal rows, UART/SWD |
-| TYPE-C-31-M-12 | C165948 | 0.16 | 336k | manager USB |
-| EC11 encoder (generic) | C2831776 | 0.036 | 4.6k | vs Alps $1.99 — generic fine |
-| MLT-8530 SMD buzzer | C94599 | 0.18 | 46k | replaces CUI CST-931RP (footprint change at PCB pass; verify 5 V drive on ds) |
+| GCT USB4105-GF-A | C3020560 | 1.30 | 1.1k at JLCPCB | manager USB (J3). 2026-09-28: matches the routed land. LCSC retail shows 0, JLCPCB assembly stock holds it; backup USB4105-GF-A-120 C5184243 (4.7k). The cheaper TYPE-C-31-M-12 C165948 has longer pads and would need the J3 breakout re-routed |
+| EC11E encoder with switch (Alps EC11E18244A5) | C255515 | 2.40 | 766 | 2026-09-27: the old "generic EC11" C2831776 was really a 100 µF/50 V electrolytic; no generic EC11 with switch is listed |
+| YX-SMD8530P SMD buzzer (Yuexin) | C781886 | 0.39 | 368 | 2026-09-27: replaces MLT-8530 C94599, which is rated 2.5–4.5 V but runs from 5V0; same vendor land, pad 1 (+) in the same corner |
 | ATO fuse holder | C3207132 | 0.42 | 997 | module 35 A |
-| Mini blade holder | C3207114 | 0.64 | 450 | manager 2 A |
+| 2 A MINI blade fuse (Littelfuse 0297002.WXNV) | C151091 | 0.11 | 5.9k | manager F1, soldered directly into the Fuse_Blade_Mini_directSolder land. 2026-09-27: replaces C3207114, which is a 6.35 mm cylindrical clip, not a mini-blade holder |
 | 2EDG 5.08 plugs (P1 bench IO) | C3697 | 0.04 | 103k | |
 | ILI9341+XPT2046 2.8" module | — | ~5 | — | AliExpress/Taobao (not LCSC); confirm 3V3-VCC jumper before soldering |
 | E-stop NC mushroom, M6 lugs, standoffs | — | ~3 | — | AliExpress/hardware store |
@@ -109,8 +109,9 @@ US$300–380** including boards, spares and the Coilcraft A/B pair.
 4. Clones: FET clones rejected for the power path; UMW TCA9535 and generic
    EC11/2N7002/diodes accepted.
 5. Ratings still to verify from datasheets **at order time** (flagged
-   above): BVS power rating, Lelon SVZ ESR,
-   alloy-shunt TCR, MLT-8530 drive voltage, TS5A3166 pin map.
+   above): BVS power rating,
+   alloy-shunt TCR, TS5A3166 pin map. (MLT-8530 drive voltage: resolved
+   2026-09-27 by the 5 V-rated YX-SMD8530P.)
 
 ## F. Engineering changes from this pass — APPLIED 2026-07-18
 

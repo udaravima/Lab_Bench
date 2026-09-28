@@ -59,6 +59,10 @@ WINDOW = 4.0
 VIA_COST = 1.5
 ZONE_COST = 0.6     # per cell through a foreign F.Cu pour fill
 RIP_COST = 0.4      # per 0.05 mm cell through rippable copper
+# Boards that reuse this router (phase3-manager/tools/finish_routes.py)
+# override these; the defaults keep phase-1 behaviour unchanged.
+FILL_AROUND = set()  # nets whose F.Cu pour is plain fill-around: no ZONE_COST
+B_COST = 0.0         # extra cost per cell on B.Cu (keeps a B.Cu plane whole)
 COPPER = (pcbnew.F_Cu, pcbnew.In1_Cu, pcbnew.In2_Cu, pcbnew.B_Cu)
 ROUTE_LAYERS = (pcbnew.F_Cu, pcbnew.B_Cu)
 mm = pcbnew.ToMM
@@ -117,6 +121,8 @@ class Copper:
                 obj = None if key(t) in base_keys else t
                 self.items.append((net, t.GetLayer(), g, "track", obj))
         for z in board.Zones():
+            if z.GetIsRuleArea():
+                continue     # keep-outs have no fill (asserts in KiCad 7)
             for g in sps_polys(z.GetFilledPolysList(z.GetLayer())):
                 self.items.append((z.GetNetname(), z.GetLayer(), g, "zone", None))
 
@@ -196,9 +202,9 @@ def route(cu, net, src, dst, board_bb, rip=False, protect=(), w=None):
     # refills around the track), so a pin walled in by a pour can still
     # get out -- but the router minimises the cut
     pour = mask([it[2] for it in items if it[1] == pcbnew.F_Cu and it[0] != net
-                 and it[3] == "zone"], CLEAR + TRACK_W / 2)
+                 and it[3] == "zone" and it[0] not in FILL_AROUND], CLEAR + TRACK_W / 2)
     pour_via = mask([it[2] for it in items if it[1] == pcbnew.F_Cu and it[0] != net
-                     and it[3] == "zone"], CLEAR + VIA_D / 2)
+                     and it[3] == "zone" and it[0] not in FILL_AROUND], CLEAR + VIA_D / 2)
     softg = {L: [it[2] for it in items if it[1] == L and it[0] != net and soft(it)]
              for L in ROUTE_LAYERS}
     track_ok = {L: ~mask(foreign[L], CLEAR + TRACK_W / 2) for L in ROUTE_LAYERS}
@@ -287,7 +293,8 @@ def route(cu, net, src, dst, board_bb, rip=False, protect=(), w=None):
             if di and dj and not (ok[l][i + di, j] and ok[l][i, j + dj]):
                 continue   # no corner cutting past an obstacle
             nc = c + w * STEP + (RIP_COST if sm[l][a, b] else 0.0) \
-                + (ZONE_COST if l == 0 and pour[a, b] else 0.0)
+                + (ZONE_COST if l == 0 and pour[a, b] else 0.0) \
+                + (B_COST if l == 1 else 0.0)
             ns = (l, a, b)
             if nc < best.get(ns, 1e18):
                 best[ns] = nc
@@ -509,10 +516,14 @@ def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--base=")]
     base = [a[7:] for a in sys.argv[1:] if a.startswith("--base=")]
     board_path = args[0] if args else BOARD
-    board = pcbnew.LoadBoard(board_path)
+    # Load the base BEFORE the board: pcbnew.LoadBoard switches the active
+    # project, and a base outside the project dir has none -- loaded second,
+    # it swapped the board's rules for KiCad defaults, which Save() then
+    # wrote into the real .kicad_pro (min drill 0.3, hole clearance 0.25...).
     base_keys = set()
     if base:
         base_keys = {key(t) for t in pcbnew.LoadBoard(base[0]).GetTracks()}
+    board = pcbnew.LoadBoard(board_path)
     pcbnew.ZONE_FILLER(board).Fill(board.Zones())
     bb = board.GetBoardEdgesBoundingBox()
     board_bb = (mm(bb.GetLeft()), mm(bb.GetTop()), mm(bb.GetRight()), mm(bb.GetBottom()))
@@ -545,6 +556,17 @@ def main():
                     break
             if res or net in POWER_NETS:
                 break
+        if not res:
+            # the largest island may be boxed in (a fine-pitch pin's escape
+            # via); join two of the others first and come back for it
+            pairs = sorted(((a, b) for i, a in enumerate(others) for b in others[i + 1:]),
+                           key=lambda p: unary_union([cu.items[i][2] for i in p[0]]).distance(
+                               unary_union([cu.items[i][2] for i in p[1]])))
+            for a, b in pairs:
+                res, _ = route(cu, net, a, b, board_bb, w=TRACK_W)
+                if res:
+                    w = TRACK_W
+                    break
         if not res and base_keys:
             # rip-up: let the path run through Freerouting copper of nets
             # that have not already been ripped too often, then requeue them

@@ -352,8 +352,13 @@ def build_disconnect(sh, p):
     sh.power("5V0", *c43.pin_pos(1))
     sh.power("AGND", *c43.pin_pos(2), ground=True)
     q9 = sh.add(kg.Placed(Q2N, "Q9", "2N7002", 205.74, 142.24, footprint=SOT23))
-    ll("OVP_TRIP", u7, 1)
-    ll("OVP_TRIP", q9, 1)
+    if p.get("ovp_to_mcu"):
+        # also reaches the MCU (PB4, EXTI): firmware kills EN and latches
+        gl("OVP_TRIP", u7, 1, shape="output")
+        gl("OVP_TRIP", q9, 1, shape="input")
+    else:
+        ll("OVP_TRIP", u7, 1)
+        ll("OVP_TRIP", q9, 1)
     sh.power("AGND", *q9.pin_pos(2), ground=True)
     ll("DISC_INP", q9, 3)
 
@@ -507,8 +512,9 @@ def build_mcu_can(sh, p):
     if p["pb4"] == "nc":
         sh.no_connect(u10.pin_pos(41))              # PB4 spare (NJTRST pull-up at reset)
     else:
-        gl(p["pb4"], u10, 41, shape="output")       # PB4 (NJTRST boot pull-up is benign:
-                                                    # module boots in SAFE, output off)
+        # PB4 (NJTRST boot pull-up is benign: module boots in SAFE, output
+        # off). Phase 1: OVP_TRIP input; phase 2: DROOP_EN output.
+        gl(p["pb4"], u10, 41, shape="input" if p["pb4"] == "OVP_TRIP" else "output")
     sh.no_connect(u10.pin_pos(2))                   # PC13
     sh.no_connect(u10.pin_pos(3))
     sh.no_connect(u10.pin_pos(4))

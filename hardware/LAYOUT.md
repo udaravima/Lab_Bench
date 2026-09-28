@@ -12,7 +12,7 @@ against the footprints + netlist, not memory.
 | phase1-module | done | green | **done** — `phase1-module.kicad_pcb`: placement, pours, planes, critical routes, 0 DRC copper errors; some signal nets unrouted (autoroute.py is WIP) |
 | phase2-module | done (hand-arranged) | green (173 comps, 116 nets) | not started — this doc is the placement plan |
 | phase3-backplane | done | green (30 comps) | not started |
-| phase3-manager | done | not yet re-checked | not started |
+| phase3-manager | done | green (80 comps, 86 nets) | **routed** 2026-09-27: 0 unconnected, 0 DRC errors (see `phase3-manager/tools/README.md`) |
 
 Phase-1's board is the reference implementation: open it next to this doc —
 every rule below is applied there and visible (input band → FET straddle →
@@ -264,7 +264,7 @@ with the bottom row facing the FETs, and give the top edge an **AGND pocket**
 - Keep the manager connector and any supply-sense divider at the same end as
   the supply entry.
 
-# Phase-3 manager (100 × 80 mm, 2-layer) — preliminary
+# Phase-3 manager (100 × 80 mm, 2-layer) — routed 2026-09-27; the rules it follows
 
 - ESP32-S3 module: antenna edge overhanging or keep-out (no copper under the
   antenna), away from the display/CAN wiring.
@@ -272,6 +272,11 @@ with the bottom row facing the FETs, and give the top edge an **AGND pocket**
   transceiver next to the backplane connector, differential pair, termination
   per the bus plan above; USB connector ESD diodes at the connector; buttons/
   encoder and display connector grouped on the UI edge (see ui.kicad_sch).
+- As built: PGND poured on both layers and stitched (a 2-layer board's top
+  layer carries the signals, so a top-side 3V3 plane only fragments); B.Cu
+  kept for short jumpers so it stays the reference plane under the USB and
+  CAN pairs; each LMR36015 VIN/PGND pin pair has its own input cap at the
+  pins; U12 (ESD) sits in the USB pair's path, not on a stub.
 
 ---
 

@@ -13,6 +13,7 @@
 #define R_ENERGY     0x09
 #define R_CHARGE     0x0A
 #define R_DIAGALRT   0x0B
+#define R_SOVL       0x0C
 #define R_DEVID      0x3F
 
 #define CURRENT_LSB_nA  20000        /* 20 uA in nA for integer math */
@@ -83,7 +84,21 @@ bool ina228_init(void)
     if (!wr16(R_CONFIG, 1u << 4)) return false;
     if (!wr16(R_ADCCFG, (0xFu << 12) | (5u << 9) | (5u << 6) | (5u << 3) | 2u))
         return false;
-    return wr16(R_SHUNTCAL, 2097);
+    if (!wr16(R_SHUNTCAL, 2097)) return false;
+    /* ALERT: transparent (not latched), active low, compared on every
+     * non-averaged conversion (ds Table 7-16: ALATCH=CNVR=SLOWALERT=APOL=0).
+     * The firmware debounces it (module_core OCP backup, >5 ms). */
+    return wr16(R_DIAGALRT, 0);
+}
+
+/* SOVL: 1.25 uV/LSB at ADCRANGE=1 (ds Table 7-17). Across 2 mOhm that is
+ * 625 uA per LSB, so 8.8 A -> 14080. */
+bool ina228_set_ocp_limit(int32_t i_ua)
+{
+    int32_t lsb = i_ua / 625;
+    if (lsb > 0x7FFF) lsb = 0x7FFF;
+    if (lsb < 0) lsb = 0;
+    return wr16(R_SOVL, (uint16_t)lsb);
 }
 
 bool ina228_read(int32_t *vbus_uv, int32_t *cur_ua)

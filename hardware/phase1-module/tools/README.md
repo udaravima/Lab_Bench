@@ -36,12 +36,13 @@ eyeball; it has caught >15 real hardware bugs before any board was ordered.
 | `check_footprints.py` | Every component has a resolvable footprint; every netted pin has a matching pad |
 | `merge_vendor.py` | Merges only datasheet-VETTED vendor symbols into `lib/labbench.kicad_sym` |
 | `build_fplib.py` | Same for footprints -> `lib/labbench.pretty/`; also generates `PowerFET_SON5x6_GDS` from the TI Q5A land pattern (pads renumbered 1=G/2=D/3=S for the generic symbol) |
-| `gen_board.py` | Netlist -> placed 120x80 4-layer board: PLACEMENT table, split In1 ground plane (PGND/AGND star at NT1 + AGND pocket under the LTC7004), In2 5V0/3V3 zones, 10 F.Cu power pours, pour/courtyard/edge checks |
+| `gen_board.py` | Netlist -> placed 100x80 4-layer board: PLACEMENT table, split In1 ground plane (PGND/AGND star at NT1; the LTC7004 now sits on the AGND side, so no pocket), In2 5V0/3V3 zones, 10 F.Cu power pours, pour/courtyard (real polygons)/edge checks. The 120x80 layout is on branch `phase1-120x80` |
 | `route_board.py` | Deterministic copper: In2 heat patches, thermal/stitching/pad vias (seam-aware), critical routes (Kelvin pair, LM5145 gate fan-out, BST/ILIM/VIN, NT1 tie) |
 | `autoroute.py` | Superseded grid A* signal router (kept for reference) |
-| `fanout.py` | Routing pass 1b: placement nudges (NUDGES), solid-joined pads (SOLID_PADS), hand escapes for U3's boxed-in pins, then a via drop for every plane-net pad (PGND/AGND to In1, 3V3/5V0 to In2) and an escape for signal pads inside a foreign F.Cu pour |
+| `fanout.py` | Routing pass 1b: placement nudges (NUDGES, empty now), solid-joined pads (SOLID_PADS), hand escapes for U3's boxed-in pins, then a via drop for every plane-net pad (PGND/AGND to In1, 3V3/5V0 to In2) and an escape for signal pads inside a foreign F.Cu pour |
 | `export_dsn.py` | Specctra export for Freerouting: In1/In2 as power layers, real filled plane outlines, F.Cu pours as planes + keepouts, existing copper locked |
 | `import_ses.py` | Imports a Freerouting session (own SES parser; KiCad 7's ImportSpecctraSES cannot run headless), refuses to save if unconnected went up |
+| `eco_move.py` | Moves parts on the routed board and peels their old routes back to the nearest junction, so `finish_routes.py` only reconnects them; `--find` lists legal spots near a point |
 | `finish_routes.py` | Routing pass 3: exact-geometry (Shapely) A* router that closes whatever Freerouting left open, with rip-up of non-base copper and a final tidy of dangling stubs |
 | `run_drc.py` | DRC via pcbnew `WriteDRCReport` (KiCad 7 CLI has no drc command) |
 | `dump helpers` | see scratch usage inside scripts; renders via `kicad-cli pcb export svg` |
@@ -64,24 +65,46 @@ python3 run_drc.py                                     # expect 0 copper errors
 `gen_board.py` + `route_board.py` give pass 1. The committed board adds:
 
 ```bash
-python3 fanout.py                                  # nudges + plane via drops
+python3 fanout.py                                  # escapes + plane via drops
 cp ../phase1-module.kicad_pcb /tmp/base.kicad_pcb  # base for rip-up
 python3 export_dsn.py wip/p1.dsn
 xvfb-run -a java -Xss64m -jar freerouting-1.9.0.jar \
     -de wip/p1.dsn -do wip/p1.ses -mp 20 -mt 1     # 2.x CLI never finishes
 python3 import_ses.py wip/p1.ses                   # 145 -> ~18 unconnected
-python3 finish_routes.py --base=/tmp/base.kicad_pcb    # -> 0
+python3 finish_routes.py ../phase1-module.kicad_pcb --base=/tmp/base.kicad_pcb  # -> 0 (board path first)
+python3 fb_reroute.py                              # FB run >= 5.5 mm from SW copper
 python3 ../../common/fix_fpids.py ../phase1-module.kicad_pcb
 python3 ../../common/finish_board.py ../phase1-module.kicad_pcb --silk --planes
 python3 run_drc.py                                 # 0 unconnected, 0 errors
 python3 ../../common/finish_board.py ../phase1-module.kicad_pcb --fab
+(cd ../.. && python3 common/cpl.py phase1-module/phase1-module.kicad_pcb)  # JLCPCB CPL
 ```
 
 Freerouting is not deterministic, so a rerun gives a different (equally
-DRC-clean) result. The NUDGES in `fanout.py` move C25, C26, R3 and R6 off
-their `gen_board.py` PLACEMENT, so rerunning `gen_board.py` no longer
-reproduces the committed board (it also fails its own L1/C23 courtyard
-check today); fold the nudges into PLACEMENT before regenerating.
+DRC-clean) result.
+
+### Changing placement on the routed board
+
+Rerouting from scratch is not needed to move a few parts. The 2026-09-27
+review fixes were made this way:
+
+```bash
+cp ../phase1-module.kicad_pcb /tmp/b.kicad_pcb
+python3 eco_move.py /tmp/b.kicad_pcb --find R60 86.75 93 5   # legal spots
+python3 eco_move.py /tmp/b.kicad_pcb C28=67.75,52.2,90       # move + peel
+python3 eco_move.py /tmp/b.kicad_pcb R60=83.5,93,0 C62=86.5,93,0 \
+    R61=85,94.75,0 --keep=U10.14 --drop=86,93.5
+cp /tmp/b.kicad_pcb /tmp/base.kicad_pcb
+python3 finish_routes.py /tmp/b.kicad_pcb --base=/tmp/base.kicad_pcb
+```
+
+Then copy the result over the board, run the finishing steps above (if
+DRC flags a kept escape via as dangling because the router joined the
+pin another way, delete that via and its stub), and
+put the new positions in `gen_board.py` PLACEMENT (page mm minus the
+20,20 origin; eco_move takes page mm). PLACEMENT matches the committed
+board for every footprint. `gen_board.py` still fails its own L1/C23
+courtyard check, as before.
 
 Any schematic change: rerun the whole chain. Any placement change: rerun from
 gen_board. `EXPECTED_NETS` must be updated in the same commit as connectivity

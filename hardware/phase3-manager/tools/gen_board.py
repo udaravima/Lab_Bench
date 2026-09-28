@@ -61,6 +61,14 @@ KEEPOUT = (46.0, 0.0, 94.0, 14.3)          # x1, y1, x2, y2
 # constraint that actually matters, and these are asserted against it.
 COURTYARD_EXEMPT = {("C64", "U10"), ("C65", "U10")}
 
+# U8's library courtyard (labbench LMR36015_RNX, shared with phase 1) is
+# 4.4 x 5.4 mm round a 2 x 3 mm body: 1.2 mm of margin, not IPC-7351's
+# 0.25. The input caps, L2 and the FB parts belong closer than that -- it
+# is what keeps the hot loops short -- so this board replaces it with the
+# IPC courtyard: pad/body extent (x +-1.2, y +-1.7) + 0.25 mm. Board-local;
+# the shared library footprint (and the routed phase-1 board) are untouched.
+COURTYARD_OVERRIDE = {"U8": (1.45, 1.95)}      # ref -> (half-width, half-height)
+
 
 def P(x, y):
     return VECTOR2I(FromMM(ORG[0] + x), FromMM(ORG[1] + y))
@@ -111,83 +119,103 @@ PLACEMENT = {
     "J1":  (5.0, 14.0, 0),        # 1x20, pins y14..62.3
 
     # === upper-left: CAN + I/O expander + pull-up field ===================
-    "U11": (15.0, 8.0, 0),        # TCAN1042HGV SOIC-8
-    "C66": (15.0, 14.0, 0),
-    "R76": (22.0, 4.0, 0),        # CAN_STB pulldown
-    "D7":  (22.0, 8.0, 0),        # LED_STAT
-    "D8":  (22.0, 11.0, 0),       # LED_CAN
-    "R69": (27.0, 8.0, 0),
-    "R70": (27.0, 11.0, 0),
+    # Refdes below were re-checked against the netlist before routing (2026-09-27):
+    # an earlier pass had labelled parts by their old refdes, which left R64,
+    # R72, R76, C69 and eleven others 20-60 mm from the pins they serve.
+    # U11 turned 180 so CAN_H/CAN_L (pins 7/6) face J1 pins 7/8 across a
+    # clear 5 mm channel, and TXD/RXD (pins 1/4) face U10. route_pairs.py
+    # lays the CAN pair in that channel.
+    "U11": (15.0, 8.0, 180),      # TCAN1042HGV SOIC-8
+    "C66": (14.5, 3.6, 0),        # U11 VIO (3V3) 100n, above pin 5
+    "C69": (20.0, 7.4, 90),       # U11 VCC (5V0) 100n, beside pin 3
+    "R64": (13.0, 12.6, 0),       # CAN_STB pulldown, below U11 pin 8
+    "D7":  (24.0, 8.0, 0),        # LED_STAT
+    "D8":  (24.0, 11.0, 0),       # LED_CAN
+    "R69": (29.0, 8.0, 0),
+    "R70": (29.0, 11.0, 0),
     "U13": (36.0, 11.0, 0),       # TCA9535 TSSOP-24
-    "C69": (36.0, 18.0, 0),
-    "R62": (28.0, 15.0, 0),       # I2C_SDA pull-up
-    "R63": (28.0, 18.0, 0),       # I2C_SCL pull-up
-    "R64": (28.0, 21.0, 0),       # EXP_INT pull-up
+    "C70": (41.8, 7.6, 90),       # U13 VCC (3V3) 100n, beside pin 24
+    "R72": (36.0, 4.0, 0),        # EXP_INT pull-up, above U13 pin 1
+    "R62": (28.0, 15.0, 0),       # I2C_SCL pull-up
+    "R63": (28.0, 18.0, 0),       # I2C_SDA pull-up
 }
-_PU = ["R77", "R78", "R79", "R80", "R81", "R82", "R83", "R84",
-       "R85", "R86", "R87", "R90", "R91", "R92", "R93", "R94"]
-for i, ref in enumerate(_PU):
+# PRESENT0-7 pull-ups (J1 pins 13-20 <-> U13 port 0), two rows of four.
+for i, ref in enumerate(["R80", "R81", "R82", "R83", "R84", "R85", "R86", "R87"]):
     PLACEMENT[ref] = (14.0 + 4.0 * (i % 4), 26.0 + 3.0 * (i // 4), 0)
+# KEY0-7 pull-ups: one column just right of U13's port-1 pins (13-20), clear
+# of U10's courtyard (x>=46), so each KEY net is a straight run down to J5.
+for i, ref in enumerate(["R97", "R96", "R95", "R94", "R93", "R92", "R91", "R90"]):
+    PLACEMENT[ref] = (44.3, 10.0 + 2.2 * i, 0)
 
 PLACEMENT.update({
     # === lower-left: VBUS -> buck -> 5V0 -> LDO -> 3V3 ====================
     "F1":  (14.0, 43.0, 0),       # blade fuse, courtyard x11..24.9
     "D5":  (31.0, 43.0, 0),       # SMBJ33A, courtyard 7.3 x 4.5
-    # Buck hot loop: these MUST hug U8's VIN (pads 9/10 at x18.9) and PGND
-    # (pads 1/11). An earlier pass had them 23 mm away at x39/x44 — EMC SW-003
-    # "large hot loop", the classic buck layout error: the di/dt loop area sets
-    # radiated emissions and switch-node ringing.
-    "C50": (23.0, 54.5, 0),       # 4.7u/50V input, hard against U8
-    "C51": (23.0, 50.5, 0),
-    "R71": (14.0, 48.5, 0),       # EN divider
-    "R52": (19.0, 48.5, 0),
+    # U8 buck, laid out round the LMR36015 RNX pinout (route_critical.py
+    # draws its copper). Each VIN/PGND pin pair gets its own 1210 input cap
+    # right at the pins -- C51 on the west (pins 2/1), C50 on the east
+    # (pins 10/11) -- so each hot loop closes in ~2 mm on F.Cu. (An earlier
+    # pass had both caps east and L2 12 mm away, which put C50 between the
+    # SW pin and the inductor.) SW (pin 12) exits north straight into L2;
+    # the output caps sit west of L2's 5V0 pad; C52 (boot) is fed from SW
+    # round the west side, BOOT from pin 4 down the south; C53 (VCC) and the
+    # FB divider R51/R50 sit under pins 5-7, and AUX_PG leaves east to R52.
     "U8":  (18.0, 55.0, 0),       # LMR36015 VQFN-HR-12
-    "L2":  (29.0, 55.0, 0),       # 33u 1210
-    "C52": (13.0, 60.0, 0),       # BOOT
-    "C53": (18.0, 60.0, 0),       # VCC
-    "R50": (24.0, 60.0, 0),       # FB top
-    "R51": (24.0, 63.0, 0),       # FB bottom
-    "C54": (36.0, 55.0, 0),       # 5V0 out 22u
-    "C55": (41.5, 55.0, 0),
-    "U9":  (37.0, 64.0, 0),       # NCP1117-3.3, fed straight from C54/C55
-    "C56": (30.0, 60.0, 0),       # LDO in
-    "C57": (44.0, 60.0, 0),       # 3V3 out
-    "R73": (14.0, 65.0, 0),       # AUX_PG pull-up
-    "R98": (14.0, 68.0, 0),
+    "C51": (14.65, 54.0, 90),      # 4.7u/50V at pins 2 (VIN) / 1 (PGND)
+    "C50": (21.35, 54.0, 90),      # 4.7u/50V at pins 10 (VIN) / 11 (PGND)
+    "L2":  (18.0, 50.0, 90),      # 33u 1210: pad1 SW (south), pad2 5V0
+    "C54": (14.2, 48.3, 90),      # 5V0 out 22u
+    "C55": (10.9, 48.3, 90),
+    "C52": (14.2, 57.3, 180),     # BOOT: pad1 BOOT east, pad2 SW west
+    "C53": (16.9, 58.5, 270),     # VCC, under pin 5
+    "R51": (19.6, 58.5, 270),     # FB bottom, under pin 7
+    "R50": (21.9, 57.68, 180),    # FB top, tapped off the 5V0 trunk
+    "R52": (25.6, 57.0, 180),     # AUX_PG pull-up
+    "U9":  (37.0, 64.0, 0),       # NCP1117-3.3
+    "C56": (30.2, 66.3, 180),     # LDO in, at pin 3
+    "C57": (44.0, 64.0, 0),       # 3V3 out, at the tab
     "C67x": None,
 
     # === bottom edge: USB-C + ESD =========================================
     "J3":  (62.0, 76.0, 0),
-    "U12": (52.0, 71.0, 0),
-    "R67": (46.0, 70.0, 0),       # CC1 5.1k
-    "R68": (46.0, 73.0, 0),       # CC2 5.1k
+    # U12 (ESD) sits IN the USB pair's path, turned 180 so its DN pin faces
+    # the pair's DN (west) track and DP the DP (east) one: the pair splits
+    # round the package and each line touches its clamp with a short stub.
+    "U12": (47.525, 69.6, 180),
+    "R67": (55.1, 71.2, 180),     # CC1 5.1k, under the USB pair, beside J3.A5
+    "R68": (67.8, 69.0, 90),      # CC2 5.1k, beside J3.B5
 
     # === right: UI headers, encoder, buttons, buzzer ======================
     "J6":  (50.0, 40.0, 90),      # 1x14 LCD, pins x50..83
     "J5":  (50.0, 46.0, 90),      # 1x09 keys, pins x50..70.3
     "J4":  (76.0, 46.0, 90),      # 1x03 UART
-    "ENC1": (52.0, 56.0, 0),      # courtyard x50.5..68, y51.4..65.6
+    "C73": (50.0, 37.0, 0),       # J6 (LCD) 3V3 100n, above pin 1
+    # ENC1 turned 180 so its A/B pins (now x66.5) face the RC network on
+    # the right instead of the 5V0 pour; same courtyard x50.5..68, y51.4..65.6.
+    "ENC1": (66.5, 61.0, 180),
     "SW1": (75.0, 56.0, 0),       # RESET
     "SW2": (85.0, 56.0, 0),       # BOOT
-    "R72": (72.0, 51.0, 0),       # EN pull-up
-    "C68": (77.0, 51.0, 0),
-    "R75": (82.0, 51.0, 0),       # BOOT0 pull-up
-    "R95": (87.0, 51.0, 0),       # ENC_A
-    "R96": (92.0, 51.0, 0),       # ENC_B
-    "R97": (97.0, 51.0, 0),       # ENC_SW
-    "C70": (87.0, 45.0, 0),       # ENC RC
-    "C73": (92.0, 45.0, 0),
-    "C74": (97.0, 45.0, 0),
+    "R65": (72.0, 51.0, 0),       # ESP_EN pull-up
+    "C68": (77.0, 51.0, 0),       # ESP_EN RC
+    "R66": (82.0, 51.0, 0),       # BOOT0 pull-up
+    # Encoder conditioning, one row per signal: pull-up, series R, cap.
+    "R75": (87.0, 45.0, 0),       # ENC_A_RAW pull-up
+    "R77": (92.0, 45.0, 0),       # ENC_A series
+    "C74": (97.0, 45.0, 0),       # ENC_A cap
+    "R76": (87.0, 48.0, 0),       # ENC_B_RAW pull-up
+    "R78": (92.0, 48.0, 0),       # ENC_B series
+    "C75": (97.0, 48.0, 0),       # ENC_B cap
+    "R79": (87.0, 51.0, 0),       # ENC_SW pull-up
+    "C76": (92.0, 51.0, 0),       # ENC_SW cap
     "BZ1": (90.0, 64.0, 0),
-    "Q8":  (72.0, 63.0, 0),       # buzzer drive
-    "Q9":  (77.0, 63.0, 0),       # HW_KILL
+    "Q8":  (72.0, 63.0, 0),       # HW_KILL -> HW_EN
+    "Q9":  (77.0, 63.0, 0),       # buzzer drive
     "Q10": (82.0, 63.0, 0),       # backlight pre-drive
     "Q11": (72.0, 69.0, 0),       # backlight PMOS
     "D9":  (97.0, 57.0, 0),       # buzzer flyback
-    "R65": (72.0, 73.0, 0),
-    "R66": (87.0, 73.0, 0),
-    "C75": (77.0, 73.0, 0),
-    "C76": (82.0, 73.0, 0),
+    "R98": (77.0, 67.0, 0),       # BUZZ pulldown, under Q9
+    "R73": (82.0, 67.0, 0),       # BL_G pull-up, under Q10
+    "R71": (72.0, 73.0, 0),       # HW_KILL pulldown
 })
 PLACEMENT = {k: v for k, v in PLACEMENT.items() if v is not None}
 
@@ -197,15 +225,12 @@ MOUNT_HOLES = [(4.0, 4.0), (4.0, 76.0), (96.0, 76.0), (96.0, 38.0)]
 FIDUCIALS = [(10.0, 36.0), (44.0, 34.0), (90.0, 76.0)]  # >=3 for SMD assembly
 
 # Pours. Nothing may enter KEEPOUT: the polygons below are shaped around it.
-PWR_POURS = {
-    # 5V0 island: buck output caps -> LDO input, one contiguous piece
-    "5V0": [(32.5, 52.0), (45.0, 52.0), (45.0, 62.0), (39.5, 62.0),
-            (39.5, 66.5), (32.5, 66.5)],
-}
+# F.Cu power pours (net -> polygon). None since the 2026-09-27 re-layout:
+# the old 5V0 island (x32..45) held output caps that now sit at L2, and
+# 5V0 runs as a 0.8 mm trunk (route_critical.py) instead.
+PWR_POURS = {}
 
-EXPECT_IN_POUR = [
-    ("C54", "1", "5V0"), ("C55", "1", "5V0"), ("U9", "3", "5V0"),
-]
+EXPECT_IN_POUR = []
 
 
 def point_in_poly(x, y, poly):
@@ -345,9 +370,9 @@ def check_plane_continuity(board):
     Must run AFTER the final ZONE_FILLER pass — island geometry is a property
     of the finished copper, not of the zone outlines. A fragment holding no
     pads is normal (the filler carves copper around pads and clearances); a
-    fragment holding pads with no via/PTH of its own is a genuine break, and
-    on this 2-layer board it is not even fixable with a stitch via, because
-    the opposite layer is the other plane. Moving the offender is the fix.
+    fragment holding pads with no via/PTH of its own is a genuine break.
+    (With PGND now poured on both layers, a stitch via re-joins such an
+    island; when F.Cu was a 3V3 plane, moving the offender was the only fix.)
 
     This exists because placing U10's decoupling caps pinched the F.Cu 3V3
     pour into two pieces and nothing in the assertion set noticed — the
@@ -447,6 +472,20 @@ def main():
         fp = load_fp(fpid)
         fp.SetReference(ref)
         fp.SetValue(value)
+        if ref in COURTYARD_OVERRIDE:
+            hw, hh = COURTYARD_OVERRIDE[ref]
+            for g in list(fp.GraphicalItems()):
+                if g.GetLayer() == pcbnew.F_CrtYd:
+                    fp.Remove(g)
+            corners = [(-hw, -hh), (hw, -hh), (hw, hh), (-hw, hh)]
+            for k in range(4):
+                seg = pcbnew.FP_SHAPE(fp, pcbnew.SHAPE_T_SEGMENT)
+                seg.SetStart0(VECTOR2I(FromMM(corners[k][0]), FromMM(corners[k][1])))
+                seg.SetEnd0(VECTOR2I(FromMM(corners[(k + 1) % 4][0]),
+                                     FromMM(corners[(k + 1) % 4][1])))
+                seg.SetLayer(pcbnew.F_CrtYd)
+                seg.SetWidth(FromMM(0.05))
+                fp.Add(seg)
         x, y, rot = PLACEMENT[ref]
         fp.SetPosition(P(x, y))
         fp.SetOrientationDegrees(rot)
@@ -483,13 +522,19 @@ def main():
         seg.SetWidth(FromMM(0.1))
         board.Add(seg)
 
-    # B.Cu = PGND plane, F.Cu = 3V3 plane, both notched clear of the antenna
+    # PGND on BOTH layers, notched clear of the antenna. This board was first
+    # drawn with F.Cu as a 3V3 plane, but on two layers F.Cu also carries
+    # nearly every signal, and the routed tracks cut a top plane into islands
+    # that only a track could re-join (the other layer is ground). A ground
+    # pour on top instead is re-joined by any stitch via, gives the USB and
+    # CAN pairs coplanar ground on their own layer, and 3V3 (under 0.5 A)
+    # runs as 0.4 mm tracks. B.Cu stays the reference plane.
     ko_x1, ko_y1, ko_x2, ko_y2 = KEEPOUT
     plane = [(1.0, 1.0), (ko_x1 - 1.0, 1.0), (ko_x1 - 1.0, ko_y2 + 1.0),
              (ko_x2 + 1.0, ko_y2 + 1.0), (ko_x2 + 1.0, 1.0), (W - 1, 1.0),
              (W - 1, H - 1), (1.0, H - 1)]
     zones = [("PGND", pcbnew.B_Cu, 0, plane, "thermal"),
-             ("3V3", pcbnew.F_Cu, 0, plane, "thermal")]
+             ("PGND", pcbnew.F_Cu, 0, plane, "thermal")]
     for name, poly in PWR_POURS.items():
         zones.append((name, pcbnew.F_Cu, 2, poly, "full"))
     for net, layer, prio, pts, conn in zones:

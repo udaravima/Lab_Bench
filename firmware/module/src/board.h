@@ -26,7 +26,8 @@
 /* PA6  VBUS_SNS  ADC2_IN3        PB2  LED_SINK  out (low = LED on)          */
 /* PA7  DAC_SDI   SPI1 AF5        PB3  PS_OFF    out (high = kill LM5145 EN) */
 /* PA8  I2C_SDA   I2C2 AF4        PB5  AUX_PG    in                          */
-/* PA9  I2C_SCL   I2C2 AF4        PB6  HW_EN     in (high = enabled)         */
+/* PA9  I2C_SCL   I2C2 AF4        PB4  OVP_TRIP  in, EXTI4 (high = HW OVP)   */
+/*                                PB6  HW_EN     in (high = enabled)         */
 /*                                PB7  INA_ALERT in (low = alert)            */
 /*                                PB10 FAN_PWM   TIM2_CH3 AF1                */
 /*                                PB11..13 SLOT_ID0..2 in, pull-up,          */
@@ -46,6 +47,7 @@
 #define AUX_PG_IN()     ((GPIOB->IDR >> 5) & 1u)
 #define HW_EN_IN()      ((GPIOB->IDR >> 6) & 1u)
 #define INA_ALERT_IN()  ((GPIOB->IDR >> 7) & 1u)      /* open-drain, 0 = alert */
+#define OVP_TRIP_IN()   ((GPIOB->IDR >> 4) & 1u)      /* TLV7011, 1 = tripped  */
 #define SLOT_ID_IN()    ((uint8_t)(~(GPIOB->IDR >> 11) & 0x7u))
 
 /* ---- analog scaling (doc 06; ideal values, trimmed by lb_cal) ------------ */
@@ -96,7 +98,7 @@ static inline int16_t ntc_dC(uint16_t counts)
 
 /* ---- firmware identity ---------------------------------------------------- */
 #define FW_MAJOR 0
-#define FW_MINOR 1
+#define FW_MINOR 2
 
 /* millisecond tick from SysTick */
 extern volatile uint32_t g_ms;

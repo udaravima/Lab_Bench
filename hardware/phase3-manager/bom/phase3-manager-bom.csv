@@ -1,5 +1,5 @@
 Item,Qty,References,Value,Footprint,LCSC,MPN,Manufacturer,Unit USD,Ext USD,Note
-1,1,BZ1,MLT-8530,labbench:MLT-8530,C94599,MLT-8530,,0.18,0.18,verify 5 V drive on datasheet
+1,1,BZ1,MLT-8530,labbench:MLT-8530,C781886,YX-SMD8530P,Yuexin,0.39,0.39,"5 V-rated (2-5 V) drop-in for the 3.6 V MLT-8530; vendor land is identical, pad 1 (+) in the same corner"
 2,2,C50 C51,4.7u/50V,Capacitor_SMD:C_1210_3225Metric,,,,,,
 3,9,C52 C65 C66 C69 C70 C73 C74 C75 C76,100n,Capacitor_SMD:C_0603_1608Metric,,,,,,
 4,2,C53 C68,1u,Capacitor_SMD:C_0603_1608Metric,,,,,,
@@ -11,10 +11,10 @@ Item,Qty,References,Value,Footprint,LCSC,MPN,Manufacturer,Unit USD,Ext USD,Note
 10,1,D7,LED_STAT,LED_SMD:LED_0603_1608Metric,,,,,,
 11,1,D8,LED_CAN,LED_SMD:LED_0603_1608Metric,,,,,,
 12,1,D9,1N4148W,Diode_SMD:D_SOD-323,,,,,,
-13,1,ENC1,EC11,Rotary_Encoder:RotaryEncoder_Alps_EC11E-Switch_Vertical_H20mm,C2831776,,,0.036,0.036,generic EC11
-14,1,F1,2A mini blade,Fuse:Fuse_Blade_Mini_directSolder,C3207114,,,0.64,0.64,mini blade fuse HOLDER; the 2 A fuse itself is bought separately
+13,1,ENC1,EC11,Rotary_Encoder:RotaryEncoder_Alps_EC11E-Switch_Vertical_H20mm,C255515,EC11E18244A5,Alps Alpine,2.4,2.4,EC11E with push switch; EasyEDA land A/B/C + D/E switch + 2 lugs matches the EC11E-Switch footprint
+14,1,F1,2A mini blade,Fuse:Fuse_Blade_Mini_directSolder,C151091,0297002.WXNV,Littelfuse,0.11,0.11,"2 A MINI blade fuse, soldered directly into the land (no holder)"
 15,1,J1,BACKPLANE,Connector_PinHeader_2.54mm:PinHeader_1x20_P2.54mm_Vertical,,,,,,
-16,1,J3,USB-C,Connector_USB:USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal,C165948,TYPE-C-31-M-12,Korean Hroparts,0.16,0.16,"CHECK: footprint is GCT USB4105 - swap to the TYPE-C-31-M-12 land before ordering, or order a USB4105"
+16,1,J3,USB-C,Connector_USB:USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal,C3020560,USB4105-GF-A,Global Connector Technology,1.3,1.3,"stocked at JLCPCB assembly, not LCSC retail; backup USB4105-GF-A-120 C5184243"
 17,1,J4,UART,Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical,,,,,,
 18,1,J5,PANEL KEYS,Connector_PinHeader_2.54mm:PinHeader_1x09_P2.54mm_Vertical,,,,,,
 19,1,J6,ILI9341 LCD MODULE,Connector_PinHeader_2.54mm:PinHeader_1x14_P2.54mm_Vertical,,,,,,"ILI9341+XPT2046 2.8in module plugs here - AliExpress, confirm 3V3-VCC jumper"
@@ -36,4 +36,4 @@ Item,Qty,References,Value,Footprint,LCSC,MPN,Manufacturer,Unit USD,Ext USD,Note
 35,1,U11,TCAN1042HGV,Package_SO:SOIC-8_3.9x4.9mm_P1.27mm,C485806,TCAN1042VDRQ1,TI,0.57,0.57,"symbol value says TCAN1042HGV; SOURCING picked the V (VIO) variant, same SOIC-8 pinout"
 36,1,U12,TPD2E001,Package_TO_SOT_SMD:Texas_R-PDSO-N5_DRL-5,C150526,TPD2E001DRLR,TI,0.16,0.16,
 37,1,U13,TCA9535PWR,Package_SO:TSSOP-24_4.4x7.8mm_P0.65mm,C130204,TCA9535PWR,TI,0.44,0.44,UMW clone acceptable here
-,80,,,,,,,,9.32,"10/80 placements have an LCSC number; total covers those only (qty-1, SOURCING.md 2026-07-18)"
+,80,,,,,,,,12.5,"10/80 placements have an LCSC number; total covers those only (qty-1, SOURCING.md 2026-07-18)"

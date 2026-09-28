@@ -31,13 +31,10 @@ PARTS = [
     ({P1: ["U10"], P2: ["U10"]}, "C529355", "STM32G431CBT6", "ST", 2.85, ""),
     ({P1: ["U1"], P2: ["U1"]}, "C1880990", "DAC80502DRXR", "TI", 4.19,
      "value says DRXT; R/T differ only in reel size"),
-    ({P2: ["U5"], BP: ["U1"]},
-     "C2887910", "INA228AIDGSR", "TI", 3.83,
-     "out of stock at LCSC/JLCPCB on 2026-09-27"),
-    ({P1: ["U5"]}, "C5214669", "INA228AQDGSRQ1", "TI", 17.16,
-     "automotive grade of INA228AIDGSR, same VSSOP-10 pinout; the "
-     "AIDGSR (C2887910) was out of stock on 2026-09-27 - swap back if it "
-     "returns, it is about a quarter of the price"),
+    ({P1: ["U5"], P2: ["U5"], BP: ["U1"]}, "C5214669", "INA228AQDGSRQ1", "TI", 17.16,
+     "automotive grade of INA228AIDGSR, same VSSOP-10 pinout and register "
+     "map (no firmware change); the AIDGSR (C2887910) was still out of stock "
+     "on 2026-09-28 - swap back if it returns, it is about a quarter of the price"),
     ({P1: ["U4"], P2: ["U4"]}, "C2060584", "INA240A3DR", "TI", 1.87, ""),
     ({P1: ["U2"], P2: ["U2"]}, "C19608", "OPA2333AIDGKR", "TI", 1.14, ""),
     ({P1: ["U11"], P2: ["U11"], MGR: ["U11"]},
@@ -83,10 +80,10 @@ PARTS = [
      "2 mOhm 2512 3 W 1 %; check TCR on datasheet"),
     ({BP: ["RS1", "RS2"]}, "C466580", "BVS-M-R0005", "Isabellenhuette", 0.60,
      "2 in parallel = 0.25 mOhm; verify power rating on datasheet"),
-    ({P2: ["C15", "C16", "C36", "C37"]}, "C2923769", "", "Lelon", 0.28,
-     "CHECK: SOURCING part is Lelon SVZ D8x11.5 polymer, symbol says "
-     "'hybrid' on a CP_Elec_10x10.5 footprint - pick footprint or part; "
-     "verify ESR <= 25 mOhm"),
+    ({P2: ["C15", "C16", "C36", "C37"]}, "C454349", "EEHZA1V221P", "Panasonic", 1.42,
+     "hybrid polymer D10x10.2 on the CP_Elec_10x10.5 land, 20 mOhm / 2.5 A "
+     "at 100 kHz; LCSC stock was 1 on 2026-09-28 - if still short, SUNCON "
+     "35HVH220M+P (C179812, D10x12.5, same land) is the stocked alternative"),
     ({P2: ["C14"]}, "C106666", "", "", 0.10, "470 uF 50 V THT radial D10"),
     ({P2: ["C6", "C7", "C8", "C9", "C10", "C11", "C12", "C13",
            "C38", "C40", "C45", "C46", "C47", "C48"]},

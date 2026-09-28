@@ -73,7 +73,7 @@ Item,Qty,References,Value,Footprint,LCSC,MPN,Manufacturer,Unit USD,Ext USD,Note
 72,1,U2,OPA2333,Package_SO:VSSOP-8_3.0x3.0mm_P0.65mm,C19608,OPA2333AIDGKR,TI,1.14,1.14,
 73,1,U3,LM5145RGYR,labbench:LM5145_RGY0020B,C485912,LM5145RGYR,TI,1.55,1.55,
 74,1,U4,INA240A3,Package_SO:SOIC-8_3.9x4.9mm_P1.27mm,C2060584,INA240A3DR,TI,1.87,1.87,
-75,1,U5,INA228,Package_SO:VSSOP-10_3x3mm_P0.5mm,C5214669,INA228AQDGSRQ1,TI,17.16,17.16,"automotive grade of INA228AIDGSR, same VSSOP-10 pinout; the AIDGSR (C2887910) was out of stock on 2026-09-27 - swap back if it returns, it is about a quarter of the price"
+75,1,U5,INA228,Package_SO:VSSOP-10_3x3mm_P0.5mm,C5214669,INA228AQDGSRQ1,TI,17.16,17.16,"automotive grade of INA228AIDGSR, same VSSOP-10 pinout and register map (no firmware change); the AIDGSR (C2887910) was still out of stock on 2026-09-28 - swap back if it returns, it is about a quarter of the price"
 76,1,U6,LTC7004,Package_SO:MSOP-10-1EP_3x3mm_P0.5mm_EP1.68x1.88mm,C690105,LTC7004EMSE#PBF,ADI,5.77,5.77,thinnest stock in the BOM - order early (IMSE fallback)
 77,1,U7,TLV7011DCK,Package_TO_SOT_SMD:SOT-353_SC-70-5,C193688,TLV7011DCKR,TI,0.27,0.27,SC-70-5 (DCK)
 78,1,U8,LMR36015AQRNXRQ1,labbench:LMR36015_RNX_VQFN-HR-12,C1850345,LMR36015ARNXR,TI,1.91,1.91,"symbol value says LMR36015AQRNXRQ1 (automotive); SOURCING picked the commercial ARNXR, same RNX package"

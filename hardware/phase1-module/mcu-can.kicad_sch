@@ -1236,7 +1236,7 @@
   (global_label "INA_ALERT" (shape input) (at 73.66 127.0 180) (fields_autoplaced) (effects (font (size 1.27 1.27))) (uuid 9659e4a8-0dbd-42b0-bab3-2761c7a60f93))
   (global_label "OUT_REQ" (shape output) (at 73.66 144.78 270) (fields_autoplaced) (effects (font (size 1.27 1.27))) (uuid eb288c53-9be3-4311-b2b7-94a33bfefe85))
   (global_label "FAN_PWM" (shape output) (at 73.66 134.62 270) (fields_autoplaced) (effects (font (size 1.27 1.27))) (uuid f804bdfe-c810-4ccf-bf08-7bc13d717ddc))
-  (no_connect (at 73.66 119.38) (uuid 2eb9ab91-6366-4b87-a261-26f0897645fe))
+  (global_label "OVP_TRIP" (shape input) (at 73.66 119.38 180) (fields_autoplaced) (effects (font (size 1.27 1.27))) (uuid 2eb9ab91-6366-4b87-a261-26f0897645fe))
   (no_connect (at 73.66 99.06) (uuid 7d4d9a50-6c41-4c03-b256-e2418d8acabb))
   (no_connect (at 73.66 101.6) (uuid bbe0cb36-9b39-48dd-871c-34b021b3745c))
   (no_connect (at 73.66 104.14) (uuid 7aa409f6-d386-4b28-9b53-95f11f38ff50))

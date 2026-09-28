@@ -23,6 +23,7 @@ void Default_Handler(void)
 }
 
 void SysTick_Handler(void);
+void EXTI4_IRQHandler(void);
 void NMI_Handler(void)        __attribute__((weak, alias("Default_Handler")));
 void HardFault_Handler(void)  __attribute__((weak, alias("Default_Handler")));
 void MemManage_Handler(void)  __attribute__((weak, alias("Default_Handler")));
@@ -31,7 +32,7 @@ void UsageFault_Handler(void) __attribute__((weak, alias("Default_Handler")));
 
 /* Cortex-M4 core vectors + enough IRQ slots for the peripherals in use.
  * Everything routes to Default_Handler; the firmware polls (only SysTick
- * interrupts are enabled). Slots must simply exist so any spurious enable
+ * and EXTI4 = hardware OVP trip interrupts are enabled). Slots must simply exist so any spurious enable
  * lands in a defined loop instead of random code. */
 __attribute__((section(".isr_vector"), used))
 static void (* const vectors[16 + 102])(void) = {
@@ -49,5 +50,7 @@ static void (* const vectors[16 + 102])(void) = {
     Default_Handler,            /* PendSV */
     SysTick_Handler,
     /* external IRQs 0..101: Default_Handler via designated range below */
-    [16 ... 16 + 101] = Default_Handler,
+    [16 ... 16 + 9] = Default_Handler,
+    [16 + 10] = EXTI4_IRQHandler,   /* EXTI4_IRQn = 10 (stm32g431xx.h) */
+    [16 + 11 ... 16 + 101] = Default_Handler,
 };

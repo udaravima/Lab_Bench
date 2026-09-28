@@ -92,6 +92,32 @@ int main(void)
     lb_core_cmd_reset(&c, LB_RESET_REBOOT);
     CHECK(c.reboot_req && c.state == LB_STATE_ACTIVE);
 
+    /* --- OCP backup (matrix #2): >110 % i_max for >5 ms latches --- */
+    CHECK(lb_core_ocp_limit_ua(&LB_CORE_CFG_PHASE1) == 8800000);
+    c = fresh_active();
+    CHECK(lb_core_cmd_output(&c, LB_OUT_ON));
+    for (int i = 0; i < 5; i++)
+        lb_core_ocp_sample(&c, 9000000, false, 1);      /* 5 ms: not yet */
+    CHECK(c.state == LB_STATE_ACTIVE);
+    lb_core_ocp_sample(&c, 8000000, false, 1);          /* dip resets the count */
+    for (int i = 0; i < 5; i++)
+        lb_core_ocp_sample(&c, 9000000, false, 1);
+    CHECK(c.state == LB_STATE_ACTIVE);
+    lb_core_ocp_sample(&c, 9000000, false, 1);          /* 6th ms: latch */
+    CHECK(c.state == LB_STATE_FAULT_LATCHED && (c.fault_bits & LB_FAULT_OCP_BACKUP));
+    CHECK(lb_core_iref_ua(&c) == 0 && !lb_core_output_closed(&c));
+    /* INA228 alert alone trips the same way */
+    c = fresh_active();
+    CHECK(lb_core_cmd_output(&c, LB_OUT_ON));
+    for (int i = 0; i < 6; i++)
+        lb_core_ocp_sample(&c, 1000000, true, 1);
+    CHECK(c.fault_bits & LB_FAULT_OCP_BACKUP);
+    /* output open: a stale alert or reading never latches */
+    c = fresh_active();
+    for (int i = 0; i < 20; i++)
+        lb_core_ocp_sample(&c, 9000000, true, 1);
+    CHECK(c.state == LB_STATE_SAFE && c.fault_bits == 0);
+
     /* --- comms loss, policy OFF (default) --- */
     c = fresh_active();
     CHECK(lb_core_cmd_output(&c, LB_OUT_ON));

@@ -15,16 +15,16 @@ to `docs/test-results/phase1-<board serial>-<date>.md` and fill it in as you
 go. Save scope captures and CAN logs next to it. When every row passes, tag
 the commit `phase1-pass` (docs/05, repo workflow).
 
-> **Heads-up: predictions from reading the design.** Two exit tests are
-> expected to show a gap between the spec and what the board and firmware do
-> today (§6.9). Run them anyway and record what happens; they are the point of
-> a learning board.
-> - Row 2 (OCP backup): firmware relies on the INA228 ALERT pin, but
->   `ina228.c` never programs an alert limit, so the backup may never fire.
-> - Row 4 (hardware OVP): the TLV7011 opens the disconnect, but in the netlist
->   its output reaches only Q9 (the disconnect), not the LM5145 EN pin or the
->   MCU. So expect non-latching behaviour with the converter still running,
->   where docs/04 says "EN low, latching".
+> **Protection gaps closed in firmware 0.2 (2026-09-28).** Two exit tests
+> (§6.9) used to be expected to fail; both are now fixed and should pass.
+> - Row 2 (OCP backup): the firmware now checks the INA240 current on the ADC
+>   every 1 ms and also programs the INA228 alert limit (SOVL) to the same
+>   8.8 A; either one held for more than 5 ms latches `OCP_BACKUP`.
+> - Row 4 (hardware OVP): the TLV7011 output (OVP_TRIP) now also goes to the
+>   MCU's PB4. Its rising edge interrupts the MCU, which pulls LM5145 EN low
+>   and latches `OVP_HW`. The comparator still opens the disconnect by itself.
+>   This needs the board revision that routes OVP_TRIP to U10 pin 41; on an
+>   older board PB4 is unconnected and row 4 stays non-latching.
 
 ## 1. Equipment
 
@@ -370,8 +370,10 @@ record. Clear latched faults with `reset clear` and re-enable between rows.
 (EAI_INJ → FB). Setpoint 12 V / 4 A. Load in CC, step from 2 A to 9 A.
 - Spec: MCU detects > 110 % I_max (8.8 A) for > 5 ms, opens the output and
   latches OCP_BACKUP.
-- Predicted: no latch (the INA228 alert limit is never configured). The
-  LM5145 valley current limit (~11 A) remains the backstop.
+- Predicted (firmware 0.2): latches `OCP_BACKUP` about 5 ms after the
+  current passes 8.8 A, from the ADC check or the INA228 alert, whichever
+  sees it first. The LM5145 valley current limit (~11 A) remains the
+  backstop behind it.
 - Record: whether FAULT `OCP_BACKUP` appears, and the output current and
   voltage. Keep this short; do not leave it at 9 A for long. Refit R8.
 
@@ -381,12 +383,14 @@ drives the output towards the input voltage.
 - Spec: TLV7011 trips at 105 % of 21.2 V ≈ 22.3 V (R45/R46 from VOUT_INT
   against the 2.5 V reference R47/R48), the disconnect opens, the controller
   is disabled, and the fault latches.
-- Predicted: the disconnect opens at ~22.3 V; the controller keeps running
-  (VOUT_INT stays high until the short is removed); nothing latches, because
-  the firmware check reads VOUT after the disconnect.
-- Record on the scope: VOUT_INT (R1 pad 1), VOUT (J4), OVP_TRIP (Q9 gate).
-  Trip voltage, time from threshold to disconnect open, and state after the
-  short is removed.
+- Predicted (firmware 0.2, OVP_TRIP routed to PB4): the disconnect opens at
+  ~22.3 V; within microseconds the MCU kills EN, so VOUT_INT falls; FAULT
+  `OVP_HW` latches and stays latched after the short is removed until
+  `reset clear`. A `reset clear` while VOUT_INT is still above the threshold
+  re-latches at once.
+- Record on the scope: VOUT_INT (R1 pad 1), VOUT (J4), OVP_TRIP (Q9 gate),
+  PS_EN (U3 pin 1). Trip voltage, time from threshold to disconnect open,
+  time from OVP_TRIP to PS_EN low, and state after the short is removed.
 
 **Rows 11 and 12 — overtemperature.** Emulate a hot NTC by clipping a
 resistor across RT1 (NTC_FET), rather than heating the board. At ~25 °C the

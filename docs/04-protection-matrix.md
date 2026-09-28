@@ -7,9 +7,9 @@ loops are themselves the first protection layer.
 | # | Fault | Detected by | Response | Latching | Recovery |
 |---|---|---|---|---|---|
 | 1 | Output overcurrent (normal) | Analog CC loop (INA240 → EA_I) | Seamless CV→CC transition at I_set | No | Automatic (it's regulation, not a fault) |
-| 2 | Output overcurrent (loop failure backup) | MCU ADC watchdog on INA240, >110 % I_max for >5 ms | Output FETs open, LM5143 disabled | Yes | `RESET(0x5A)` after cause cleared |
+| 2 | Output overcurrent (loop failure backup) | MCU ADC check on INA240 every 1 ms, plus INA228 ALERT (SOVL at the same limit): >110 % I_max for >5 ms | Output FETs open, LM5143 disabled | Yes | `RESET(0x5A)` after cause cleared |
 | 3 | Per-phase overcurrent (shoot-through, saturation) | LM5143 cycle-by-cycle current limit + hiccup | Cycle truncation → hiccup restart | No (hiccup) | Automatic; MCU reports if persistent >100 ms |
-| 4 | Output overvoltage | Hardware comparator (TLV7011, fixed 105 % V_max) — independent of MCU | Output disconnect FETs open + controller EN low | Yes | `RESET(0x5A)`; requires V_out below threshold |
+| 4 | Output overvoltage | Hardware comparator (TLV7011, fixed 105 % V_max) — independent of MCU | Output disconnect FETs open (comparator, directly) + controller EN low (MCU EXTI on the comparator output, µs) | Yes (firmware latch) | `RESET(0x5A)`; requires V_out below threshold |
 | 5 | Output overvoltage (setpoint sanity) | Module firmware clamp | I_set/V_set clamped to envelope: I ≤ min(30 A, 600 W/V) | No | n/a — clamp, report in STATUS warn bits |
 | 6 | Battery back-feed into disabled output | Back-to-back output FETs (blocking both directions) | Inherently blocked | n/a | n/a |
 | 7 | Reverse current while enabled (battery > V_set) | DEM mode (LM5143 DEMB) — stage cannot sink | Inherently blocked in battery mode; firmware warns if I_meas < −200 mA in non-DEM mode and opens FETs | Yes (non-DEM case) | `RESET(0x5A)` |
@@ -35,6 +35,12 @@ loops are themselves the first protection layer.
   module's absolute V_max, not the current setpoint — it is a catastrophic-
   failure backstop (e.g. CV loop open), not a user-range protection. Tight
   user-level OVP is a firmware warn/trip configured via LIMITS if desired.
+- Phase 1 implements fault 4 as: TLV7011 → Q9 opens the disconnect with no
+  MCU involvement; the same OVP_TRIP net reaches MCU PB4, whose EXTI handler
+  sets PS_OFF (EN low, and Q7 also holds the disconnect off) and the 1 ms
+  tick latches `OVP_HW`. The comparator alone is non-latching; the latch
+  lives in firmware. If the MCU hangs, the IWDG reset boots into SAFE with
+  PS_OFF high, so the converter still ends up off.
 - Battery work always uses `OUTPUT(on+DEM)` mode: source-only power stage
   (fault 7) plus blocking disconnect when off (fault 6) means no path ever
   drains or back-feeds the pack.

@@ -62,11 +62,17 @@ manager, CAN 2.0B @500k. Docs 01–07 are the spec; read 05 (build plan) first
 
 **State: routed. 0 unconnected, 0 DRC errors, 19 warnings (silk and
 four one-layer vias), PS-002 clear, fab zip + CPL generated.** The routing
-recipe is in `tools/README.md`. Review items before ordering: the G_LS_A
-B.Cu ring around U3, VOUT2/COMP2 routed under U3's body, RT1 (NTC_FET)
-next to U3 rather than the FETs, signal tracks across the B.Cu AGND
-pocket, FB2 (U3 pin 3) tied to AGND, the C15/16/36/37 land vs part CHECK,
-and INA228 (U5) out of stock at LCSC.
+recipe is in `tools/README.md`. The pre-order review (2026-09-28) closed
+every point: FB2 -> AGND is what LM5143 §8.3.17.2 asks for in interleaved
+mode; C15/16/36/37 are now EEHZA1V221P (fits the 10x10.5 land); U5 is the
+stocked INA228AQDGSRQ1 (same pinout and registers). Layout points kept on
+purpose: G_LS_A's B.Cu detour is 26 mm vs G_LS_B's 20 mm (a few nH);
+VOUT2/COMP2 under U3 are mask-covered, DC-quiet tie nets; B.Cu signal
+crossings leave the In1 AGND pocket (the reference plane) unbroken.
+**Bring-up item:** RT1 sits between the phases as docs/08 intends, but on
+the AGND pocket, which is thermally isolated from the PGND copper the FETs
+heat. Expect NTC_FET to lag and read low: log it against a thermocouple
+on Q2 at full load and set the derate/OTP thresholds from that offset.
 
 Everything below in this section is the 2026-07-26 history (83 open
 connections), kept for its Freerouting and PS-002 notes. The old recipe:

@@ -18,7 +18,7 @@ Item,Qty,References,Value,Footprint,LCSC,MPN,Manufacturer,Unit USD,Ext USD,Note
 17,1,J4,UART,Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical,,,,,,
 18,1,J5,PANEL KEYS,Connector_PinHeader_2.54mm:PinHeader_1x09_P2.54mm_Vertical,,,,,,
 19,1,J6,ILI9341 LCD MODULE,Connector_PinHeader_2.54mm:PinHeader_1x14_P2.54mm_Vertical,,,,,,"ILI9341+XPT2046 2.8in module plugs here - AliExpress, confirm 3V3-VCC jumper"
-20,1,L2,33u/1.2A,Inductor_SMD:L_1210_3225Metric,,,,,,
+20,1,L2,33u/1.2A,Inductor_SMD:L_Changjiang_FNR5040S,C167973,FNR5040S330MT,cjiang (Changjiang Microelectronics),0.06,0.06,"5x5x4 mm shielded, KiCad L_Changjiang_FNR5040S land; Isat 1.30 A min covers the 33u/1.2A value. Any 5040-size 33 uH >=1.2 A part with the same 2.3 mm pad gap fits"
 21,3,Q8 Q9 Q10,2N7002,Package_TO_SOT_SMD:SOT-23,,,,,,
 22,1,Q11,AO3401A-class PMOS,Package_TO_SOT_SMD:SOT-23,,,,,,
 23,1,R50,100K 1%,Resistor_SMD:R_0603_1608Metric,,,,,,
@@ -36,4 +36,4 @@ Item,Qty,References,Value,Footprint,LCSC,MPN,Manufacturer,Unit USD,Ext USD,Note
 35,1,U11,TCAN1042HGV,Package_SO:SOIC-8_3.9x4.9mm_P1.27mm,C485806,TCAN1042VDRQ1,TI,0.57,0.57,"symbol value says TCAN1042HGV; SOURCING picked the V (VIO) variant, same SOIC-8 pinout"
 36,1,U12,TPD2E001,Package_TO_SOT_SMD:Texas_R-PDSO-N5_DRL-5,C150526,TPD2E001DRLR,TI,0.16,0.16,
 37,1,U13,TCA9535PWR,Package_SO:TSSOP-24_4.4x7.8mm_P0.65mm,C130204,TCA9535PWR,TI,0.44,0.44,UMW clone acceptable here
-,80,,,,,,,,12.5,"10/80 placements have an LCSC number; total covers those only (qty-1, SOURCING.md 2026-07-18)"
+,80,,,,,,,,12.56,"11/80 placements have an LCSC number; total covers those only (qty-1, SOURCING.md 2026-07-18)"

@@ -1,6 +1,6 @@
 Item,Qty,References,Value,Footprint,LCSC,MPN,Manufacturer,Unit USD,Ext USD,Note
 1,2,C1 C3,100n,Capacitor_SMD:C_0603_1608Metric,,,,,,
-2,1,C2,470u/50V,Capacitor_SMD:CP_Elec_16x17.5,,,,,,SOURCING's 470 uF part C106666 is THT D10; this board uses a 16x17.5 SMD footprint - choose an SMD part
+2,1,C2,470u/50V,Capacitor_SMD:CP_Elec_16x17.5,C462700,UCX1H471MNS1MS,Nichicon,1.63,1.63,"SMD 16x16.5, 50 V, 70 mOhm, 1.0 A ripple at 100 kHz, 135 C rated; fits the 16x17.5 land. Fallback: Panasonic EEEFK1H471AM (C178551)"
 3,1,D5,SMBJ33A,Diode_SMD:D_SMB,,,,,,
 4,1,J1,MANAGER,Connector_PinHeader_2.54mm:PinHeader_1x20_P2.54mm_Vertical,,,,,,
 5,1,J2,E-STOP NC (jumper if absent),Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical,,,,,,
@@ -27,4 +27,4 @@ Item,Qty,References,Value,Footprint,LCSC,MPN,Manufacturer,Unit USD,Ext USD,Note
 26,1,R3,120R slot7-end,Resistor_SMD:R_0603_1608Metric,,,,,,
 27,2,RS1 RS2,0m5 3920,labbench:R3920_BVS,C466580,BVS-M-R0005,Isabellenhuette,0.6,1.2,2 in parallel = 0.25 mOhm; verify power rating on datasheet
 28,1,U1,INA228,Package_SO:VSSOP-10_3x3mm_P0.5mm,C5214669,INA228AQDGSRQ1,TI,17.16,17.16,"automotive grade of INA228AIDGSR, same VSSOP-10 pinout and register map (no firmware change); the AIDGSR (C2887910) was still out of stock on 2026-09-28 - swap back if it returns, it is about a quarter of the price"
-,30,,,,,,,,22.84,"11/30 placements have an LCSC number; total covers those only (qty-1, SOURCING.md 2026-07-18)"
+,30,,,,,,,,24.47,"12/30 placements have an LCSC number; total covers those only (qty-1, SOURCING.md 2026-07-18)"

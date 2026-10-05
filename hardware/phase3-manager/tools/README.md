@@ -33,6 +33,19 @@ DRC-clean) result. Everything placed by hand lives in `gen_board.py`
 PLACEMENT, so rerunning it always reproduces the committed placement; no
 script after it moves a part.
 
+### Engineering changes on the routed board
+
+A part change does not need the full rebuild (Freerouting would reshuffle
+every net). The 2026-10-05 L2 change (1210 -> 5x5 mm FNR5040S) was done as
+an ECO: update PLACEMENT and the affected ROUTES first, so a rebuild still
+reproduces the board; then on the committed board swap the footprint, move
+the parts, delete only the touched nets' copper (SW_AUX, the 5V0 head,
+PRESENT4-7), redraw the ROUTES items locked, and run
+`finish_routes.py --base=<fresh gen_board + route_critical board>`, then
+`stitch.py` **fragment pass only** (rerunning its 5 mm grid on a stitched
+board doubles every grid via, 1 mm from the first), `fix_fpids`,
+`finish_board --silk --planes`, `run_drc.py`, `--fab` and `common/cpl.py`.
+
 ## Scripts
 
 | Script | Role |

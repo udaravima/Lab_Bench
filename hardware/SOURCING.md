@@ -62,6 +62,8 @@ Decisions taken this pass (user-approved 2026-07-18):
 | Bus shunt 0.5 mΩ 3920 ×2 ∥ | C466580 | 0.60 | 2.9k | BVS-M-R0005: 2 in parallel = 0.25 mΩ (0.5 W each @62 A); verify power rating on ds. Alt: ARCS8518 100 µΩ bar $3.64/49 |
 | 220 µF 35 V hybrid ×4 | C454349 | 1.42 | **1** | Panasonic EEHZA1V221P D10×10.2, 20 mΩ / 2.5 A — fits the CP_Elec_10x10.5 land. Stocked alternative on the same land: SUNCON 35HVH220M+P (C179812, D10×12.5, 8 in stock 2026-09-28). The earlier D8 SVZ pick (C2923769) did not fit the land and is out of stock |
 | 470 µF 50 V bulk | C106666 | 0.10 | 73k | **THT radial D10×20** — cheaper + stronger than SMD; footprint changes at PCB pass |
+| 470 µF 50 V SMD (backplane C2) | C462700 | 1.63 | 633 (JLCPCB) | Nichicon UCX1H471MNS1MS, 16×16.5, 70 mΩ, 1.0 A @100 kHz, 135 °C. The board has an SMD CP_Elec_16x17.5 land (17×17 platform), not the THT D10 above; 16×16.5 cans fit it. Fallback: Panasonic EEEFK1H471AM (C178551, 131). Picked 2026-10-05 |
+| 33 µH aux-buck inductor (manager L2) | C167973 | 0.06 | 51k (JLCPCB) | cjiang FNR5040S330MT, 5×5×4 mm: **Isat 1.30 A min / Irms 1.20 A min / DCR 0.244 Ω max** (cjiang FNR datasheet). No 1210 33 µH is stocked above 0.5 A, so the manager land grew to L_Changjiang_FNR5040S (2026-10-05). Phase-1/2 L2 are still 1210 |
 | 10 µF 50 V X7S 1210 ×8+6 | C126612 | 0.144 | 43k | GCM32EC71H106KA03L; also replaces the 22 µF/50 V output MLCCs (that value barely exists) |
 | 8 MHz 3225 crystal | C400090 | 0.105 | 200k | cheap parts are CL=12 pF → C66/C67 = 18 p (APPLIED, both phases) |
 

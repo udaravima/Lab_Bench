@@ -4,9 +4,11 @@ Written 2026-07-16, last refreshed 2026-10-06 for the next agent (or future
 session) continuing this project. Read this + README.md before touching anything.
 **All four boards are routed with 0 unconnected and 0 DRC errors**, v0.1.0
 was released from `master` on 2026-09-29, and the manager L2 / backplane C2
-part change (PR #16) landed on `development` on 2026-10-06. What stands
-between the project and the first order is the owner's pick on the BOM
-`CHECK:` rows and the gates under "Immediate next steps".
+part change (PR #16) landed on `development` on 2026-10-06. On 2026-10-06
+the phase-1/phase-2 L2 moved to the manager's 5 × 5 mm land and the last
+BOM `CHECK:` rows were closed, so no `CHECK:` row is left in any BOM. What
+stands between the project and the first order is the gates under
+"Immediate next steps".
 
 ## The user & working agreement
 
@@ -48,9 +50,9 @@ manager, CAN 2.0B @500k. Docs 01–07 are the spec; read 05 (build plan) first
 | Design docs 01–07 | complete (07 = module firmware, new) |
 | Phase-1 schematic | **complete, v1**: 7 generated sheets, 137 components, ~90 nets machine-verified; audited (kicad-happy + ngspice 38/40 pass) |
 | Footprints | all vetted; custom lib `labbench.pretty` (LM5145 RGY, LMR36015 RNX, DAC80502 no-EP WSON, PowerFET_SON5x6_GDS) |
-| PCB — Phase 1 | **100 × 80 mm, routed, 0 unconnected, 0 DRC errors** (2026-09-27, PR #9, merged; the 120 × 80 layout it replaces is kept on branch `phase1-120x80`). Re-placed from the netlist, so L1 now has the 17 mm MWSA1707S/XAL1510 superset land and U7 the SC-70-5 land the BOM orders (the 120 × 80 board still carried XAL1350 and SOT-23-5 lands: do not order it). Output bank tightened round the bigger L1; R30 Kelvin shunt, U4/U5 and their sense traces moved as one block with the same geometry; Q3/Q4, J4 and the LTC7004 stack down the right edge. Pipeline: pass-1 + `fanout.py` + Freerouting 1.9 + `finish_routes.py`; 1303 tracks / 353 vias. DRC = 11 silk *warnings*. Fab zip + CPL regenerated. 2026-09-28 (PR #13): OVP_TRIP routed to U10 PB4 for the firmware 0.2 OVP latch |
+| PCB — Phase 1 | **100 × 80 mm, routed, 0 unconnected, 0 DRC errors** (2026-09-27, PR #9, merged; the 120 × 80 layout it replaces is kept on branch `phase1-120x80`). Re-placed from the netlist, so L1 now has the 17 mm MWSA1707S/XAL1510 superset land and U7 the SC-70-5 land the BOM orders (the 120 × 80 board still carried XAL1350 and SOT-23-5 lands: do not order it). Output bank tightened round the bigger L1; R30 Kelvin shunt, U4/U5 and their sense traces moved as one block with the same geometry; Q3/Q4, J4 and the LTC7004 stack down the right edge. Pipeline: pass-1 + `fanout.py` + Freerouting 1.9 + `finish_routes.py`; 1303 tracks / 353 vias. DRC = 11 silk *warnings*. Fab zip + CPL regenerated. 2026-09-28 (PR #13): OVP_TRIP routed to U10 PB4 for the firmware 0.2 OVP latch. **ECO 2026-10-06:** L2 1210 → 5×5 mm FNR5040S at (32.6, 61.25), SW_AUX stub re-ended on the new pad, a 0.4 mm F.Cu 5V0 link added from L2's via to C54's; C20/C75–C77 value now 10u/50V. DRC unchanged (10 silk warnings) |
 | PCB — Phase 3 backplane | **FAB-READY (2026-07-26, d9e1a7b)**: 0 DRC, 0 unconnected, silk 39/39 clean, no plane islands. Gerbers+drills in `fab/` (gitignored) via `python3 ../common/finish_board.py phase3-backplane.kicad_pcb`. Cross-checked: Edge_Cuts exactly 330.00×100.00 mm; drills 2×6.4 (M6 lugs), 16×2.8 (8 slots × 2 XT60 pins), 6×3.2 (M3), 86×1.0, 61×0.4. **Still gated on the XT60 polarity buzz-out before ordering** |
-| PCB — Phase 2 | **130 × 90 mm, routed, 0 unconnected, 0 DRC errors (2026-09-27, PR #11, merged 2026-09-28)**; fab zip + CPL committed; pre-order review closed (see the resume section). The 83-unconnected history is kept below for its tooling notes |
+| PCB — Phase 2 | **130 × 90 mm, routed, 0 unconnected, 0 DRC errors (2026-09-27, PR #11, merged 2026-09-28)**; fab zip + CPL committed; pre-order review closed (see the resume section). **ECO 2026-10-06:** L2 1210 → 5×5 mm FNR5040S at (68.4, 57.45) r270; its SW_AUX and 5V0 vias now sit in its pads, a 5V0 stub ties C55's via to L2. DRC unchanged (19 warnings, 0 errors). The 83-unconnected history is kept below for its tooling notes |
 | PCB — Phase 3 manager | **Routed, 0 unconnected, 0 DRC errors (2026-09-27, merged into `development`)**: placement reworked (15+ passives had been placed by stale refdes, far from their pins; U8 buck re-laid tight round its pinout; U11 turned so CAN faces J1; U12 in the USB path), PGND now poured on both layers (was F.Cu 3V3 / B.Cu PGND), USB + CAN pairs and buck power copper hand-drawn and locked (`route_critical.py`), rest Freerouting 1.9 + `finish_routes.py`, 283 PGND stitch vias. DRC = 5 warnings (4 silk, 1 U8 courtyard-override lib mismatch). Antenna keep-out copper-free. Pipeline: `phase3-manager/tools/README.md`. **ECO 2026-10-05:** L2 moved from the 1210 land (no stocked 33 µH above 0.5 A) to a 5×5 mm FNR5040S (FNR5040S330MT, Isat 1.3 A); C54/C55 turned 180° so 5V0 runs straight from L2; PRESENT1/4–7 re-routed round the bigger part with `finish_routes.py`. Still 0 unconnected, 0 DRC errors, 4 warnings (PR #16, merged 2026-10-06; fab zip, BOM and CPL regenerated) |
 | Module firmware | v0.2 builds clean (7.1 KB): full peripheral binding + CAN dispatch around the host-tested `module_core`. 0.2 (2026-09-28) closes the two protection gaps from the bench-test review: OCP backup #2 (`lb_core_ocp_sample`: INA240 ADC or INA228 SOVL alert >110 % i_max for >5 ms) and OVP latch #4 (OVP_TRIP routed to PB4 on the 100 × 80 board; EXTI4 kills EN, tick latches). Untested on silicon (no board yet) |
 | Host tests | `cd firmware/tests && make test` — must stay green. **5 suites now**: can, core, manager, scpi, ui |
@@ -217,29 +219,28 @@ Notable route_board facts a future session needs:
 
 ## Immediate next steps (agreed order)
 
-1. **Owner picks the five BOM `CHECK:` rows** (state 2026-10-06; the
-   notes in the BOM CSVs say what each one needs):
-   - Phase-1 C20/C75–C77: no 22 µF 50 V 1210 stocked, 10 µF 50 V fitted
-     (input ceramic drops from 88 to 40 µF; C21 is the bulk).
-   - Phase-1 L2: 33 µH on a 1210 land, the strongest stocked part is 0.5 A
-     against a 1.2 A value. Fine only if 5V0 stays well under ~0.4 A.
-   - Phase-1 Q1/Q2 and Q3/Q4: NTMFS5C670NLT1G stands in for the
-     out-of-stock CSD18563Q5A (same S-S-S-G / tab pinout); confirm the pad
-     overlay in the JLCPCB preview.
-   - Phase-2 U3: symbol says LM5143RHAR, the BOM orders the cheaper
-     LM5143QRHARQ1; confirm the RHA0040P land against the Q1 addendum.
-2. **Open: Phase-1 and Phase-2 L2 still sit on 1210 lands** (phase-2 L2
-   has no LCSC number yet). The manager had the same problem and was fixed
-   by moving to the 5 × 5 mm FNR5040S land as an ECO (PR #16); the same
-   change was offered for phase-1/2 and waits on the owner's call.
+1. **BOM `CHECK:` rows: all closed 2026-10-06** (stock checked that day):
+   - Phase-1 C20/C75–C77: no 22 µF 50 V 1210 is stocked anywhere, so the
+     design value is now 10 µF 50 V X7R (GRM32ER71H106KA12L). About 0.3 Vpp
+     input ripple at 8 A, D = 0.5, 350 kHz; ~1 A RMS per cap; C21 is the bulk.
+   - Phase-1 and phase-2 L2: moved to the manager's 5 × 5 mm FNR5040S land
+     (FNR5040S330MT, C167973, Isat 1.3 A) as an ECO on both routed boards.
+   - Phase-1 Q1–Q4: CSD18563Q5A is still out of stock; NTMFS5C670NLT1G
+     stays. Its case 488AA terminals sit within 0.14 mm of the TI part's on
+     the TI Q5A land, with more clearance to the drain land (0.35 vs 0.24 mm).
+   - Phase-2 U3: LM5143QRHARQ1 is the LM5143A-Q1. Same pin map, and its
+     RHA0040N land equals RHA0040P (EP 3.3, 0.5 pitch, 5.8 span); only
+     wettable flanks differ. It now costs $6.29 (243 at LCSC).
+2. **Thin stock (2026-10-06):** INA228AQDGSRQ1 has **5** at LCSC/JLCPCB
+   (the AIDGSR has 0): one per module plus the backplane, so buy them
+   first or from Mouser/DigiKey. LTC7004EMSE has 25 (now $11.62).
 3. **Order files**: `python3 common/bom.py` (from `hardware/`) writes hidden
    LCSC/MPN/Manufacturer properties into the schematics (surgical, additive
    only) and emits `<board>/bom/*-bom.csv` + `*-jlcpcb.csv`;
    `common/cpl.py` writes the placement files. The part table is
    `common/lcsc_parts.py`; `--check` fails if anything is stale. Still
-   open: generic R/C/jellybean/header numbers. The manager and backplane
-   order files bundled with the v0.1.0 release predate PR #16: regenerate
-   them from `development` before ordering those two boards.
+   open: generic R/C/jellybean/header numbers. The v0.1.0 release order
+   files are superseded; use the v0.2.0 set.
 4. Review notes that still hold at order time: manager J3 is the GCT
    USB4105-GF-A (C3020560; JLCPCB assembly stock, backup -120 C5184243);
    13 manager nets cross under the USB pair on B.Cu (fine at full speed).
@@ -254,7 +255,8 @@ Notable route_board facts a future session needs:
 - **XT60 polarity continuity check** (MECHANICAL.md — verify J1 male vs
   backplane J-female in the *mated* orientation; the footprint descr still
   says pads 1/2 are ASSUMED +/−).
-- **Re-verify LCSC stock** of the order-early parts (LTC7004, CSD19536KTT).
+- **Re-verify LCSC stock** of the order-early parts (INA228AQDGSRQ1,
+  LTC7004, CSD19536KTT).
 - **Manager board only: confirm the fab quotes 0.2 mm drilling** on a 2-layer
   stackup — the board rule was relaxed from 0.3 to 0.2 for the stock ESP32
   footprint's thermal-pad stitching, and that is above some cheapest-process

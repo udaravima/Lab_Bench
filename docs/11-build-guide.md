@@ -17,10 +17,10 @@ takes over and checks that it actually meets the spec.
 
 | Board | What it is | Can you order it? |
 |---|---|---|
-| **Phase-1 module** (`hardware/phase1-module/`) | Single 150 W channel: 24 V in, 0–20 V / 0–8 A out, CAN controlled | **Yes, once the parts in §3.3 are settled.** Order the 100 × 80 board on `development`/`master`; the 120 × 80 layout on branch `phase1-120x80` has wrong L1/U7 lands |
-| Phase-2 module (`hardware/phase2-module/`) | 600 W channel, 0–28 V / 0–30 A, hot-swap input | Routed and fab-ready (2026-09-27). Wait for Phase-1 to pass its bench tests (docs/05 exit criteria) and settle the U3 `CHECK:` row |
+| **Phase-1 module** (`hardware/phase1-module/`) | Single 150 W channel: 24 V in, 0–20 V / 0–8 A out, CAN controlled | **Yes.** Check the parts in §3.3, then order the 100 × 80 board on `development`/`master`; the 120 × 80 layout on branch `phase1-120x80` has wrong L1/U7 lands |
+| Phase-2 module (`hardware/phase2-module/`) | 600 W channel, 0–28 V / 0–30 A, hot-swap input | Routed and fab-ready (2026-09-27). Wait for Phase-1 to pass its bench tests (docs/05 exit criteria) |
 | Phase-3 backplane (`hardware/phase3-backplane/`) | 8-slot bus with CAN, E-stop and bus metering | Fab-ready, but gated on the XT60 polarity check and only useful with Phase-2 modules and a manager |
-| Phase-3 manager (`hardware/phase3-manager/`) | ESP32-S3 with display, encoder, USB SCPI | Routed and fab-ready. Confirm the fab quotes 0.2 mm drilling on 2 layers; regenerate the order files if yours predate 2026-10-06 (L2 changed) |
+| Phase-3 manager (`hardware/phase3-manager/`) | ESP32-S3 with display, encoder, USB SCPI | Routed and fab-ready. Confirm the fab quotes 0.2 mm drilling on 2 layers; use the v0.2.0 order files or newer (L2 changed 2026-10-05) |
 
 So today this guide is about the **Phase-1 module**. It is the "learning
 board": every risky part of the design (analog CV/CC loops, sensing,
@@ -126,13 +126,11 @@ tolerance matters in a few places:
 
 | Item | What to decide |
 |---|---|
-| **Q1–Q4 (power and disconnect FETs)** | The CSD18563Q5A was out of stock on 2026-09-27; the BOM orders onsemi NTMFS5C670NLT1G (60 V, 6.1 mΩ, Qg 20 nC) with the same S-S-S-G / tab pinout. Confirm the pad overlay in the JLCPCB preview, or buy CSD18563Q5A if it is back |
-| **C20, C75–C77 (input ceramics)** | No 22 µF 50 V 1210 is stocked; the BOM orders 10 µF 50 V, which drops the input ceramic from 88 to 40 µF (C21 is the bulk). Accept it or source 22 µF elsewhere |
-| **L2 (5V0 aux buck inductor)** | The 1210 land only takes 33 µH parts rated about 0.5 A; the value asks for 1.2 A. Fine if the 5V0 load (fan included) stays well under ~0.4 A. A bigger 5 × 5 mm land, as on the manager, is an open option |
+| **Q1–Q4 (power and disconnect FETs)** | The CSD18563Q5A is out of stock (2026-10-06); the BOM orders onsemi NTMFS5C670NLT1G (60 V, 6.1 mΩ, Qg 20 nC), same S-S-S-G / tab pinout, overlay on the land checked. If the CSD18563Q5A is back, either part fits |
 | **R30 (2 mΩ shunt)** | The LCSC part (C2994640) is cheap but its TCR is unverified. The CC accuracy depends on it. A Vishay WSLP-class part (~US$1.50) is the safe choice |
 | **U8, U11 variants** | The LCSC variants (LMR36015ARNXR, TCAN1042VDRQ1) differ from the symbol values. Both are the right function (adjustable buck, VIO-capable CAN transceiver) in the same package |
 | **J1, J4 terminal blocks** | The footprint is a 5.0 mm Phoenix PT; SOURCING.md lists 5.08 mm 2EDG plugs. Buy a header that matches the 5.0 mm footprint |
-| **Order-early parts** | LTC7004EMSE had only 5 in stock at LCSC. Put it in the cart first |
+| **Order-early parts** | INA228AQDGSRQ1 had 5 and LTC7004EMSE 25 in stock at LCSC (2026-10-06). Put them in the cart first |
 
 ## 4. Assemble
 
@@ -179,7 +177,7 @@ is cheap; a short at 24 V is not.
 | J2 SWD | 1 = 3V3, 2 = SWDIO, 3 = SWCLK, 4 = NRST, 5 = GND | See the note on pin 1 below |
 | J3 UART | 1 = GND, 2 = TX (from MCU), 3 = RX (to MCU) | 115200 8N1, 3.3 V |
 | J5 BACKPLANE | 1 = CAN_H, 2 = CAN_L, 3 = HW_EN, 4–6 = SLOT_ID0–2, 7–8 = PGND | The bench harness plugs in here |
-| J6 FAN | 1 = +5 V, 2 = fan return (switched low side) | Small 5 V fan; keep it under ~200 mA. The 5 V rail is sized for 0.5 A total, and the 1210 L2 the BOM fits is rated about 0.5 A, so keep the whole 5V0 load under ~0.4 A (§3.3) |
+| J6 FAN | 1 = +5 V, 2 = fan return (switched low side) | Small 5 V fan; keep it under ~200 mA. The 5 V rail is sized for 0.5 A total; L2 (FNR5040S330MT) is rated 1.2 A, so the converter, not the inductor, sets that limit |
 
 **J2 pin 1:** a genuine ST-Link only senses target voltage on this pin. Many
 clone ST-Link V2 dongles *drive* 3.3 V onto it, which then fights the board's
@@ -270,14 +268,14 @@ ADC sampling on the high-impedance V_MEAS divider, then the DAC80502 gain.
   aux and MCU blocks, with a 2-phase LM5143 power stage and LM5069 hot-swap
   input. Its assembly is the same as above plus heavier soldering on the power
   stage. The board is routed and the 220 µF caps are settled (EEHZA1V221P);
-  the one open BOM item is the LM5143 Q1-variant land check (U3), plus the
-  1210 L2 question that Phase-1 has too.
+  the LM5143 Q1 variant (U3) was checked against its land on 2026-10-06, and
+  L2 moved to a 5 × 5 mm land like Phase-1's.
 - **Phase-3 backplane and manager** turn modules into a rack. Before ordering
   the backplane, mate one XT60PW-M/F pair and buzz out which pad connects to
   which, and which cavity is marked "+" ([hardware/MECHANICAL.md](../hardware/MECHANICAL.md)).
   Pads 1 = + on both sides is still an assumption. The manager board is
-  routed; its order files changed on 2026-10-06 (L2 on a 5 × 5 mm land), so
-  use ones generated from `development` or later. The manager firmware builds
+  routed; its order files changed on 2026-10-05 (L2 on a 5 × 5 mm land), so
+  use the v0.2.0 set or newer. The manager firmware builds
   in CI (`firmware/manager/idf`, ESP-IDF 5.3.2); its bring-up knobs are in
   [docs/10](10-manager-firmware.md).
 

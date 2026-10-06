@@ -157,15 +157,20 @@ PLACEMENT.update({
     # (pins 10/11) -- so each hot loop closes in ~2 mm on F.Cu. (An earlier
     # pass had both caps east and L2 12 mm away, which put C50 between the
     # SW pin and the inductor.) SW (pin 12) exits north straight into L2;
-    # the output caps sit west of L2's 5V0 pad; C52 (boot) is fed from SW
+    # the output caps sit west of L2's 5V0 pad, turned so their 5V0 pads
+    # line up with it (one straight 0.8 mm run) and their PGND pads face
+    # the input caps; C52 (boot) is fed from SW
     # round the west side, BOOT from pin 4 down the south; C53 (VCC) and the
     # FB divider R51/R50 sit under pins 5-7, and AUX_PG leaves east to R52.
     "U8":  (18.0, 55.0, 0),       # LMR36015 VQFN-HR-12
     "C51": (14.65, 54.0, 90),      # 4.7u/50V at pins 2 (VIN) / 1 (PGND)
     "C50": (21.35, 54.0, 90),      # 4.7u/50V at pins 10 (VIN) / 11 (PGND)
-    "L2":  (18.0, 50.0, 90),      # 33u 1210: pad1 SW (south), pad2 5V0
-    "C54": (14.2, 48.3, 90),      # 5V0 out 22u
-    "C55": (10.9, 48.3, 90),
+    # L2 is a 5x5 mm FNR5040S (33u, Isat 1.3 A min): the 1210 it replaced
+    # had no stocked part above 0.5 A. Nudged east so its courtyard clears
+    # C54, and as far north as F1 allows so it clears C50/C51.
+    "L2":  (18.8, 48.4, 90),      # pad1 SW (south), pad2 5V0 (north)
+    "C54": (14.2, 48.3, 270),     # 5V0 out 22u: pad1 5V0 north, pad2 PGND south
+    "C55": (10.9, 48.3, 270),
     "C52": (14.2, 57.3, 180),     # BOOT: pad1 BOOT east, pad2 SW west
     "C53": (16.9, 58.5, 270),     # VCC, under pin 5
     "R51": (19.6, 58.5, 270),     # FB bottom, under pin 7

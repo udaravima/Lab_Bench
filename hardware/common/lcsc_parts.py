@@ -67,9 +67,9 @@ PARTS = [
 
     # ---- B. Magnetics & power passives ------------------------------------
     ({P2: ["L1", "L3"]}, "C6238332", "MWSA1707S-6R8MT", "Sunlord", 1.72,
-     "17 A Irms / 22 A Isat; placeholder footprint until the land pass"),
+     "17 A Irms / 22 A Isat; L_1707_XAL1510 superset land (also takes the XAL1510 spares)"),
     ({P1: ["L1"]}, "C5240401", "MWSA1707S-100MT", "Sunlord", 1.68,
-     "16.5 A Isat / 10.5 A Irms; placeholder footprint until the land pass"),
+     "16.5 A Isat / 10.5 A Irms; L_1707_XAL1510 superset land"),
     ({P2: ["R36", "R37", "R42", "R57"]}, "C49837985", "", "", 0.025,
      "7.5 mOhm 1206 1 W 1 %, phase-shunt pairs"),
     ({P2: ["R30", "R34"]}, "C46634444", "", "", 0.058,

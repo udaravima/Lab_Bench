@@ -67,9 +67,9 @@ PARTS = [
 
     # ---- B. Magnetics & power passives ------------------------------------
     ({P2: ["L1", "L3"]}, "C6238332", "MWSA1707S-6R8MT", "Sunlord", 1.72,
-     "17 A Irms / 22 A Isat; placeholder footprint until the land pass"),
+     "17 A Irms / 22 A Isat; L_1707_XAL1510 superset land (also takes the XAL1510 spares)"),
     ({P1: ["L1"]}, "C5240401", "MWSA1707S-100MT", "Sunlord", 1.68,
-     "16.5 A Isat / 10.5 A Irms; placeholder footprint until the land pass"),
+     "16.5 A Isat / 10.5 A Irms; L_1707_XAL1510 superset land"),
     ({P2: ["R36", "R37", "R42", "R57"]}, "C49837985", "", "", 0.025,
      "7.5 mOhm 1206 1 W 1 %, phase-shunt pairs"),
     ({P2: ["R30", "R34"]}, "C46634444", "", "", 0.058,
@@ -116,6 +116,20 @@ PARTS = [
     # solder in. C3207114 was a 6.35 mm cylindrical clip, not a holder.
     ({MGR: ["F1"]}, "C151091", "0297002.WXNV", "Littelfuse", 0.11,
      "2 A MINI blade fuse, soldered directly into the land (no holder)"),
+
+    # ---- Deferred picks closed 2026-10-05 (JLCPCB stock checked that day) --
+    # No 1210 33 uH is stocked above 0.5 A, so the manager's L2 land grew to
+    # the 5x5 mm FNR5040S (board re-routed round it). Datasheet: 33 uH +-20 %,
+    # DCR 0.244 ohm max, Isat 1.30 A min / 1.45 A typ, Irms 1.20 A min.
+    ({MGR: ["L2"]}, "C167973", "FNR5040S330MT", "cjiang (Changjiang Microelectronics)",
+     0.06, "5x5x4 mm shielded, KiCad L_Changjiang_FNR5040S land; Isat 1.30 A "
+     "min covers the 33u/1.2A value. Any 5040-size 33 uH >=1.2 A part with "
+     "the same 2.3 mm pad gap fits"),
+    # C2 sits on CP_Elec_16x17.5 (17 x 17 mm platform); 16 x 16.5 cans share
+    # that platform and terminal layout, so no board change.
+    ({BP: ["C2"]}, "C462700", "UCX1H471MNS1MS", "Nichicon", 1.63,
+     "SMD 16x16.5, 50 V, 70 mOhm, 1.0 A ripple at 100 kHz, 135 C rated; "
+     "fits the 16x17.5 land. Fallback: Panasonic EEEFK1H471AM (C178551)"),
 
     # ---- D. Phase-1 passives & small parts (JLCPCB catalogue, 2026-09-27) --
     ({P1: ["C1"]}, "C57112", "0603B103K500NT", "FH", 0.0108,
@@ -231,8 +245,6 @@ NOTES = [
     ({P1: ["F1"]}, "through-hole, hand-solder; the land is KiCad's "
      "direct-solder mini blade pattern, so a 10 A mini blade (ATM) fuse "
      "solders straight in with no holder (C3207114 does not fit it)"),
-    ({BP: ["C2"]}, "SOURCING's 470 uF part C106666 is THT D10; this board "
-     "uses a 16x17.5 SMD footprint - choose an SMD part"),
     ({P1: ["J2", "J3", "J5", "J6"]}, "through-hole pin header: hand-solder "
      "(or pay for JLCPCB THT assembly)"),
     ({MGR: ["J6"]}, "ILI9341+XPT2046 2.8in module plugs here - AliExpress, "

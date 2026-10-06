@@ -1,6 +1,6 @@
 # PCB layout guide — placement rules per board
 
-Status of layout work as of 2026-07-19, and per-cluster placement guidance for
+Status of layout work (table refreshed 2026-10-06), and per-cluster placement guidance for
 hand-layout in KiCad. Net names below are exactly as in the verified netlists
 (`check_netlist.py` green on phase-2 and backplane). Pin numbers were verified
 against the footprints + netlist, not memory.
@@ -9,14 +9,15 @@ against the footprints + netlist, not memory.
 
 | Board | Schematic | Netlist check | PCB |
 |---|---|---|---|
-| phase1-module | done | green | **done** — `phase1-module.kicad_pcb`: placement, pours, planes, critical routes, 0 DRC copper errors; some signal nets unrouted (autoroute.py is WIP) |
-| phase2-module | done (hand-arranged) | green (173 comps, 116 nets) | not started — this doc is the placement plan |
-| phase3-backplane | done | green (30 comps) | not started |
-| phase3-manager | done | green (80 comps, 86 nets) | **routed** 2026-09-27: 0 unconnected, 0 DRC errors (see `phase3-manager/tools/README.md`) |
+| phase1-module | done | green | **routed** 2026-09-27 at 100 × 80 mm: 0 unconnected, 0 DRC errors (see `phase1-module/tools/README.md`) |
+| phase2-module | done (hand-arranged) | green (173 comps, 116 nets) | **routed** 2026-09-27 at 130 × 90 mm: 0 unconnected, 0 DRC errors; the placement plan below is what was built |
+| phase3-backplane | done | green (30 comps) | **fab-ready** 2026-07-26: 0 unconnected, 0 DRC errors |
+| phase3-manager | done | green (80 comps, 86 nets) | **routed** 2026-09-27: 0 unconnected, 0 DRC errors; L2 moved to a 5 × 5 mm land 2026-10-05 (see `phase3-manager/tools/README.md`) |
 
 Phase-1's board is the reference implementation: open it next to this doc —
 every rule below is applied there and visible (input band → FET straddle →
-SW island → inductor → output band; the ground seam; the AGND pocket).
+SW island → inductor → output band; the ground seam. The 100 × 80 board has
+no AGND pocket: the LTC7004 cluster sits on the AGND side of the seam).
 
 ---
 

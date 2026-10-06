@@ -33,7 +33,7 @@ Item,Qty,References,Value,Footprint,LCSC,MPN,Manufacturer,Unit USD,Ext USD,Note
 32,1,J4,XT60PW-M OUTPUT,labbench:XT60PW-M,C98732,XT60PW-M,Amass,0.54,0.54,
 33,1,J5,SLOT SIGNALS,Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical,,,,,,
 34,1,J6,FAN,Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical,,,,,,
-35,2,L1 L3,6.8u MWSA1707S/XAL1510,labbench:L_1707_XAL1510,C6238332,MWSA1707S-6R8MT,Sunlord,1.72,3.44,17 A Irms / 22 A Isat; placeholder footprint until the land pass
+35,2,L1 L3,6.8u MWSA1707S/XAL1510,labbench:L_1707_XAL1510,C6238332,MWSA1707S-6R8MT,Sunlord,1.72,3.44,17 A Irms / 22 A Isat; L_1707_XAL1510 superset land (also takes the XAL1510 spares)
 36,1,L2,33u/1.2A,Inductor_SMD:L_1210_3225Metric,,,,,,
 37,8,Q1 Q2 Q3 Q4 Q10 Q11 Q12 Q13,CSD18540Q5B,labbench:PowerFET_SON5x6_GDS,C86513,CSD18540Q5B,TI,1.43,11.44,do not substitute clone power-stage FETs
 38,5,Q5 Q6 Q7 Q8 Q9,2N7002,Package_TO_SOT_SMD:SOT-23,,,,,,

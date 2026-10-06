@@ -1,19 +1,24 @@
 # Session Handover — Lab_Bench modular PSU
 
-Written 2026-07-16, updated 2026-07-26 for the next agent (or future session)
-continuing this project. Read this + README.md before touching anything.
-**Phase-2 PCB is routed (2026-09-27): 0 unconnected, 0 DRC errors, fab
-outputs generated** — see "Phase-2 PCB — resume point" below and
-`hardware/phase2-module/tools/README.md`. Manager firmware is done.
+Written 2026-07-16, last refreshed 2026-10-06 for the next agent (or future
+session) continuing this project. Read this + README.md before touching anything.
+**All four boards are routed with 0 unconnected and 0 DRC errors**, v0.1.0
+was released from `master` on 2026-09-29, and the manager L2 / backplane C2
+part change (PR #16) landed on `development` on 2026-10-06. What stands
+between the project and the first order is the owner's pick on the BOM
+`CHECK:` rows and the gates under "Immediate next steps".
 
 ## The user & working agreement
 
 - Hobbyist building a **multi-channel modular bench PSU**, learning along the
   way — explain the *why* of engineering decisions, not just the what.
-- **Git: ask per-commit, NEVER `git push`.** The user's global CLAUDE.md rule
-  (per-action commit approval) OVERRIDES the older "standing permission" line
-  that used to be here — do the work, then stop and ask before each
-  `git commit`. The user has been committing the PCB work themselves.
+- **Git: ask before committing, never push to `master`.** The user's global
+  CLAUDE.md rule (per-action commit approval) OVERRIDES the older "standing
+  permission" line that used to be here. Since 2026-09-27 all work goes to
+  the `development` branch through a feature branch and a pull request;
+  `master` only receives batched merges from `development` (it stays the
+  GitHub default branch). A major board redesign goes on its own branch,
+  and the prior design is saved as a branch first (e.g. `phase1-120x80`).
 - **The KiCad schematics are hand-owned now (since 2026-07-19).** The user
   hand-rearranged every `.kicad_sch` for readability (commits 7485036 /
   f9c5ff6 / b6402a7). **Never rerun the schematic generators** (gen_phase2.py
@@ -43,12 +48,10 @@ manager, CAN 2.0B @500k. Docs 01–07 are the spec; read 05 (build plan) first
 | Design docs 01–07 | complete (07 = module firmware, new) |
 | Phase-1 schematic | **complete, v1**: 7 generated sheets, 137 components, ~90 nets machine-verified; audited (kicad-happy + ngspice 38/40 pass) |
 | Footprints | all vetted; custom lib `labbench.pretty` (LM5145 RGY, LMR36015 RNX, DAC80502 no-EP WSON, PowerFET_SON5x6_GDS) |
-| PCB — Phase 1 | **100 × 80 mm, routed, 0 unconnected, 0 DRC errors** (2026-09-27, draft PR from `claude/phase1-100x80`; the 120 × 80 layout it replaces is kept on branch `phase1-120x80`). Re-placed from the netlist, so L1 now has the 17 mm MWSA1707S/XAL1510 superset land and U7 the SC-70-5 land the BOM orders (the 120 × 80 board still carried XAL1350 and SOT-23-5 lands: do not order it). Output bank tightened round the bigger L1; R30 Kelvin shunt, U4/U5 and their sense traces moved as one block with the same geometry; Q3/Q4, J4 and the LTC7004 stack down the right edge. Pipeline: pass-1 + `fanout.py` + Freerouting 1.9 + `finish_routes.py`; 1303 tracks / 353 vias. DRC = 11 silk *warnings*. Fab zip + CPL regenerated |
+| PCB — Phase 1 | **100 × 80 mm, routed, 0 unconnected, 0 DRC errors** (2026-09-27, PR #9, merged; the 120 × 80 layout it replaces is kept on branch `phase1-120x80`). Re-placed from the netlist, so L1 now has the 17 mm MWSA1707S/XAL1510 superset land and U7 the SC-70-5 land the BOM orders (the 120 × 80 board still carried XAL1350 and SOT-23-5 lands: do not order it). Output bank tightened round the bigger L1; R30 Kelvin shunt, U4/U5 and their sense traces moved as one block with the same geometry; Q3/Q4, J4 and the LTC7004 stack down the right edge. Pipeline: pass-1 + `fanout.py` + Freerouting 1.9 + `finish_routes.py`; 1303 tracks / 353 vias. DRC = 11 silk *warnings*. Fab zip + CPL regenerated. 2026-09-28 (PR #13): OVP_TRIP routed to U10 PB4 for the firmware 0.2 OVP latch |
 | PCB — Phase 3 backplane | **FAB-READY (2026-07-26, d9e1a7b)**: 0 DRC, 0 unconnected, silk 39/39 clean, no plane islands. Gerbers+drills in `fab/` (gitignored) via `python3 ../common/finish_board.py phase3-backplane.kicad_pcb`. Cross-checked: Edge_Cuts exactly 330.00×100.00 mm; drills 2×6.4 (M6 lugs), 16×2.8 (8 slots × 2 XT60 pins), 6×3.2 (M3), 86×1.0, 61×0.4. **Still gated on the XT60 polarity buzz-out before ordering** |
-| PCB — Phase 2 | **83 unconnected, 0 copper DRC, silk clean (2026-07-26, c1a86eb)** — see the resume section; finish by hand in KiCad. Older detail below: |
-| PCB — Phase 2 (history) | **(2026-07-25, 27fb2d1).** `gen_board.py` placement green (173 comps, all pour/courtyard/edge assertions pass, 130×90 4-layer); `route_board.py` pass-1 done (power pours, In2 heat patches, both phases' gate fan-outs, Kelvin pairs, disconnect trunk). DRC: **copper down to ~19 clearance + ~11 dangling/mask/hole in 3 known clusters** (see resume section); 243 unconnected = signal nets, autoroute not yet run. Found & fixed a real LM5143 land-pattern bug in the process (see load-bearing decisions) |
-| PCB — Phase 3 backplane | **COMPLETE pass-1 (2026-07-25)**: `phase3-backplane/tools/gen_board.py` (single-script: placement + 2oz bus pours + stitching + ALL signal routing) — **0 copper DRC, 0 unconnected**; only lib-bookkeeping (39) + 1 silk nick remain. 8 slots @30mm (XT60PW-F rot-90 mates the module pad-for-pad, socket y60..77.8 = module J5 1:1), M6 lugs -> RS1‖RS2 0.5mΩ Kelvin-sensed by INA228, nested PRESENT L-bus, CAN terminated past both end slots, E-stop chain threaded per docs. Netlist from `tools/wip/bp.net` (regenerate via kicad-cli) |
-| PCB — Phase 3 manager | **Routed, 0 unconnected, 0 DRC errors (2026-09-27, draft PR into `development` from `claude/route-manager-shxsg1`)**: placement reworked (15+ passives had been placed by stale refdes, far from their pins; U8 buck re-laid tight round its pinout; U11 turned so CAN faces J1; U12 in the USB path), PGND now poured on both layers (was F.Cu 3V3 / B.Cu PGND), USB + CAN pairs and buck power copper hand-drawn and locked (`route_critical.py`), rest Freerouting 1.9 + `finish_routes.py`, 283 PGND stitch vias. DRC = 5 warnings (4 silk, 1 U8 courtyard-override lib mismatch). Antenna keep-out copper-free. Pipeline: `phase3-manager/tools/README.md` |
+| PCB — Phase 2 | **130 × 90 mm, routed, 0 unconnected, 0 DRC errors (2026-09-27, PR #11, merged 2026-09-28)**; fab zip + CPL committed; pre-order review closed (see the resume section). The 83-unconnected history is kept below for its tooling notes |
+| PCB — Phase 3 manager | **Routed, 0 unconnected, 0 DRC errors (2026-09-27, merged into `development`)**: placement reworked (15+ passives had been placed by stale refdes, far from their pins; U8 buck re-laid tight round its pinout; U11 turned so CAN faces J1; U12 in the USB path), PGND now poured on both layers (was F.Cu 3V3 / B.Cu PGND), USB + CAN pairs and buck power copper hand-drawn and locked (`route_critical.py`), rest Freerouting 1.9 + `finish_routes.py`, 283 PGND stitch vias. DRC = 5 warnings (4 silk, 1 U8 courtyard-override lib mismatch). Antenna keep-out copper-free. Pipeline: `phase3-manager/tools/README.md`. **ECO 2026-10-05:** L2 moved from the 1210 land (no stocked 33 µH above 0.5 A) to a 5×5 mm FNR5040S (FNR5040S330MT, Isat 1.3 A); C54/C55 turned 180° so 5V0 runs straight from L2; PRESENT1/4–7 re-routed round the bigger part with `finish_routes.py`. Still 0 unconnected, 0 DRC errors, 4 warnings (PR #16, merged 2026-10-06; fab zip, BOM and CPL regenerated) |
 | Module firmware | v0.2 builds clean (7.1 KB): full peripheral binding + CAN dispatch around the host-tested `module_core`. 0.2 (2026-09-28) closes the two protection gaps from the bench-test review: OCP backup #2 (`lb_core_ocp_sample`: INA240 ADC or INA228 SOVL alert >110 % i_max for >5 ms) and OVP latch #4 (OVP_TRIP routed to PB4 on the 100 × 80 board; EXTI4 kills EN, tick latches). Untested on silicon (no board yet) |
 | Host tests | `cd firmware/tests && make test` — must stay green. **5 suites now**: can, core, manager, scpi, ui |
 | Manager firmware | **v0.2 COMPLETE (2026-07-25, commit 174595e)**: `scpi_core` + `ui_core` join `manager_core` as host-tested cores; ESP-IDF shell fully written (display/encoder/USB-SCPI/app_main). **First compile 2026-09-27: builds clean on IDF v5.3.2** (355 KB image, two build fixes). Untested on silicon. See docs/10 |
@@ -56,7 +59,7 @@ manager, CAN 2.0B @500k. Docs 01–07 are the spec; read 05 (build plan) first
 | Phase-2 schematic | **complete, v1, audited (2026-07-17)**: 8 sheets, 171 components, 116 nets machine-verified; kicad-happy audit triaged (all errors = known false-positive classes or the deferred MPN pass — same baseline as Phase-1); ngspice **45/47 pass** (crystal warn + bridge skip = same model limitations as Phase-1's 38/40) |
 | Phase-3 schematics | **complete, v1, audited (2026-07-17)**: backplane (29 comps, EXACT net assertions) + manager (80 comps) — audit caught a real omission (manager I²C pull-ups specified in docs/09 but not drawn; fixed, PR-001 clear). SPICE: manager 16/16, backplane 3/3. Backplane "missing I²C pull-up" findings = by design (manager owns them) |
 | Manager firmware — detail | manager_core v0.1 (2026-07-18) + **scpi_core & ui_core v0.2 (2026-07-25)**, all host-tested. Shell modules: `display.c` (esp_lcd ILI9341, 8×16 VGA font generated by `idf/tools/gen_font.py` from the system PSF — never hand-typed), `encoder.c` (PCNT ×4 quadrature, push/hold), `scpi_usb.c` (TinyUSB CDC), `app_main.c` (one mutex over the three cores; TCA9535 keys; backplane INA228 meter). Managed components in `main/idf_component.yml`. **Bring-up knobs (expect wrong on first light-up): display rotation + RGB565 byte order, then encoder direction** — docs/10 §Bring-up 6–7 |
-| Ordering/BOM | **China-first sourcing pass done (hardware/SOURCING.md, 2026-07-18)**: LCSC prices/stock verified for all phases (~$135 parts for the Phase-3 build, ~$300–380 all-in); inductor + slot-connector decisions taken (Sunlord + 3.75 mΩ shunts APPLIED to gen_phase2; XT60PW slots queued); order-early list: LTC7004 (5 pcs), CSD19536KTT (12 pcs). MPN-properties pass into symbols still pending |
+| Ordering/BOM | **China-first sourcing pass done (hardware/SOURCING.md, 2026-07-18)**: LCSC prices/stock verified for all phases (~$135 parts for the Phase-3 build, ~$300–380 all-in); inductor + slot-connector decisions taken (Sunlord + 3.75 mΩ shunts APPLIED to gen_phase2; XT60PW slots queued); order-early list: LTC7004 (5 pcs), CSD19536KTT (12 pcs). MPN/LCSC pass done (`common/bom.py`, see next steps). Picks since: ENC1/F1/BZ1 (PR #10), phase-2 C15/16/36/37 EEHZA1V221P and U5 INA228AQDGSRQ1 (PR #11), manager J3 USB4105-GF-A (C3020560, PR #12), manager L2 FNR5040S330MT (C167973) and backplane C2 Nichicon UCX1H471MNS1MS (C462700, fallback EEEFK1H471AM C178551) (PR #16) |
 
 ## Phase-2 PCB — resume point (routed, 2026-09-27)
 
@@ -75,7 +78,8 @@ heat. Expect NTC_FET to lag and read low: log it against a thermocouple
 on Q2 at full load and set the derate/OTP thresholds from that offset.
 
 Everything below in this section is the 2026-07-26 history (83 open
-connections), kept for its Freerouting and PS-002 notes. The old recipe:
+connections, since finished), kept for its Freerouting and PS-002 notes.
+The old recipe:
 
 ```bash
 cd hardware/phase2-module/tools
@@ -87,7 +91,7 @@ python3 check_planes.py           # PS-002 island advisory
 python3 run_drc.py                # -> ../drc-report.txt
 ```
 
-### What is left: finish 83 connections by hand in KiCad
+### History: the 83 connections left on 2026-07-26 (all routed since)
 
 This is the honest recommendation, not a fallback. A grid maze router
 cannot finish fine-pitch escapes; KiCad's interactive push-and-shove can,
@@ -118,9 +122,11 @@ verify the spot is on the right side of SEAM 67.3 (a via on the wrong
 side shorts AGND to PGND), then rerun the checker. Current advisory: 6
 islands, all electrically connected — quality, not a break.
 
-### Freerouting: ruled out, with evidence
+### Freerouting: the 2026-07 failure notes
 
-Do not spend another session on it without reading this.
+Superseded: Freerouting 1.9 with a zone-free DSN and `-oit` finished the
+board on 2026-09-27 (`tools/README.md`). The notes below explain why the
+plugin route and 2.x still fail.
 
 - **With zones** (what the KiCad Freerouting *plugin* exports):
   `java.lang.StackOverflowError` in `PolylineTrace.combine`. Both v1.9
@@ -211,28 +217,37 @@ Notable route_board facts a future session needs:
 
 ## Immediate next steps (agreed order)
 
-1. **Phase-2 board — routed (2026-09-27).** Review the items listed in the
-   resume section before ordering.
-2. **Phase-3 manager board — routed (2026-09-27).** Review before ordering:
-   J3 is the GCT USB4105-GF-A (C3020560, picked 2026-09-28 to match the
-   routed land; JLCPCB assembly stock, backup -120 C5184243); 13 nets cross under the USB pair on B.Cu (fine at
-   full speed); the 0.2 mm drilling gate below still applies.
-3. **Order files** — the MPN/LCSC pass is done for every part SOURCING.md
-   verified: `python3 common/bom.py` (from `hardware/`) writes hidden
+1. **Owner picks the five BOM `CHECK:` rows** (state 2026-10-06; the
+   notes in the BOM CSVs say what each one needs):
+   - Phase-1 C20/C75–C77: no 22 µF 50 V 1210 stocked, 10 µF 50 V fitted
+     (input ceramic drops from 88 to 40 µF; C21 is the bulk).
+   - Phase-1 L2: 33 µH on a 1210 land, the strongest stocked part is 0.5 A
+     against a 1.2 A value. Fine only if 5V0 stays well under ~0.4 A.
+   - Phase-1 Q1/Q2 and Q3/Q4: NTMFS5C670NLT1G stands in for the
+     out-of-stock CSD18563Q5A (same S-S-S-G / tab pinout); confirm the pad
+     overlay in the JLCPCB preview.
+   - Phase-2 U3: symbol says LM5143RHAR, the BOM orders the cheaper
+     LM5143QRHARQ1; confirm the RHA0040P land against the Q1 addendum.
+2. **Open: Phase-1 and Phase-2 L2 still sit on 1210 lands** (phase-2 L2
+   has no LCSC number yet). The manager had the same problem and was fixed
+   by moving to the 5 × 5 mm FNR5040S land as an ECO (PR #16); the same
+   change was offered for phase-1/2 and waits on the owner's call.
+3. **Order files**: `python3 common/bom.py` (from `hardware/`) writes hidden
    LCSC/MPN/Manufacturer properties into the schematics (surgical, additive
-   only) and emits `<board>/bom/*-bom.csv` + `*-jlcpcb.csv`. The part table
-   is `common/lcsc_parts.py`; `--check` fails if anything is stale. Still
-   open: generic R/C/jellybean/header numbers, and the `CHECK:` rows in the
-   BOMs (footprint/variant mismatches vs SOURCING.md).
-4. **Phase-1 board** — shrunk to 100 × 80 mm and re-routed (0
-   unconnected, 0 DRC errors, 2026-09-27) with the BOM's L1 and U7 lands;
-   the 120 × 80 version (wrong L1/U7 lands) is on branch `phase1-120x80`.
-   Earlier review items still hold: C28 sits on U3.20, the VBUS divider
-   (R60/R61/C62) sits by U10.14, and every part offset is in `gen_board.py`
-   PLACEMENT. The VOUT_INT FB sense run (52 mm, tapped at L1.2) keeps
-   5.5 mm or more from SW copper on every layer, enforced by
-   `tools/fb_reroute.py` after routing. Next: owner picks the BOM `CHECK:` parts,
-   then order.
+   only) and emits `<board>/bom/*-bom.csv` + `*-jlcpcb.csv`;
+   `common/cpl.py` writes the placement files. The part table is
+   `common/lcsc_parts.py`; `--check` fails if anything is stale. Still
+   open: generic R/C/jellybean/header numbers. The manager and backplane
+   order files bundled with the v0.1.0 release predate PR #16: regenerate
+   them from `development` before ordering those two boards.
+4. Review notes that still hold at order time: manager J3 is the GCT
+   USB4105-GF-A (C3020560; JLCPCB assembly stock, backup -120 C5184243);
+   13 manager nets cross under the USB pair on B.Cu (fine at full speed).
+   Phase-1: C28 sits on U3.20, the VBUS divider (R60/R61/C62) by U10.14,
+   every part offset is in `gen_board.py` PLACEMENT, and the VOUT_INT FB
+   sense run keeps 5.5 mm or more from SW copper (`tools/fb_reroute.py`).
+   Phase-2 bring-up: calibrate NTC_FET against a thermocouple (resume
+   section).
 
 **Gates before ordering ANY board — including the fab-ready backplane:**
 
@@ -249,13 +264,6 @@ Notable route_board facts a future session needs:
   (VIO-variant / verified V_IH / R31-mitigated / divider-bounded); FS-001
   "FB divider too low-Z" is the injection scheme working as designed; RS-001
   set identical to the audited Phase-1 baseline.
-
-(This section used to carry three orphaned list items — "backplane + manager
-schematics", "manager firmware", "batch PCB pass for phase-1" — left behind
-by an earlier edit of the next-steps list above. All three were either
-complete or superseded, and one repeated the stale "phase-1 has 33
-unconnected" figure. Removed 2026-07-26; the live list is the numbered one
-above.)
 
 ## Shared layout tooling (hardware/common, 2026-07-26)
 
@@ -395,9 +403,9 @@ that the average is servo'd but ripple is skip-mode coarse.
   zone-free DSN, `-oit` bounds the optimizer; see tools/README.md). The
   older failure notes: the KiCad plugin hits the same StackOverflowError. On phase-1 it
   works headless as **1.9.0** under `xvfb-run` with `-Xss64m` (2.x's CLI
-  never finished); see phase1-module/tools/README.md. phase-2's
-  `import_ses.py` is broken (KiCad 7 `ImportSpecctraSES` takes no board);
-  phase-1's has a working SES parser to port.
+  never finished); see phase1-module/tools/README.md. both
+  boards' `import_ses.py` now use their own SES parser (KiCad 7's
+  `ImportSpecctraSES` takes no board, so it cannot run headless).
 - Phase-1 `autoroute.py` is superseded by fanout.py + Freerouting +
   finish_routes.py (the board is routed); kept for reference.
 - Phase-1/2 DRC noise is now **silk only** (9 and 11 warnings, cosmetic). The

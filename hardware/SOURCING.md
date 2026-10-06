@@ -4,7 +4,9 @@ Verified 2026-07-18 via the jlcsearch API (LCSC stock + qty-1 USD prices)
 and JLCPCB part pages for critical ratings. **Strategy: everything from
 LCSC/JLCPCB in one consolidated shipment to Sri Lanka** (LCSC parts +
 JLCPCB boards combine into one DHL parcel; modules/AliExpress items noted
-separately). Prices move — re-check stock the week of ordering.
+separately). Prices move — re-check stock the week of ordering. Individual
+rows were re-checked and changed later (dated in their notes, latest
+2026-10-05); the per-board BOM CSVs are the current source of truth.
 
 The LCSC numbers below are applied to the schematic symbols and the per-board
 BOMs by `common/bom.py` (table: `common/lcsc_parts.py`) — change a part there,
@@ -38,14 +40,14 @@ Decisions taken this pass (user-approved 2026-07-18):
 | LMR36015ARNXR | C1850345 | 1.91 | 1.2k | |
 | NCP1117ST33T3G | C26537 | 0.21 | 14k | |
 | LTC7004EMSE#PBF | C690105 | 5.77 | **5** | thinnest stock in the BOM; 3 needed + spares. **Order early** (IMSE $6.98/30 as fallback) |
-| TLV7011DCKR | C193688 | 0.27 | 838 | **SC-70-5** — footprint changes from DBVR (SOT-23-5, $0.52, only 42 left) at the PCB pass |
+| TLV7011DCKR | C193688 | 0.27 | 838 | **SC-70-5** instead of DBVR (SOT-23-5, $0.52, only 42 left); the boards carry the SC-70-5 land |
 | TL431BIDBZR | C41283 | 0.054 | 7.9k | |
 | TS5A3166DBVR | C353035 | 0.28 | 7.6k | replaces TMUX1101 (not stocked on LCSC). Verified + applied 2026-07-18 (§F) |
 | TCA9535PWR | C130204 | 0.44 | 11k | UMW clone $0.33 acceptable here (non-critical) |
 | ESP32-S3-WROOM-1-N8R2 | C2913204 | 5.01 | 18k | |
 | TPD2E001DRLR | C150526 | 0.16 | 14k | |
 | LM5145RGYR (P1) | C485912 | 1.55 | 5.2k | |
-| CSD18563Q5A (P1) | C77239 | 0.85 | 794 | |
+| CSD18563Q5A (P1) | C77239 | 0.85 | 794 | out of stock 2026-09-27: the P1 BOM orders onsemi NTMFS5C670NLT1G (C179626, $0.49) for Q1–Q4 instead, same S-S-S-G / tab pinout. Still a `CHECK:` row: confirm the pad overlay in the JLCPCB preview |
 | 2N7002 / BAT54W / 1N4148WS / SMBJ33A / AO3401A | — | 0.01–0.05 | ≫10k | jellybeans, any reputable line |
 
 ## B. Magnetics & power passives
@@ -61,7 +63,10 @@ Decisions taken this pass (user-approved 2026-07-18):
 | 2 mΩ 2512 3 W 1 % (P1) | C2994640 | 0.060 | 167k | same TCR caveat |
 | Bus shunt 0.5 mΩ 3920 ×2 ∥ | C466580 | 0.60 | 2.9k | BVS-M-R0005: 2 in parallel = 0.25 mΩ (0.5 W each @62 A); verify power rating on ds. Alt: ARCS8518 100 µΩ bar $3.64/49 |
 | 220 µF 35 V hybrid ×4 | C454349 | 1.42 | **1** | Panasonic EEHZA1V221P D10×10.2, 20 mΩ / 2.5 A — fits the CP_Elec_10x10.5 land. Stocked alternative on the same land: SUNCON 35HVH220M+P (C179812, D10×12.5, 8 in stock 2026-09-28). The earlier D8 SVZ pick (C2923769) did not fit the land and is out of stock |
-| 470 µF 50 V bulk | C106666 | 0.10 | 73k | **THT radial D10×20** — cheaper + stronger than SMD; footprint changes at PCB pass |
+| 470 µF 50 V bulk | C106666 | 0.10 | 73k | **THT radial D10×20** — cheaper + stronger than SMD; phase-2 C14 carries the CP_Radial_D10 land |
+| 470 µF 50 V SMD (backplane C2) | C462700 | 1.63 | 633 (JLCPCB) | Nichicon UCX1H471MNS1MS, 16×16.5, 70 mΩ, 1.0 A @100 kHz, 135 °C. The board has an SMD CP_Elec_16x17.5 land (17×17 platform), not the THT D10 above; 16×16.5 cans fit it. Fallback: Panasonic EEEFK1H471AM (C178551, 131). Picked 2026-10-05 |
+| 33 µH aux-buck inductor (manager L2) | C167973 | 0.06 | 51k (JLCPCB) | cjiang FNR5040S330MT, 5×5×4 mm: **Isat 1.30 A min / Irms 1.20 A min / DCR 0.244 Ω max** (cjiang FNR datasheet). No 1210 33 µH is stocked above 0.5 A, so the manager land grew to L_Changjiang_FNR5040S (2026-10-05). Phase-1/2 L2 are still 1210: see the next row |
+| 33 µH 1210 (phase-1 L2) | C223226 | 0.25 | — | Taiyo Yuden CBC3225T330KR, 0.5 A: the strongest stocked 1210 33 µH, against a 1.2 A value. A BOM `CHECK:` row (fine only if 5V0 stays well under ~0.4 A). Phase-2 L2 has no number yet. Moving both to the manager's 5×5 land is offered and waits on the owner |
 | 10 µF 50 V X7S 1210 ×8+6 | C126612 | 0.144 | 43k | GCM32EC71H106KA03L; also replaces the 22 µF/50 V output MLCCs (that value barely exists) |
 | 8 MHz 3225 crystal | C400090 | 0.105 | 200k | cheap parts are CL=12 pF → C66/C67 = 18 p (APPLIED, both phases) |
 
@@ -129,9 +134,8 @@ green (137/173/30/80 components):
 - 470 µF bulk → THT radial D10; output MLCCs 22 µF→10 µF/50 V X7S
 - module slot power + P2 output → XT60PW-M (2-pin); backplane slots →
   XT60PW-F; bus shunt → 2× BVS-M-R0005 parallel
-- buzzer value → MLT-8530
+- buzzer value → MLT-8530 (since replaced by the 5 V-rated YX-SMD8530P, §C)
 
-Placeholder FOOTPRINTS remain for: XT60PW, MWSA1707S (17.2×17.2), BVS
-3920, MLT-8530 — land patterns from vendor drawings at the footprint pass
-(hardware/MECHANICAL.md lists them; the JLC datasheet CDN links expire,
-fetch fresh from part pages at that point).
+The placeholder footprints for XT60PW, MWSA1707S (17.2×17.2), BVS 3920 and
+MLT-8530 were replaced by vendor-drawing land patterns in the footprint pass
+(commit d281f94; `labbench.pretty`).

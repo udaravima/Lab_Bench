@@ -83,6 +83,11 @@ verifies every component's footprint resolves and every netted pin has a pad.
 
 ## E. Pricing snapshot — verified 2026-07-16 (LCSC via jlcsearch, qty 1–10 USD)
 
+> Historical snapshot. The parts actually ordered changed since (for example
+> INA228AQDGSRQ1, TLV7011DCKR, NTMFS5C670NLT1G for Q1–Q4, MWSA1707S-100MT for
+> L1, and the board is now 100 × 80 mm). Current picks and prices:
+> `hardware/SOURCING.md` and `hardware/phase1-module/bom/`.
+
 | Part | Unit $ | Stock | Note |
 |---|---|---|---|
 | LTC7004EMSE#PBF | 5.77 | **5** | priciest IC, thin stock — order early or Mouser (~1.5×) |

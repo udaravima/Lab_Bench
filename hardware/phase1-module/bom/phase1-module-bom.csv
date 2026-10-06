@@ -6,7 +6,7 @@ Item,Qty,References,Value,Footprint,LCSC,MPN,Manufacturer,Unit USD,Ext USD,Note
 5,1,C17,DNP,Capacitor_SMD:C_0603_1608Metric,,,,,,do not populate (value says DNP)
 6,1,C18,47n,Capacitor_SMD:C_0603_1608Metric,C1622,CL10B473KB8NNNC,Samsung Electro-Mechanics,0.0073,0.007,
 7,1,C19,15p,Capacitor_SMD:C_0603_1608Metric,C1644,CL10C150JB8NNNC,Samsung Electro-Mechanics,0.0113,0.011,C0G
-8,4,C20 C75 C76 C77,22u/50V X7R,Capacitor_SMD:C_1210_3225Metric,C77102,GRM32ER71H106KA12L,Murata Electronics,0.3274,1.31,"CHECK: symbol says 22u/50V but no 22 uF 50 V 1210 is stocked at JLCPCB; this is 10 uF 50 V X7R (the phase-2 input part is also 10 uF) - input ceramic drops from 88 to 40 uF nominal, C21 is the bulk"
+8,4,C20 C75 C76 C77,10u/50V X7R,Capacitor_SMD:C_1210_3225Metric,C77102,GRM32ER71H106KA12L,Murata Electronics,0.3274,1.31,"10 uF 50 V X7R: no 22 uF 50 V 1210 is stocked, so the design value is now 10u (phase-2 uses 10 uF too). 4 x ~4.5 uF at 30 V bias gives about 0.3 Vpp input ripple at 8 A, D = 0.5, 350 kHz; ~1 A RMS each; C21 is the bulk"
 9,1,C21,220u/50V,Capacitor_SMD:CP_Elec_10x10.5,C2887271,RVT220UF50V67RV0021,KNSCHA,0.1412,0.141,"SMD D10x10.2 aluminium, fits CP_Elec_10x10.5"
 10,2,C22 C78,220u/25V poly,Capacitor_SMD:CP_Elec_8x11.9,C46550471,MA35V220M8X12,jieerrui,0.2872,0.574,"35 V polymer SMD D8x11.5, 16 mOhm; fits CP_Elec_8x11.9"
 11,4,C23 C79 C80 C81,22u/25V X7R,Capacitor_SMD:C_1210_3225Metric,C5341638,CC1210KKX7R8BB226,YAGEO,0.596,2.384,22 uF 25 V X7R 1210; the 5V0/3V3 positions (16 V/10 V in the value) get the same part
@@ -35,9 +35,9 @@ Item,Qty,References,Value,Footprint,LCSC,MPN,Manufacturer,Unit USD,Ext USD,Note
 34,1,J5,BACKPLANE,Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical,,,,,,through-hole pin header: hand-solder (or pay for JLCPCB THT assembly)
 35,1,J6,FAN,Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical,,,,,,through-hole pin header: hand-solder (or pay for JLCPCB THT assembly)
 36,1,L1,10u MWSA1707S-100/XAL1350,labbench:L_1707_XAL1510,C5240401,MWSA1707S-100MT,Sunlord,1.68,1.68,16.5 A Isat / 10.5 A Irms; L_1707_XAL1510 superset land
-37,1,L2,33u/1.2A,Inductor_SMD:L_1210_3225Metric,C223226,CBC3225T330KR,Taiyo Yuden,0.2475,0.247,"CHECK: value says 33u/1.2A but no 1210 33 uH is rated near 1.2 A; this is the strongest stocked one (0.5 A). Fine if the 5V0 load stays well under ~0.4 A, otherwise move to a bigger inductor footprint"
-38,2,Q1 Q2,CSD18563Q5A,labbench:PowerFET_SON5x6_GDS,C179626,NTMFS5C670NLT1G,onsemi,0.49,0.98,"CHECK: stands in for CSD18563Q5A (C77239, out of stock 2026-09-27). 60 V, 6.1 mOhm, Qg 20 nC vs 5.7 mOhm / 15 nC; SO-8FL has the same S-S-S-G / drain-tab pinout as the TI Q5A land - confirm the pad overlay in the JLCPCB preview. Q3/Q4 dissipate about 0.6 W each at 10 A"
-39,2,Q3 Q4,60V NFET,labbench:PowerFET_SON5x6_GDS,C179626,NTMFS5C670NLT1G,onsemi,0.49,0.98,"CHECK: stands in for CSD18563Q5A (C77239, out of stock 2026-09-27). 60 V, 6.1 mOhm, Qg 20 nC vs 5.7 mOhm / 15 nC; SO-8FL has the same S-S-S-G / drain-tab pinout as the TI Q5A land - confirm the pad overlay in the JLCPCB preview. Q3/Q4 dissipate about 0.6 W each at 10 A"
+37,1,L2,33u/1.2A,Inductor_SMD:L_Changjiang_FNR5040S,C167973,FNR5040S330MT,cjiang (Changjiang Microelectronics),0.06,0.06,"5x5x4 mm shielded, KiCad L_Changjiang_FNR5040S land; Isat 1.30 A min covers the 33u/1.2A value. Any 5040-size 33 uH >=1.2 A part with the same 2.3 mm pad gap fits"
+38,2,Q1 Q2,CSD18563Q5A,labbench:PowerFET_SON5x6_GDS,C179626,NTMFS5C670NLT1G,onsemi,0.49,0.98,"stands in for CSD18563Q5A (C77239, still out of stock 2026-10-06). 60 V, 6.1 mOhm, Qg 20 nC vs 5.7 mOhm / 15 nC; same S-S-S-G / drain-tab pinout. Overlay on the TI Q5A land checked against case 488AA: terminals within 0.14 mm of the TI part's (E 6.15 vs 6.00, L 0.575 vs 0.61, K 1.35 vs 1.10), 0.35 mm from the drain land edge vs 0.24 for the TI part. Q3/Q4 dissipate about 0.6 W each at 10 A"
+39,2,Q3 Q4,60V NFET,labbench:PowerFET_SON5x6_GDS,C179626,NTMFS5C670NLT1G,onsemi,0.49,0.98,"stands in for CSD18563Q5A (C77239, still out of stock 2026-10-06). 60 V, 6.1 mOhm, Qg 20 nC vs 5.7 mOhm / 15 nC; same S-S-S-G / drain-tab pinout. Overlay on the TI Q5A land checked against case 488AA: terminals within 0.14 mm of the TI part's (E 6.15 vs 6.00, L 0.575 vs 0.61, K 1.35 vs 1.10), 0.35 mm from the drain land edge vs 0.24 for the TI part. Q3/Q4 dissipate about 0.6 W each at 10 A"
 40,5,Q5 Q6 Q7 Q8 Q9,2N7002,Package_TO_SOT_SMD:SOT-23,C8545,2N7002,"Jiangsu Changjing Electronics Technology Co., Ltd.",0.0178,0.089,
 41,1,R1,25.5K 0.1%,Resistor_SMD:R_0603_1608Metric,C861257,RT0603BRD0725K5L,YAGEO,0.0353,0.035,0.1 % 25 ppm thin film
 42,1,R2,1.0K 0.1%,Resistor_SMD:R_0603_1608Metric,C110776,RT0603BRD071KL,YAGEO,0.0327,0.033,0.1 % 25 ppm thin film
@@ -73,12 +73,12 @@ Item,Qty,References,Value,Footprint,LCSC,MPN,Manufacturer,Unit USD,Ext USD,Note
 72,1,U2,OPA2333,Package_SO:VSSOP-8_3.0x3.0mm_P0.65mm,C19608,OPA2333AIDGKR,TI,1.14,1.14,
 73,1,U3,LM5145RGYR,labbench:LM5145_RGY0020B,C485912,LM5145RGYR,TI,1.55,1.55,
 74,1,U4,INA240A3,Package_SO:SOIC-8_3.9x4.9mm_P1.27mm,C2060584,INA240A3DR,TI,1.87,1.87,
-75,1,U5,INA228,Package_SO:VSSOP-10_3x3mm_P0.5mm,C5214669,INA228AQDGSRQ1,TI,17.16,17.16,"automotive grade of INA228AIDGSR, same VSSOP-10 pinout and register map (no firmware change); the AIDGSR (C2887910) was still out of stock on 2026-09-28 - swap back if it returns, it is about a quarter of the price"
-76,1,U6,LTC7004,Package_SO:MSOP-10-1EP_3x3mm_P0.5mm_EP1.68x1.88mm,C690105,LTC7004EMSE#PBF,ADI,5.77,5.77,thinnest stock in the BOM - order early (IMSE fallback)
+75,1,U5,INA228,Package_SO:VSSOP-10_3x3mm_P0.5mm,C5214669,INA228AQDGSRQ1,TI,17.16,17.16,"automotive grade of INA228AIDGSR, same VSSOP-10 pinout and register map (no firmware change); the AIDGSR (C2887910) was still out of stock on 2026-09-28 - swap back if it returns, it is about a quarter of the price. Only 5 in stock on 2026-10-06: order early"
+76,1,U6,LTC7004,Package_SO:MSOP-10-1EP_3x3mm_P0.5mm_EP1.68x1.88mm,C690105,LTC7004EMSE#PBF,ADI,11.62,11.62,thin stock (25 on 2026-10-06) - order early (IMSE fallback)
 77,1,U7,TLV7011DCK,Package_TO_SOT_SMD:SOT-353_SC-70-5,C193688,TLV7011DCKR,TI,0.27,0.27,SC-70-5 (DCK)
 78,1,U8,LMR36015AQRNXRQ1,labbench:LMR36015_RNX_VQFN-HR-12,C1850345,LMR36015ARNXR,TI,1.91,1.91,"symbol value says LMR36015AQRNXRQ1 (automotive); SOURCING picked the commercial ARNXR, same RNX package"
 79,1,U9,NCP1117-3.3,Package_TO_SOT_SMD:SOT-223-3_TabPin2,C26537,NCP1117ST33T3G,onsemi,0.21,0.21,
 80,1,U10,STM32G431CBT6,Package_QFP:LQFP-48_7x7mm_P0.5mm,C529355,STM32G431CBT6,ST,2.85,2.85,
 81,1,U11,TCAN1042HGV,Package_SO:SOIC-8_3.9x4.9mm_P1.27mm,C485806,TCAN1042VDRQ1,TI,0.57,0.57,"symbol value says TCAN1042HGV; SOURCING picked the V (VIO) variant, same SOIC-8 pinout"
 82,1,Y1,8MHz,Crystal:Crystal_SMD_3225-4Pin_3.2x2.5mm,C403948,TAXM8M4RFDCET2T,Yajingxin,0.147,0.147,"8 MHz 3225, CL = 12 pF (load caps 18 p); replaces C400090, which is the CL = 10 pF version"
-,136,,,,,,,,50.24,"127/136 placements have an LCSC number; total covers those only (qty-1, SOURCING.md 2026-07-18)"
+,136,,,,,,,,55.9,"127/136 placements have an LCSC number; total covers those only (qty-1, SOURCING.md 2026-07-18)"

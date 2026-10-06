@@ -37,8 +37,10 @@ e.g. Würth 744325550 class.
   Ripple ≈ ESR·ΔI ≈ 7.5 mΩ · 1.7 A ≈ 13 mVpp ✓.
   LC corner: f_LC = 1/(2π√(10 µH · ~480 µF)) ≈ **2.3 kHz**;
   ESR zero ≈ 1/(2π·7.5 mΩ·440 µF) ≈ **48 kHz** — both needed for compensation (§6).
-- **Input:** 4 × 22 µF 50 V X7R close to the FETs (input RMS ripple ≈ I_out/2 = 4 A
-  at D = 0.5) + 220 µF 50 V electrolytic bulk.
+- **Input:** 4 × 10 µF 50 V X7R close to the FETs (input RMS ripple ≈ I_out/2 = 4 A
+  at D = 0.5, ~1 A per cap) + 220 µF 50 V electrolytic bulk. 22 µF 50 V 1210 is
+  not stocked; at 30 V bias each 10 µF keeps ~4.5 µF, so ΔV ≈ 8 A · 0.25 /
+  (350 kHz · 18 µF) ≈ 0.3 Vpp at the worst duty cycle.
 - **Preload:** 2.2 kΩ across the output — gives DEM mode a minimum load so the
   output doesn't drift up at zero load, and discharges the caps when disabled.
 

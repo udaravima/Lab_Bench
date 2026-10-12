@@ -106,6 +106,24 @@ put the new positions in `gen_board.py` PLACEMENT (page mm minus the
 board for every footprint. `gen_board.py` still fails its own L1/C23
 courtyard check, as before.
 
+### Swapping a land on the routed board
+
+A footprint change (not just a move) is done with
+`../../common/eco_swap_fp.py`, which replaces the footprint in place and
+carries the reference, value, fields and pad nets over. The 2026-10-06 L2
+change (1210 -> 5 x 5 mm FNR5040S, same as the manager's in PR #16):
+
+```bash
+python3 ../../common/eco_swap_fp.py ../phase1-module.kicad_pcb L2 \
+    Inductor_SMD:L_Changjiang_FNR5040S 32.6 61.25 0
+```
+
+then the SW_AUX diagonal was re-ended on the new pad 1 at (30.75, 60.15),
+a 0.4 mm F.Cu 5V0 link was added from L2's via (35.5, 61) to C54's
+(36.425, 61), and `finish_board --silk --planes`, `run_drc.py`, `--fab` and
+`common/cpl.py` were rerun. The spot came from `eco_move.py --find L2`.
+PLACEMENT in `gen_board.py` carries the new position.
+
 Any schematic change: rerun the whole chain. Any placement change: rerun from
 gen_board. `EXPECTED_NETS` must be updated in the same commit as connectivity
 changes.

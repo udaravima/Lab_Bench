@@ -27,19 +27,19 @@ Decisions taken this pass (user-approved 2026-07-18):
 
 | Part | LCSC | $ qty-1 | Stock | Note |
 |---|---|---|---|---|
-| LM5143QRHARQ1 | C5219258 | 2.93 | 52 | automotive variant CHEAPER than LM5143RHAR ($4.62/C5219297); same VQFN-40 6×6 — confirm RHA0040P land vs Q1 addendum at order |
+| LM5143QRHARQ1 | C5219258 | 6.29 | 243 | the LM5143A-Q1 (TI ZHCSQC8). Checked 2026-10-06: same 40-pin map as the LM5143, and its RHA0040N land matches RHA0040P (6×6, 0.5 pitch, 0.25×0.6 pads at 5.8 span, EP 3.3 ±0.1); only wettable flanks differ. No longer cheaper than LM5143RHAR (C5219297) |
 | LM5069MM-2/NOPB | C111822 | 1.17 | 6.6k | |
 | CSD18540Q5B (TI) | C86513 | 1.43 | 953 | ×8/module. TOKMAS/“ES” clones at $0.45–0.57 exist — **do not substitute** power-stage FETs |
 | CSD19536KTT | C2687963 | 4.94 | **12** | hot-swap pass FET — SOA-critical, no clone. **Order early** |
 | STM32G431CBT6 | C529355 | 2.85 | 67k | |
 | DAC80502DRXR | C1880990 | 4.19 | 189 | |
-| INA228AQDGSRQ1 | C5214669 | 17.16 | 142 | ×1/module + 1 backplane. The AIDGSR (C2887910, $3.83) was out of stock on 2026-09-28; the Q1 grade is pin- and register-identical. Swap back if it returns |
+| INA228AQDGSRQ1 | C5214669 | 17.16 | **5** (2026-10-06) | ×1/module + 1 backplane. The AIDGSR (C2887910, $3.83) was out of stock on 2026-09-28; the Q1 grade is pin- and register-identical. Swap back if it returns |
 | INA240A3DR | C2060584 | 1.87 | 1.7k | |
 | OPA2333AIDGKR | C19608 | 1.14 | 1.3k | |
 | TCAN1042VDRQ1 | C485806 | 0.57 | 2.6k | V = VIO variant ✓ (Phase-1 finding) |
 | LMR36015ARNXR | C1850345 | 1.91 | 1.2k | |
 | NCP1117ST33T3G | C26537 | 0.21 | 14k | |
-| LTC7004EMSE#PBF | C690105 | 5.77 | **5** | thinnest stock in the BOM; 3 needed + spares. **Order early** (IMSE $6.98/30 as fallback) |
+| LTC7004EMSE#PBF | C690105 | 11.62 | **25** (2026-10-06) | thinnest stock in the BOM; 3 needed + spares. **Order early** (IMSE $6.98/30 as fallback) |
 | TLV7011DCKR | C193688 | 0.27 | 838 | **SC-70-5** instead of DBVR (SOT-23-5, $0.52, only 42 left); the boards carry the SC-70-5 land |
 | TL431BIDBZR | C41283 | 0.054 | 7.9k | |
 | TS5A3166DBVR | C353035 | 0.28 | 7.6k | replaces TMUX1101 (not stocked on LCSC). Verified + applied 2026-07-18 (§F) |
@@ -47,7 +47,7 @@ Decisions taken this pass (user-approved 2026-07-18):
 | ESP32-S3-WROOM-1-N8R2 | C2913204 | 5.01 | 18k | |
 | TPD2E001DRLR | C150526 | 0.16 | 14k | |
 | LM5145RGYR (P1) | C485912 | 1.55 | 5.2k | |
-| CSD18563Q5A (P1) | C77239 | 0.85 | 794 | out of stock 2026-09-27: the P1 BOM orders onsemi NTMFS5C670NLT1G (C179626, $0.49) for Q1–Q4 instead, same S-S-S-G / tab pinout. Still a `CHECK:` row: confirm the pad overlay in the JLCPCB preview |
+| CSD18563Q5A (P1) | C77239 | 0.85 | 794 | still out of stock 2026-10-06: the P1 BOM orders onsemi NTMFS5C670NLT1G (C179626, $0.49, 13.7k) for Q1–Q4 instead, same S-S-S-G / tab pinout. Overlay checked against case 488AA: terminals within 0.14 mm of the TI part's on the Q5A land, 0.35 mm from the drain land (0.24 for the TI part) |
 | 2N7002 / BAT54W / 1N4148WS / SMBJ33A / AO3401A | — | 0.01–0.05 | ≫10k | jellybeans, any reputable line |
 
 ## B. Magnetics & power passives
@@ -65,8 +65,8 @@ Decisions taken this pass (user-approved 2026-07-18):
 | 220 µF 35 V hybrid ×4 | C454349 | 1.42 | **1** | Panasonic EEHZA1V221P D10×10.2, 20 mΩ / 2.5 A — fits the CP_Elec_10x10.5 land. Stocked alternative on the same land: SUNCON 35HVH220M+P (C179812, D10×12.5, 8 in stock 2026-09-28). The earlier D8 SVZ pick (C2923769) did not fit the land and is out of stock |
 | 470 µF 50 V bulk | C106666 | 0.10 | 73k | **THT radial D10×20** — cheaper + stronger than SMD; phase-2 C14 carries the CP_Radial_D10 land |
 | 470 µF 50 V SMD (backplane C2) | C462700 | 1.63 | 633 (JLCPCB) | Nichicon UCX1H471MNS1MS, 16×16.5, 70 mΩ, 1.0 A @100 kHz, 135 °C. The board has an SMD CP_Elec_16x17.5 land (17×17 platform), not the THT D10 above; 16×16.5 cans fit it. Fallback: Panasonic EEEFK1H471AM (C178551, 131). Picked 2026-10-05 |
-| 33 µH aux-buck inductor (manager L2) | C167973 | 0.06 | 51k (JLCPCB) | cjiang FNR5040S330MT, 5×5×4 mm: **Isat 1.30 A min / Irms 1.20 A min / DCR 0.244 Ω max** (cjiang FNR datasheet). No 1210 33 µH is stocked above 0.5 A, so the manager land grew to L_Changjiang_FNR5040S (2026-10-05). Phase-1/2 L2 are still 1210: see the next row |
-| 33 µH 1210 (phase-1 L2) | C223226 | 0.25 | — | Taiyo Yuden CBC3225T330KR, 0.5 A: the strongest stocked 1210 33 µH, against a 1.2 A value. A BOM `CHECK:` row (fine only if 5V0 stays well under ~0.4 A). Phase-2 L2 has no number yet. Moving both to the manager's 5×5 land is offered and waits on the owner |
+| 33 µH aux-buck inductor (manager L2) | C167973 | 0.06 | 51k (JLCPCB) | cjiang FNR5040S330MT, 5×5×4 mm: **Isat 1.30 A min / Irms 1.20 A min / DCR 0.244 Ω max** (cjiang FNR datasheet). No 1210 33 µH is stocked above 0.5 A, so the manager land grew to L_Changjiang_FNR5040S (2026-10-05) and the phase-1/phase-2 L2 lands followed (2026-10-06). Same part on all three boards |
+| 10 µF 50 V X7R 1210 (phase-1 input C20/C75–C77) | C77102 | 0.33 | 28k | Murata GRM32ER71H106KA12L. No 22 µF 50 V 1210 is stocked, so 10 µF is the design value since 2026-10-06 (≈0.3 Vpp input ripple at 8 A) |
 | 10 µF 50 V X7S 1210 ×8+6 | C126612 | 0.144 | 43k | GCM32EC71H106KA03L; also replaces the 22 µF/50 V output MLCCs (that value barely exists) |
 | 8 MHz 3225 crystal | C400090 | 0.105 | 200k | cheap parts are CL=12 pF → C66/C67 = 18 p (APPLIED, both phases) |
 
@@ -105,11 +105,13 @@ US$300–380** including boards, spares and the Coilcraft A/B pair.
 
 ## E. Order-early / risk list
 
-1. **LTC7004EMSE — 5 in stock.** 3 boards need 3 + spares. First thing in
-   the cart, or accept IMSE ($6.98, 30 pcs).
+1. **LTC7004EMSE — 25 in stock (2026-10-06, $11.62).** 3 boards need 3 +
+   spares. First thing in the cart.
+1a. **INA228AQDGSRQ1 — 5 in stock (2026-10-06)**, the AIDGSR 0. One per
+   module + one backplane: buy them first, or from Mouser/DigiKey.
 2. **CSD19536KTT — 12 in stock.** SOA-verified hot-swap FET, no substitute
    without redoing the SOA math.
-3. LM5143QRHARQ1 (52) and MWSA1707S-6R8MT (67) — fine for this build,
+3. LM5143QRHARQ1 (243) and MWSA1707S-6R8MT (163) — fine for this build,
    thin for a rebuy; recheck at order time.
 4. Clones: FET clones rejected for the power path; UMW TCA9535 and generic
    EC11/2N7002/diodes accepted.

@@ -59,7 +59,7 @@ PLACEMENT = {
     "F1":  (10.8, 6.5, 0),         # pad1 VBUS (5,6.5) -> J1.1; pad2 (13,6.5) in pour
     "D5":  (13.0, 16.9, 270),     # SMBJ33A: pad1 VBUS_F band, pad2 PGND band
     "C21": (22.3, 16.9, 270),     # 220u/50V straddle
-    "C20": (30.0, 16.9, 270),     # 22u/50V bank straddle: pad1 up (VBUS_F)
+    "C20": (30.0, 16.9, 270),     # 10u/50V bank straddle: pad1 up (VBUS_F)
     "C75": (34.0, 16.9, 270),
     "C76": (38.0, 16.9, 270),
     "C77": (42.0, 16.9, 270),
@@ -142,7 +142,7 @@ PLACEMENT = {
     "C51": (8.2, 35.6, 0),
     "C52": (17.0, 32.5, 270),     # AUX_BOOT up / SW_AUX down
     "C53": (17.5, 37.5, 0),       # AUX_VCC
-    "L2":  (13.0, 41.0, 0),       # pad1 SW_AUX, pad2 5V0
+    "L2":  (12.6, 41.25, 0),      # FNR5040S 5x5: pad1 SW_AUX (west), pad2 5V0 (east)
     "C54": (19.0, 41.0, 0),
     "C55": (19.0, 44.6, 0),
     "R50": (14.0, 45.5, 0),

@@ -73,13 +73,13 @@ module. v0.1.0 was released from `master` on 2026-09-29.
 | Area | State |
 |---|---|
 | Design docs | Complete: 01–10, plus the build guide (11) and Phase-1 bench test procedure (12) |
-| Phase-1 module (150 W) | 100 × 80 mm, **routed, 0 unconnected, 0 DRC errors**, fab zip and CPL committed. OVP_TRIP routed to the MCU (PB4) for the firmware 0.2 OVP latch. Next: the owner picks the four Phase-1 BOM `CHECK:` rows, then order and run [docs/12](docs/12-phase1-bench-tests.md). The older 120 × 80 layout on branch `phase1-120x80` has wrong L1/U7 lands: do not order it |
-| Phase-2 module (600 W) | 130 × 90 mm, **routed, 0 unconnected, 0 DRC errors**, fab zip and CPL committed; pre-order review closed (HANDOVER) |
+| Phase-1 module (150 W) | 100 × 80 mm, **routed, 0 unconnected, 0 DRC errors**, fab zip and CPL committed. OVP_TRIP routed to the MCU (PB4) for the firmware 0.2 OVP latch. L2 moved to a 5 × 5 mm land (2026-10-06). Next: order and run [docs/12](docs/12-phase1-bench-tests.md). The older 120 × 80 layout on branch `phase1-120x80` has wrong L1/U7 lands: do not order it |
+| Phase-2 module (600 W) | 130 × 90 mm, **routed, 0 unconnected, 0 DRC errors**, fab zip and CPL committed; pre-order review closed (HANDOVER); L2 moved to a 5 × 5 mm land (2026-10-06) |
 | Phase-3 backplane | 330 × 100 mm, fab-ready; gated on the XT60 polarity buzz-out ([MECHANICAL.md](hardware/MECHANICAL.md)) |
 | Phase-3 manager | 100 × 80 mm, **routed, 0 unconnected, 0 DRC errors**; L2 moved to a 5 × 5 mm land (2026-10-05) |
 | Module firmware | v0.2 builds (~7 KB, bare-metal STM32G431) with the OCP backup and OVP latch; control core host-tested |
 | Manager firmware | v0.2 builds on ESP-IDF 5.3.2; manager, SCPI and UI cores host-tested |
-| BOM / sourcing | LCSC numbers in the schematics and per-board BOM and CPL files (`hardware/common/bom.py`); five `CHECK:` rows await the owner's pick (four Phase-1, one Phase-2); generic R/C parts not yet numbered |
+| BOM / sourcing | LCSC numbers in the schematics and per-board BOM and CPL files (`hardware/common/bom.py`); no `CHECK:` rows left (closed 2026-10-06); INA228 stock is thin (5 at LCSC); generic R/C parts not yet numbered |
 | CI | GitHub Actions: host tests, module and manager firmware builds on every PR |
 
 Complete Phase-1 build (parts, five PCBs, stencil, shipping) ≈ US$100–125.

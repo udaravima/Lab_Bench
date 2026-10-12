@@ -19,9 +19,11 @@ P1, P2, BP, MGR = ("phase1-module", "phase2-module",
 
 PARTS = [
     # ---- A. Semiconductors -------------------------------------------------
-    ({P2: ["U3"]}, "C5219258", "LM5143QRHARQ1", "TI", 2.93,
-     "CHECK: symbol value says LM5143RHAR; SOURCING picked the cheaper Q1 "
-     "variant (same VQFN-40) - confirm RHA0040P land vs the Q1 addendum"),
+    ({P2: ["U3"]}, "C5219258", "LM5143QRHARQ1", "TI", 6.29,
+     "symbol value says LM5143RHAR; this is the LM5143A-Q1 (TI ZHCSQC8, "
+     "2022). Same 40-pin map and the same land: RHA0040N vs RHA0040P is "
+     "6x6 body, 0.5 pitch, 0.25x0.6 pads at 5.8 span, EP 3.3 +-0.1 in both; "
+     "the Q1 part only adds wettable flanks (checked 2026-10-06)"),
     ({P2: ["U12"]}, "C111822", "LM5069MM-2/NOPB", "TI", 1.17, ""),
     ({P2: ["Q1", "Q2", "Q3", "Q4", "Q10", "Q11", "Q12", "Q13"]},
      "C86513", "CSD18540Q5B", "TI", 1.43,
@@ -34,7 +36,8 @@ PARTS = [
     ({P1: ["U5"], P2: ["U5"], BP: ["U1"]}, "C5214669", "INA228AQDGSRQ1", "TI", 17.16,
      "automotive grade of INA228AIDGSR, same VSSOP-10 pinout and register "
      "map (no firmware change); the AIDGSR (C2887910) was still out of stock "
-     "on 2026-09-28 - swap back if it returns, it is about a quarter of the price"),
+     "on 2026-09-28 - swap back if it returns, it is about a quarter of the price. "
+     "Only 5 in stock on 2026-10-06: order early"),
     ({P1: ["U4"], P2: ["U4"]}, "C2060584", "INA240A3DR", "TI", 1.87, ""),
     ({P1: ["U2"], P2: ["U2"]}, "C19608", "OPA2333AIDGKR", "TI", 1.14, ""),
     ({P1: ["U11"], P2: ["U11"], MGR: ["U11"]},
@@ -47,8 +50,8 @@ PARTS = [
      "commercial ARNXR, same RNX package"),
     ({P1: ["U9"], P2: ["U9"], MGR: ["U9"]},
      "C26537", "NCP1117ST33T3G", "onsemi", 0.21, ""),
-    ({P1: ["U6"], P2: ["U6"]}, "C690105", "LTC7004EMSE#PBF", "ADI", 5.77,
-     "thinnest stock in the BOM - order early (IMSE fallback)"),
+    ({P1: ["U6"], P2: ["U6"]}, "C690105", "LTC7004EMSE#PBF", "ADI", 11.62,
+     "thin stock (25 on 2026-10-06) - order early (IMSE fallback)"),
     ({P1: ["U7"], P2: ["U7"]}, "C193688", "TLV7011DCKR", "TI", 0.27,
      "SC-70-5 (DCK)"),
     ({P2: ["D8"]}, "C41283", "TL431BIDBZR", "TI", 0.054, ""),
@@ -60,10 +63,12 @@ PARTS = [
     ({P1: ["U3"]}, "C485912", "LM5145RGYR", "TI", 1.55, ""),
     ({P1: ["Q1", "Q2", "Q3", "Q4"]}, "C179626", "NTMFS5C670NLT1G", "onsemi",
      0.49,
-     "CHECK: stands in for CSD18563Q5A (C77239, out of stock 2026-09-27). "
-     "60 V, 6.1 mOhm, Qg 20 nC vs 5.7 mOhm / 15 nC; SO-8FL has the same "
-     "S-S-S-G / drain-tab pinout as the TI Q5A land - confirm the pad "
-     "overlay in the JLCPCB preview. Q3/Q4 dissipate about 0.6 W each at 10 A"),
+     "stands in for CSD18563Q5A (C77239, still out of stock 2026-10-06). "
+     "60 V, 6.1 mOhm, Qg 20 nC vs 5.7 mOhm / 15 nC; same S-S-S-G / drain-tab "
+     "pinout. Overlay on the TI Q5A land checked against case 488AA: "
+     "terminals within 0.14 mm of the TI part's (E 6.15 vs 6.00, L 0.575 vs "
+     "0.61, K 1.35 vs 1.10), 0.35 mm from the drain land edge vs 0.24 for "
+     "the TI part. Q3/Q4 dissipate about 0.6 W each at 10 A"),
 
     # ---- B. Magnetics & power passives ------------------------------------
     ({P2: ["L1", "L3"]}, "C6238332", "MWSA1707S-6R8MT", "Sunlord", 1.72,
@@ -121,7 +126,9 @@ PARTS = [
     # No 1210 33 uH is stocked above 0.5 A, so the manager's L2 land grew to
     # the 5x5 mm FNR5040S (board re-routed round it). Datasheet: 33 uH +-20 %,
     # DCR 0.244 ohm max, Isat 1.30 A min / 1.45 A typ, Irms 1.20 A min.
-    ({MGR: ["L2"]}, "C167973", "FNR5040S330MT", "cjiang (Changjiang Microelectronics)",
+    # Phase-1 and phase-2 L2 had the same 1210 land and moved to the same
+    # part on 2026-10-06 (ECO on both routed boards).
+    ({MGR: ["L2"], P1: ["L2"], P2: ["L2"]}, "C167973", "FNR5040S330MT", "cjiang (Changjiang Microelectronics)",
      0.06, "5x5x4 mm shielded, KiCad L_Changjiang_FNR5040S land; Isat 1.30 A "
      "min covers the 33u/1.2A value. Any 5040-size 33 uH >=1.2 A part with "
      "the same 2.3 mm pad gap fits"),
@@ -161,7 +168,9 @@ PARTS = [
     ({P1: ["C66", "C67"]}, "C1647", "CL10C180JB8NNNC", "Samsung Electro-Mechanics", 0.0157,
      "C0G"),
     ({P1: ["C20", "C75", "C76", "C77"]}, "C77102", "GRM32ER71H106KA12L", "Murata Electronics", 0.3274,
-     "CHECK: symbol says 22u/50V but no 22 uF 50 V 1210 is stocked at JLCPCB; this is 10 uF 50 V X7R (the phase-2 input part is also 10 uF) - input ceramic drops from 88 to 40 uF nominal, C21 is the bulk"),
+     "10 uF 50 V X7R: no 22 uF 50 V 1210 is stocked, so the design value is "
+     "now 10u (phase-2 uses 10 uF too). 4 x ~4.5 uF at 30 V bias gives about "
+     "0.3 Vpp input ripple at 8 A, D = 0.5, 350 kHz; ~1 A RMS each; C21 is the bulk"),
     ({P1: ["C21"]}, "C2887271", "RVT220UF50V67RV0021", "KNSCHA", 0.1412,
      "SMD D10x10.2 aluminium, fits CP_Elec_10x10.5"),
     ({P1: ["C22", "C78"]}, "C46550471", "MA35V220M8X12", "jieerrui", 0.2872,
@@ -180,8 +189,6 @@ PARTS = [
      "1N4148WS is the SOD-323 version (1N4148W is SOD-123)"),
     ({P1: ["D7"]}, "C2286", "KT-0603R", "Hubei KENTO Elec", 0.0075,
      "red 0603 LED (Basic)"),
-    ({P1: ["L2"]}, "C223226", "CBC3225T330KR", "Taiyo Yuden", 0.2475,
-     "CHECK: value says 33u/1.2A but no 1210 33 uH is rated near 1.2 A; this is the strongest stocked one (0.5 A). Fine if the 5V0 load stays well under ~0.4 A, otherwise move to a bigger inductor footprint"),
     ({P1: ["Q5", "Q6", "Q7", "Q8", "Q9"]}, "C8545", "2N7002", "Jiangsu Changjing Electronics Technology Co., Ltd.", 0.0178,
      ""),
     ({P1: ["R1"]}, "C861257", "RT0603BRD0725K5L", "YAGEO", 0.0353,

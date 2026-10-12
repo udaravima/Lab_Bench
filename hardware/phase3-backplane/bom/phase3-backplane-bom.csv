@@ -26,5 +26,5 @@ Item,Qty,References,Value,Footprint,LCSC,MPN,Manufacturer,Unit USD,Ext USD,Note
 25,1,R2,120R slot0-end,Resistor_SMD:R_0603_1608Metric,,,,,,
 26,1,R3,120R slot7-end,Resistor_SMD:R_0603_1608Metric,,,,,,
 27,2,RS1 RS2,0m5 3920,labbench:R3920_BVS,C466580,BVS-M-R0005,Isabellenhuette,0.6,1.2,2 in parallel = 0.25 mOhm; verify power rating on datasheet
-28,1,U1,INA228,Package_SO:VSSOP-10_3x3mm_P0.5mm,C5214669,INA228AQDGSRQ1,TI,17.16,17.16,"automotive grade of INA228AIDGSR, same VSSOP-10 pinout and register map (no firmware change); the AIDGSR (C2887910) was still out of stock on 2026-09-28 - swap back if it returns, it is about a quarter of the price"
+28,1,U1,INA228,Package_SO:VSSOP-10_3x3mm_P0.5mm,C5214669,INA228AQDGSRQ1,TI,17.16,17.16,"automotive grade of INA228AIDGSR, same VSSOP-10 pinout and register map (no firmware change); the AIDGSR (C2887910) was still out of stock on 2026-09-28 - swap back if it returns, it is about a quarter of the price. Only 5 in stock on 2026-10-06: order early"
 ,30,,,,,,,,24.47,"12/30 placements have an LCSC number; total covers those only (qty-1, SOURCING.md 2026-07-18)"

@@ -1,11 +1,11 @@
 ** Drc report for ../phase2-module.kicad_pcb **
-** Created on 2026-09-27 23:24:25 **
+** Created on 2026-10-06 07:17:22 **
 
 ** Found 19 DRC violations **
 [silk_overlap]: Silkscreen overlap
     Rule: board setup constraints silk; Severity: warning
-    @(110.5800 mm, 50.9700 mm): Reference 'R8'
-    @(110.5800 mm, 50.5200 mm): Reference 'C24'
+    @(131.1500 mm, 83.5400 mm): Line on F.Silkscreen
+    @(131.0600 mm, 74.6044 mm): Line on F.Silkscreen
 [silk_overlap]: Silkscreen overlap
     Rule: board setup constraints silk; Severity: warning
     @(92.5300 mm, 92.0300 mm): Reference 'C64'
@@ -14,6 +14,10 @@
     Rule: board setup constraints silk; Severity: warning
     @(95.1300 mm, 105.0700 mm): Reference 'R67'
     @(97.0000 mm, 105.0700 mm): Reference 'R68'
+[silk_overlap]: Silkscreen overlap
+    Rule: board setup constraints silk; Severity: warning
+    @(110.5800 mm, 50.9700 mm): Reference 'R8'
+    @(110.5800 mm, 50.5200 mm): Reference 'C24'
 [silk_overlap]: Silkscreen overlap
     Rule: board setup constraints silk; Severity: warning
     @(102.3200 mm, 94.8200 mm): Reference 'R52'
@@ -26,10 +30,6 @@
     Rule: board setup constraints silk; Severity: warning
     @(103.9700 mm, 100.9000 mm): Reference 'C43'
     @(103.3700 mm, 100.7300 mm): Reference 'R64'
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(131.1500 mm, 83.5400 mm): Line on F.Silkscreen
-    @(131.0600 mm, 74.6044 mm): Line on F.Silkscreen
 [silk_overlap]: Silkscreen overlap
     Rule: board setup constraints silk; Severity: warning
     @(60.2200 mm, 46.4000 mm): Reference 'R73'

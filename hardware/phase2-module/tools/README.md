@@ -51,6 +51,22 @@ Rip-up across the whole board (`--base=` with no `--only`) cascades on this
 board: one pass went from 1 open to 10. Strip one blocking net and re-route
 it after the stuck net instead.
 
+## Engineering changes on the routed board
+
+The 2026-10-06 L2 change (1210 -> 5 x 5 mm FNR5040S, as on the manager)
+was an ECO, not a re-route:
+
+```bash
+python3 ../../common/eco_swap_fp.py ../phase2-module.kicad_pcb L2 \
+    Inductor_SMD:L_Changjiang_FNR5040S 68.4 57.45 270
+```
+
+The bigger pads swallow the old SW_AUX via (68.85, 55.4) and 5V0 via
+(68.575, 59.175), so the two F.Cu stubs that reached them from the old pads
+were deleted and a 0.3 mm 5V0 stub ties C55's via (68.6, 60.4) to pad 2.
+Then zone refill, `finish_board --silk --planes`, `run_drc.py`, `--fab` and
+`common/cpl.py`. `gen_board.py` PLACEMENT carries the new position.
+
 ## Finishing
 
 ```bash

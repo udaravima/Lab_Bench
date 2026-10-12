@@ -1,22 +1,18 @@
-** Drc report for /home/claude/Lab_Bench/hardware/phase3-manager/tools/../phase3-manager.kicad_pcb **
-** Created on 2026-09-27 09:27:22 **
+** Drc report for /home/user/Lab_Bench/hardware/phase3-manager/tools/../phase3-manager.kicad_pcb **
+** Created on 2026-10-05 12:48:19 **
 
-** Found 5 DRC violations **
-[silk_overlap]: Silkscreen overlap
-    Rule: board setup constraints silk; Severity: warning
-    @(31.8000 mm, 71.9500 mm): Reference 'C54'
-    @(31.6000 mm, 74.0000 mm): Reference 'C51'
+** Found 4 DRC violations **
 [silk_overlap]: Silkscreen overlap
     Rule: board setup constraints silk; Severity: warning
     @(107.0000 mm, 69.5700 mm): Reference 'R79'
     @(107.0000 mm, 69.4300 mm): Reference 'R76'
 [silk_overlap]: Silkscreen overlap
     Rule: board setup constraints silk; Severity: warning
-    @(49.0000 mm, 29.5700 mm): Reference 'R70'
-    @(49.0000 mm, 29.4300 mm): Reference 'R69'
+    @(38.8000 mm, 71.9000 mm): Reference 'L2'
+    @(38.0000 mm, 72.3500 mm): Reference 'U8'
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; Severity: warning
-    @(38.0000 mm, 72.0500 mm): Reference 'U8'
+    @(34.2000 mm, 64.6500 mm): Reference 'C54'
 [lib_footprint_mismatch]: Footprint 'LMR36015_RNX_VQFN-HR-12' does not match copy in library 'labbench'.
     Local override; Severity: warning
     @(38.0000 mm, 75.0000 mm): Footprint U8

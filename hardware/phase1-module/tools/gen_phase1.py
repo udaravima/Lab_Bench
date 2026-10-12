@@ -189,7 +189,7 @@ def build_power_stage():
     gl("VOUT_INT", l1, 2, shape="output")
     # input/output banks + preload + snubber (DNP); one component per physical cap
     CPOL = kg.get_symbol("Device", "C_Polarized")
-    cin = [cap(r, "22u/50V X7R", x, 146.05, fp="Capacitor_SMD:C_1210_3225Metric")
+    cin = [cap(r, "10u/50V X7R", x, 146.05, fp="Capacitor_SMD:C_1210_3225Metric")
            for r, x in (("C20", 146.05), ("C75", 154.94), ("C76", 163.83), ("C77", 172.72))]
     c21 = sh.add(kg.Placed(CPOL, "C21", "220u/50V", 181.61, 146.05,
                            footprint="Capacitor_SMD:CP_Elec_10x10.5"))

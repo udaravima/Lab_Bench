@@ -174,19 +174,22 @@ header (generic 1×14).
 | MCU module | ESP32-S3-WROOM-1-N8R2 | quad PSRAM keeps IO35–37 (§3) |
 | I/O expander | TCA9535PWR (TSSOP-24) | 16 ch: PRESENT + keys |
 | USB ESD | TPD2E001DRLR | SOT-5X3 |
-| USB-C | 16-pin USB2.0 receptacle (GCT USB4105-class) | verify at sourcing |
-| Bus shunt | 250 µΩ ±1 % ≥8 W bolt/bar | WSBS8518-class, verify at sourcing |
+| USB-C | GCT USB4105-GF-A (C3020560) | picked 2026-09-28 to match the routed land; backup USB4105-GF-A-120 (C5184243) |
+| Bus shunt | 2 × BVS-M-R0005 (0.5 mΩ 3920, C466580) in parallel = 250 µΩ | chosen at sourcing (hardware/SOURCING.md); verify the power rating on the datasheet |
+| Backplane bulk C2 | Nichicon UCX1H471MNS1MS 470 µF 50 V SMD (C462700) | picked 2026-10-05, fits the CP_Elec_16x17.5 land; fallback Panasonic EEEFK1H471AM (C178551) |
+| Manager aux-buck L2 | cjiang FNR5040S330MT 33 µH (C167973) | 2026-10-05: 5 × 5 mm land, Isat 1.30 A; no stocked 1210 33 µH is rated above 0.5 A |
 | Display | 2.8" ILI9341+XPT2046 SPI module | off-the-shelf, header-mounted |
-| Encoder | EC11 w/ switch | panel part |
+| Encoder | Alps EC11E18244A5 (C255515) | EC11 with switch, panel part |
 | E-stop | NC mushroom switch (panel) | + shipped bench jumper |
 | P-FET | SOT-23 PMOS (AO3401A-class) | backlight switch, verify at sourcing |
 | Everything else | Phase-1/2 BOM carries over | |
 
 ## 6. Open items → resolve at capture / bring-up
 
-1. Backplane slot connector family — decided at the batch PCB pass
-   together with the module edge (docs/08 §12); schematic uses the same
-   generic 1×04 + 1×08 pair per slot.
+1. ~~Backplane slot connector family~~ — resolved at sourcing
+   (2026-07-18): Amass XT60PW-F per slot (XT60PW-M on the module) plus the
+   2.54 mm signal row. The XT60 polarity buzz-out (MECHANICAL.md) still
+   gates the backplane order.
 2. Encoder RC values + TCA9535 key debounce (firmware) **(bench)**.
 3. NCP1117 thermal under Wi-Fi soak **(bench)**, escape hatches in §3.
 4. Display module VCC jumper convention varies by vendor — confirm the

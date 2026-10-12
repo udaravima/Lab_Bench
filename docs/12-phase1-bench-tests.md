@@ -407,8 +407,8 @@ Setpoint 12 V / 4 A, load at 3 A.
 - 750 Ω: T_fet reads ≥ 100 °C, output off, FAULT `OTP` latched. With the
   resistor still fitted, `reset clear` must not leave the module running (the
   fault re-latches on the next tick). Remove the resistor, then `reset clear`
-  clears it. docs/04 says clearing needs < 70 °C; firmware 0.1 only re-latches
-  at ≥ 100 °C, so note the actual behaviour.
+  clears it. docs/04 says clearing needs < 70 °C; firmware 0.2 (like 0.1) only
+  re-latches at ≥ 100 °C, so note the actual behaviour.
 - Record the reported temperature, the bits, and the output current at each
   step.
 

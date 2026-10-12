@@ -42,7 +42,9 @@ vias. Drawn here instead:
   * VBUS_F comes 0.8 mm from F1 down x23.6 to C50; C51 (west) is reached by
     one 0.6 mm B.Cu jumper under the south side of U8, since the SW-to-C52
     run encloses it on F.Cu;
-  * 5V0 leaves L2 0.8 mm into C54/C55, and a 0.6 mm trunk runs down the west
+  * 5V0 leaves L2 0.8 mm straight west along the output caps' 5V0 pads
+    (their PGND pads face south, tied together and dropped to the plane by
+    vias west of C55), and a 0.6 mm trunk runs down the west
     channel and back east along y61.6 to the FB divider (R50) -- the rest
     of the 5V0 net (U9, U11, BZ1) hangs off that trunk via the router;
   * VBUS from J1 pins 1/2 runs 0.8 mm down x7 to F1.
@@ -107,19 +109,21 @@ ROUTES = {
                T(B, 0.6, (23.60, 56.40), (23.60, 59.80), (12.95, 59.80), (12.95, 55.50)),
                V(12.95, 55.50), T(F, 0.6, (12.95, 55.50), (13.60, 55.50))],
     "SW_AUX": [T(F, 0.25, (18.00, 54.00), (18.00, 53.30)),
-               T(F, 0.6, (18.00, 53.30), (18.00, 51.40)),
-               T(F, 0.3, (17.00, 51.40), (16.50, 50.90), (12.00, 50.90), (12.00, 57.30),
+               T(F, 0.6, (18.00, 53.30), (18.00, 50.50)),
+               T(F, 0.3, (17.20, 50.90), (12.00, 50.90), (12.00, 57.30),
                  (13.42, 57.30))],
-    "5V0": [T(F, 0.8, (18.00, 49.20), (10.90, 49.20)),
-            T(F, 0.6, (10.90, 49.78), (9.20, 49.78), (8.80, 50.18), (8.80, 61.60),
+    "5V0": [T(F, 0.8, (18.00, 46.80), (10.90, 46.80)),
+            T(F, 0.6, (10.90, 46.82), (9.20, 46.82), (8.80, 47.22), (8.80, 61.60),
               (22.72, 61.60), (22.72, 57.68))],
     "PGND": [T(F, 0.3, (17.10, 53.875), (16.40, 53.875), (15.80, 52.90)),  # pin 1 -> C51.2
              T(F, 0.3, (18.90, 53.875), (19.60, 53.875), (20.20, 52.90)),  # pin 11 -> C50.2
              V(13.90, 51.60), V(15.50, 51.60), V(20.60, 51.55), V(22.00, 51.55),
              T(F, 0.4, (13.90, 51.60), (13.90, 52.52)), T(F, 0.4, (15.50, 51.60), (15.50, 52.52)),
              T(F, 0.4, (20.60, 51.55), (20.60, 52.52)), T(F, 0.4, (22.00, 51.55), (22.00, 52.52)),
-             V(14.20, 45.60), V(10.90, 45.60),
-             T(F, 0.4, (14.20, 45.60), (14.20, 46.82)), T(F, 0.4, (10.90, 45.60), (10.90, 46.82))],
+             # output caps C54/C55: PGND pads tied, two vias west/south of C55
+             T(F, 0.8, (14.20, 49.78), (10.90, 49.78)),
+             V(10.90, 51.35), V(9.95, 51.35),
+             T(F, 0.4, (10.90, 49.78), (10.90, 51.35)), T(F, 0.4, (9.95, 49.78), (9.95, 51.35))],
 }
 
 PAIRS = (("USB_DP", "USB_DN"), ("CAN_H", "CAN_L"))

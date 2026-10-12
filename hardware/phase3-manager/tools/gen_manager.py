@@ -124,7 +124,7 @@ def build_power_can():
     ll("AUX_VCC", c53, 1)
     sh.power("PGND", *c53.pin_pos(2), ground=True)
     l2 = sh.add(kg.Placed(L, "L2", "33u/1.2A", 153.67, 91.44, rot=90,
-                          footprint="Inductor_SMD:L_1210_3225Metric"))
+                          footprint="Inductor_SMD:L_Changjiang_FNR5040S"))
     ll("SW_AUX", l2, 1)
     sh.power("5V0", *l2.pin_pos(2))
     r50 = res("R50", "100K 1%", 167.64, 88.9)
